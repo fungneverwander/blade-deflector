@@ -780,11 +780,6 @@
         <span style="color: #39ff14; font-weight: 800; font-size: 0.85rem; letter-spacing: 1px;">💾 SAVE</span>
       </div>
 
-      <!-- Achievements Button on HUD -->
-      <div class="hud-card" id="hud-achievements-btn" style="cursor: pointer; background: rgba(255, 230, 0, 0.12); border-color: #ffe600;" title="Open Achievements & Bonuses Menu" onclick="openAchievementsModal()">
-        <span style="color: #ffe600; font-weight: 800; font-size: 0.85rem; letter-spacing: 1px;">🏆 ACHIEVEMENTS</span>
-      </div>
-
       <!-- Score Display -->
       <div class="hud-card">
         <div>
@@ -963,6 +958,10 @@
 
       <!-- Achievement Summary Header -->
       <div class="achievements-summary-bar" style="display: flex; gap: 12px; align-items: stretch; margin-bottom: 14px;">
+        <!-- Back to Main Menu Button directly to the left of UNLOCKED -->
+        <button class="btn-primary" id="achievements-close-btn" style="flex: 0.85; padding: 10px 14px; font-size: 0.88rem; font-weight: 800; background: linear-gradient(135deg, var(--accent-yellow), var(--accent-orange)); color: #040814; border-radius: 12px; margin: 0; display: flex; align-items: center; justify-content: center; white-space: nowrap; cursor: pointer;">
+          ◀ BACK TO MENU
+        </button>
         <div class="summary-item" style="flex: 0.7;">
           <span class="summary-label">UNLOCKED</span>
           <strong id="ach-unlocked-count" style="color: #ffe600; font-size: 1.1rem;">0 / 2</strong>
@@ -997,11 +996,6 @@
       <!-- Save Progress Button inside Achievements Modal -->
       <button class="btn-primary" onclick="saveGameProgress(true)" style="width: 100%; margin-top: 12px; padding: 14px; font-size: 0.95rem; background: linear-gradient(135deg, #39ff14, #00b344); color: #000; font-weight: 800; letter-spacing: 1px;">
         💾 SAVE PROGRESS & DOWNLOAD SAVE FILE
-      </button>
-
-      <!-- Close Button -->
-      <button class="btn-primary" id="achievements-close-btn" style="width: 100%; margin-top: 10px; padding: 14px; font-size: 1rem; letter-spacing: 1px;">
-        ◀ BACK TO MENU
       </button>
     </div>
   </div>
@@ -1075,9 +1069,6 @@
 
       <div style="display: flex; gap: 10px; width: 100%; margin-top: 10px;">
         <button class="btn-primary" id="restart-btn" style="flex: 2;">PLAY AGAIN ▶</button>
-        <button onclick="openAchievementsModal()" style="flex: 1; padding: 14px; font-size: 0.92rem; font-weight: 800; background: rgba(255, 230, 0, 0.12); border: 2px solid var(--accent-yellow); color: var(--accent-yellow); border-radius: 14px; cursor: pointer; transition: all 0.2s ease;">
-          🏆 ACHIEVEMENTS
-        </button>
         <button onclick="saveGameProgress(true)" style="flex: 1; padding: 14px; font-size: 0.92rem; font-weight: 800; background: rgba(57, 255, 20, 0.12); border: 2px solid #39ff14; color: #39ff14; border-radius: 14px; cursor: pointer; transition: all 0.2s ease;">
           💾 SAVE
         </button>
@@ -1122,11 +1113,6 @@
           <button class="btn-primary" id="select-range-btn" style="padding: 10px; font-size: 0.85rem; margin-top: 14px;">CHOOSE</button>
         </div>
       </div>
-
-      <!-- Achievements Button in Reward Modal -->
-      <button onclick="openAchievementsModal()" style="width: 100%; margin-top: 14px; padding: 12px; font-size: 0.9rem; font-weight: 800; background: rgba(255, 230, 0, 0.12); border: 2px solid var(--accent-yellow); color: var(--accent-yellow); border-radius: 14px; cursor: pointer;">
-        🏆 VIEW ACHIEVEMENTS & SIDE CLASSES
-      </button>
     </div>
   </div>
 
@@ -1167,11 +1153,6 @@
           <button class="btn-primary" id="select-ghost-btn" style="padding: 10px; font-size: 0.85rem; margin-top: 14px;">CHOOSE</button>
         </div>
       </div>
-
-      <!-- Achievements Button in Crescent Reward Modal -->
-      <button onclick="openAchievementsModal()" style="width: 100%; margin-top: 14px; padding: 12px; font-size: 0.9rem; font-weight: 800; background: rgba(255, 230, 0, 0.12); border: 2px solid var(--accent-yellow); color: var(--accent-yellow); border-radius: 14px; cursor: pointer;">
-        🏆 VIEW ACHIEVEMENTS & SIDE CLASSES
-      </button>
     </div>
   </div>
 
@@ -1212,11 +1193,6 @@
           <button class="btn-primary" id="select-minions-btn" style="padding: 10px; font-size: 0.85rem; margin-top: 14px; background: linear-gradient(135deg, #ff3300, #ff6600);">CHOOSE</button>
         </div>
       </div>
-
-      <!-- Achievements Button in Triangle Reward Modal -->
-      <button onclick="openAchievementsModal()" style="width: 100%; margin-top: 14px; padding: 12px; font-size: 0.9rem; font-weight: 800; background: rgba(255, 230, 0, 0.12); border: 2px solid var(--accent-yellow); color: var(--accent-yellow); border-radius: 14px; cursor: pointer;">
-        🏆 VIEW ACHIEVEMENTS & SIDE CLASSES
-      </button>
     </div>
   </div>
 
@@ -1228,7 +1204,6 @@
 
       <div style="margin-top: 18px; margin-bottom: 18px; display: flex; flex-direction: column; gap: 10px;">
         <button class="btn-primary" id="resume-btn" style="width: 100%;">RESUME GAME [ESC / P]</button>
-        <button class="btn-primary" onclick="openAchievementsModal()" style="width: 100%; background: linear-gradient(135deg, #ffe600, #ff9900); color: #040814; font-weight: 800;">🏆 ACHIEVEMENTS & BONUSES</button>
         <button class="btn-primary" id="pause-save-btn" onclick="saveGameProgress(true)" style="width: 100%; background: linear-gradient(135deg, #00ff66, #00b344); color: #040814; font-weight: 800;">💾 SAVE PROGRESS TO DEVICE</button>
         <button class="btn-primary" id="pause-restart-btn" style="width: 100%; background: linear-gradient(135deg, #ff0055, #ff6b00);">RESTART RUN</button>
         <button class="btn-primary" id="pause-mainmenu-btn" style="width: 100%; background: linear-gradient(135deg, var(--accent-yellow), var(--accent-orange)); color: #040814;">🏠 RETURN TO MAIN MENU</button>
@@ -1349,9 +1324,6 @@
 
       <div style="display: flex; gap: 10px; width: 100%; margin-top: 24px;">
         <button class="btn-primary" id="start-next-wave-btn" style="flex: 2;">START NEXT WAVE ▶</button>
-        <button onclick="openAchievementsModal()" style="flex: 1; padding: 14px; font-size: 0.92rem; font-weight: 800; background: rgba(255, 230, 0, 0.12); border: 2px solid var(--accent-yellow); color: var(--accent-yellow); border-radius: 14px; cursor: pointer; transition: all 0.2s ease;">
-          🏆 ACHIEVEMENTS
-        </button>
         <button onclick="saveGameProgress(true)" style="flex: 1; padding: 14px; font-size: 0.92rem; font-weight: 800; background: rgba(57, 255, 20, 0.12); border: 2px solid #39ff14; color: #39ff14; border-radius: 14px; cursor: pointer; transition: all 0.2s ease;">
           💾 SAVE
         </button>
