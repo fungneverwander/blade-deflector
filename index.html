@@ -640,17 +640,18 @@
     }
 
     .start-modal-card {
-      max-width: 960px;
-      width: 95vw;
-      max-height: 94vh;
+      max-width: 860px;
+      width: 90vw;
+      max-height: 90vh;
+      padding: 20px 24px;
       overflow-y: auto;
     }
 
     .start-selectors-container {
       display: flex;
       flex-direction: row;
-      gap: 16px;
-      margin-bottom: 14px;
+      gap: 14px;
+      margin-bottom: 12px;
     }
 
     .selector-section {
@@ -661,7 +662,9 @@
 
     .section-title {
       text-align: center;
-      margin-bottom: 8px;
+      margin-bottom: 6px;
+      font-size: 0.75rem;
+      letter-spacing: 1.5px;
     }
 
     .char-grid {
@@ -676,75 +679,91 @@
       gap: 6px;
     }
 
+    .diff-card {
+      padding: 8px 6px;
+      text-align: center;
+    }
+
+    .diff-title {
+      font-weight: 800;
+      font-size: 0.82rem;
+      margin-bottom: 2px;
+    }
+
+    .diff-desc {
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      line-height: 1.2;
+    }
+
     /* Mobile Phone & Tablet Modal Responsive Styles */
-    @media (pointer: coarse), (max-width: 1200px), (max-height: 700px) {
+    @media (pointer: coarse) and (max-width: 768px), (max-height: 500px) {
       .guide-box, .subtitle, #start-guide-box, #start-subtitle {
-        display: none !important; /* Hide explanation box on all touch & mobile devices */
+        display: none !important; /* Hide explanation box on touch mobile devices */
       }
     }
 
-    @media (max-width: 850px), (max-height: 600px) {
+    @media (max-width: 768px), (max-height: 500px) {
       .start-selectors-container {
         flex-direction: column !important;
-        gap: 12px !important;
+        gap: 8px !important;
       }
       .char-grid {
         grid-template-columns: repeat(2, 1fr) !important;
-        gap: 6px !important;
+        gap: 5px !important;
       }
       .diff-grid-5 {
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 6px !important;
+        grid-template-columns: repeat(3, 1fr) !important;
+        gap: 5px !important;
       }
       .diff-title {
-        font-size: 0.85rem !important;
+        font-size: 0.78rem !important;
       }
       .diff-desc {
-        font-size: 0.7rem !important;
+        font-size: 0.64rem !important;
       }
       .diff-card {
-        padding: 8px 6px !important;
+        padding: 6px 4px !important;
       }
-      .modal-card {
-        padding: 12px !important;
+      .start-modal-card {
+        padding: 10px 14px !important;
         max-width: 95vw !important;
         max-height: 92vh !important;
-        overflow-y: auto !important;
       }
       .game-title {
-        font-size: 1.5rem !important;
-        letter-spacing: 2px !important;
-        margin-bottom: 8px !important;
+        font-size: 1.35rem !important;
+        letter-spacing: 1.5px !important;
+        margin-bottom: 6px !important;
       }
       .hud-top {
         gap: 4px !important;
-        padding: 6px 10px !important;
-      }
-      .hud-card {
         padding: 4px 8px !important;
       }
+      .hud-card {
+        padding: 3px 6px !important;
+      }
       .score-value {
-        font-size: 0.95rem !important;
+        font-size: 0.9rem !important;
       }
       .v-joystick-base {
-        width: 90px;
-        height: 90px;
-        bottom: 16px;
-      }
-      #v-joystick-move { left: 16px; }
-      #v-joystick-aim { right: 116px; }
-      .touch-btn {
         width: 80px;
         height: 80px;
-        bottom: 16px;
-        right: 16px;
-        font-size: 0.7rem;
+        bottom: 12px;
+      }
+      #v-joystick-move { left: 12px; }
+      #v-joystick-aim { right: 106px; }
+      .touch-btn {
+        width: 74px;
+        height: 74px;
+        bottom: 12px;
+        right: 12px;
+        font-size: 0.65rem;
       }
       .touch-btn-shop {
-        bottom: 110px;
-        right: 20px;
-        width: 48px;
-        height: 48px;
+        bottom: 96px;
+        right: 16px;
+        width: 42px;
+        height: 42px;
       }
     }
   </style>
@@ -1644,7 +1663,7 @@
 
     // Global Mobile & Touch Check to hide Start Menu Explanation Box on Mobile
     function checkMobileGuideBox() {
-      const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.innerWidth <= 1024);
+      const isMobile = (('ontouchstart' in window) || (navigator.maxTouchPoints > 0)) && (window.innerWidth <= 768 || window.innerHeight <= 500);
       if (isMobile) {
         const gb = document.getElementById('start-guide-box');
         const st = document.getElementById('start-subtitle');
