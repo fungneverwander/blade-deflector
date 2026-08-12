@@ -5355,6 +5355,71 @@
       alert(`💾 Progress successfully saved to your device!\n\n• High Score: ${saveData.highScore}\n• Character: ${saveData.selectedCharacter}\n• Unlocked Achievements: ${saveData.unlockedAchievements.length} / 2\n• Backup file downloaded to device downloads folder.`);
     }
 
+    /* ==========================================================================
+       Auto-Load Last Save Engine
+       ========================================================================== */
+    function autoLoadLastSave() {
+      try {
+        const rawFullSave = localStorage.getItem('blade_deflector_full_save');
+        const savedHi = localStorage.getItem('blade_deflector_hi');
+        const savedChar = localStorage.getItem('blade_deflector_character');
+        const savedArcherKills = localStorage.getItem('blade_deflector_archer_flame_kills');
+        const savedSentinelKills = localStorage.getItem('blade_deflector_sentinel_flame_ram_kills');
+        const savedAch = localStorage.getItem('blade_deflector_achievements');
+
+        let loadedSave = null;
+        if (rawFullSave) {
+          try { loadedSave = JSON.parse(rawFullSave); } catch(e) {}
+        }
+
+        if (savedHi) {
+          highScore = parseInt(savedHi);
+        } else if (loadedSave && loadedSave.highScore) {
+          highScore = loadedSave.highScore;
+        }
+
+        if (savedArcherKills) {
+          flameKillsAsArcher = parseInt(savedArcherKills);
+        } else if (loadedSave && loadedSave.flameKillsAsArcher) {
+          flameKillsAsArcher = loadedSave.flameKillsAsArcher;
+        }
+
+        if (savedSentinelKills) {
+          flameRamKillsAsSentinel = parseInt(savedSentinelKills);
+        } else if (loadedSave && loadedSave.flameRamKillsAsSentinel) {
+          flameRamKillsAsSentinel = loadedSave.flameRamKillsAsSentinel;
+        }
+
+        if (savedAch) {
+          try {
+            const achList = JSON.parse(savedAch);
+            achList.forEach(id => unlockedAchievements.add(id));
+          } catch(e) {}
+        } else if (loadedSave && Array.isArray(loadedSave.unlockedAchievements)) {
+          loadedSave.unlockedAchievements.forEach(id => unlockedAchievements.add(id));
+        }
+
+        // Restore High Score UI
+        const hiEl = document.getElementById('high-score');
+        if (hiEl) hiEl.textContent = highScore;
+
+        // Restore Character Class
+        const charToRestore = savedChar || (loadedSave && loadedSave.selectedCharacter) || 'KNIGHT';
+        if (typeof window.setCharacter === 'function') {
+          window.setCharacter(charToRestore);
+        }
+
+        // Update Achievements UI
+        if (typeof updateAchievementsUI === 'function') {
+          updateAchievementsUI();
+        }
+
+        console.log('💾 Auto-loaded last save successfully!');
+      } catch(e) {
+        console.error('Auto-load last save failed:', e);
+      }
+    }
+
     function updateAchievementsUI() {
       flameKillsAsArcher = parseInt(localStorage.getItem('blade_deflector_archer_flame_kills') || '0');
       flameRamKillsAsSentinel = parseInt(localStorage.getItem('blade_deflector_sentinel_flame_ram_kills') || '0');
@@ -5755,8 +5820,9 @@
       try { audio.playDeflect(); } catch(e) {}
     };
 
-    // Initial character sync
+    // Initial character & auto-load save sync
     window.setCharacter('KNIGHT');
+    autoLoadLastSave();
 
     /* Difficulty Selector Event Listeners & State Handler */
     window.setDifficulty = function(mode) {
