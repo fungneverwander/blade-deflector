@@ -2556,7 +2556,6 @@
             const aimAngle = Math.atan2(mouse.y - player.y, mouse.x - player.x);
 
             audio.playSlash();
-            triggerDeflectFlash();
             screenShake = 6;
             createSparks(player.x, player.y, 14, '#00ff66', 6);
             addFloatingText('🏹 ARROW SHOT!', player.x, player.y - 30, '#00ff66');
@@ -2615,7 +2614,6 @@
             player.y -= Math.sin(aimAngle) * 5;
 
             audio.playSlash();
-            triggerDeflectFlash();
             screenShake = 10;
             createSparks(player.x, player.y, 18, '#ff5500', 7);
             addFloatingText('💥 BUCKSHOT!', player.x, player.y - 30, '#ff5500');
