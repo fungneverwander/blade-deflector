@@ -247,6 +247,56 @@
       transform: translateY(0) scale(1);
     }
 
+    /* Achievements Modal Styling */
+    .achievements-modal-card {
+      max-width: 720px;
+      width: 92%;
+      padding: 32px 36px;
+    }
+
+    .achievements-summary-bar {
+      background: rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(255, 230, 0, 0.3);
+      border-radius: 16px;
+      padding: 14px 22px;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      margin-bottom: 20px;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 230, 0, 0.15);
+    }
+
+    .summary-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .summary-label {
+      font-size: 0.75rem;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+      font-weight: 800;
+    }
+
+    .achievements-list-container {
+      max-height: 320px;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      padding-right: 4px;
+    }
+
+    .achievements-empty-card {
+      background: rgba(0, 0, 0, 0.35);
+      border: 1px dashed rgba(255, 230, 0, 0.3);
+      border-radius: 20px;
+      padding: 36px 20px;
+      text-align: center;
+    }
+
     .game-title {
       font-size: 2.4rem;
       font-weight: 900;
@@ -748,6 +798,11 @@
         </div>
       </div>
 
+      <!-- Achievements Button in HUD -->
+      <button class="btn-icon" id="hud-achievements-btn" title="Achievements & Bonuses">
+        <span style="font-size: 1.15rem; line-height: 1;">🏆</span>
+      </button>
+
       <!-- Audio Mute Button -->
       <button class="btn-icon" id="audio-toggle-btn" title="Toggle Sound">
         <svg id="sound-on-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -877,10 +932,49 @@
         </div>
       </div>
 
-      <!-- Start Button Row -->
-      <div style="display: flex; justify-content: flex-end; width: 100%; margin-top: 10px;">
-        <button class="btn-primary" id="start-btn" style="width: 100% !important; padding: 16px; font-size: 1.1rem; letter-spacing: 1px;">ENTER ARENA ▶</button>
+      <!-- Start Button & Achievements Button Row -->
+      <div style="display: flex; gap: 12px; width: 100%; margin-top: 12px;">
+        <button class="btn-primary" id="start-btn" style="flex: 2; padding: 16px; font-size: 1.1rem; letter-spacing: 1px;">ENTER ARENA ▶</button>
+        <button id="start-achievements-btn" style="flex: 1; padding: 16px; font-size: 0.95rem; font-weight: 800; background: rgba(255, 230, 0, 0.12); border: 2px solid var(--accent-yellow); color: var(--accent-yellow); border-radius: 14px; cursor: pointer; transition: all 0.2s ease;">
+          🏆 ACHIEVEMENTS
+        </button>
       </div>
+    </div>
+  </div>
+
+  <!-- Achievements & Bonus System Modal -->
+  <div class="modal-overlay" id="achievements-modal">
+    <div class="modal-card achievements-modal-card">
+      <h1 class="game-title" style="background: linear-gradient(135deg, #ffe600, #ff9900); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">ACHIEVEMENTS & BONUSES</h1>
+      <p class="subtitle" style="margin-bottom: 16px;">Complete achievements to unlock permanent passive stat bonuses and arena rewards!</p>
+
+      <!-- Achievement Summary Header -->
+      <div class="achievements-summary-bar">
+        <div class="summary-item">
+          <span class="summary-label">UNLOCKED</span>
+          <strong id="ach-unlocked-count" style="color: #ffe600; font-size: 1.1rem;">0 / 0</strong>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">ACTIVE STAT BONUSES</span>
+          <strong id="ach-active-bonuses" style="color: var(--accent-cyan); font-size: 1.05rem;">None Active</strong>
+        </div>
+      </div>
+
+      <!-- Empty State Container (Ready for future achievements) -->
+      <div class="achievements-list-container" id="achievements-list">
+        <div class="achievements-empty-card">
+          <div style="font-size: 2.5rem; margin-bottom: 10px;">🏆</div>
+          <div style="font-size: 1.15rem; font-weight: 900; color: #ffffff; letter-spacing: 0.5px;">ACHIEVEMENT SYSTEM READY</div>
+          <div style="font-size: 0.88rem; color: var(--text-muted); max-width: 440px; margin: 8px auto 0 auto; line-height: 1.45;">
+            The achievement engine is initialized. Unlockable achievements, milestones, and stat bonus rewards will appear here!
+          </div>
+        </div>
+      </div>
+
+      <!-- Close Button -->
+      <button class="btn-primary" id="achievements-close-btn" style="width: 100%; margin-top: 16px; padding: 14px; font-size: 1rem; letter-spacing: 1px;">
+        ◀ BACK TO MENU
+      </button>
     </div>
   </div>
 
@@ -4785,6 +4879,47 @@
       requestAnimationFrame(gameLoop);
     }
     requestAnimationFrame(gameLoop);
+
+    /* ==========================================================================
+       Achievement System Core Architecture
+       ========================================================================== */
+    const achievements = []; // Array for future achievements
+    const unlockedAchievements = new Set(JSON.parse(localStorage.getItem('blade_deflector_achievements') || '[]'));
+
+    function openAchievementsModal() {
+      audio.init();
+      const modal = document.getElementById('achievements-modal');
+      if (modal) {
+        updateAchievementsUI();
+        modal.classList.add('active');
+      }
+    }
+
+    function closeAchievementsModal() {
+      const modal = document.getElementById('achievements-modal');
+      if (modal) {
+        modal.classList.remove('active');
+      }
+    }
+
+    function updateAchievementsUI() {
+      const countEl = document.getElementById('ach-unlocked-count');
+      const bonusEl = document.getElementById('ach-active-bonuses');
+      
+      if (countEl) countEl.textContent = `${unlockedAchievements.size} / ${achievements.length}`;
+      if (bonusEl) {
+        bonusEl.textContent = unlockedAchievements.size > 0 ? `+${unlockedAchievements.size * 5}% Stat Multipliers` : 'None Active';
+      }
+    }
+
+    const startAchBtn = document.getElementById('start-achievements-btn');
+    if (startAchBtn) startAchBtn.addEventListener('click', openAchievementsModal);
+
+    const hudAchBtn = document.getElementById('hud-achievements-btn');
+    if (hudAchBtn) hudAchBtn.addEventListener('click', openAchievementsModal);
+
+    const closeAchBtn = document.getElementById('achievements-close-btn');
+    if (closeAchBtn) closeAchBtn.addEventListener('click', closeAchievementsModal);
 
     /* ==========================================================================
        UI Event Listeners
