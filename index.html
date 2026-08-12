@@ -2354,7 +2354,7 @@
 
       // Apply Difficulty Settings
       player.character = selectedCharacter || 'KNIGHT';
-      player.color = player.character === 'SENTINEL' ? '#ffe600' : (player.character === 'SHOTGUN' ? '#ff5500' : (player.character === 'ARCHER' ? '#ffe600' : '#00f0ff'));
+      player.color = player.character === 'SENTINEL' ? '#ffe600' : (player.character === 'SHOTGUN' ? '#ff5500' : (player.character === 'ARCHER' ? '#00ff66' : '#00f0ff'));
       player.dashActive = false;
       player.dashProgress = 0;
       player.dashCooldown = 0;
@@ -4487,19 +4487,21 @@
           ctx.translate(p.x, p.y);
           ctx.rotate(p.spinAngle || 0);
 
-          // Crisp Orange Bomb Shell (Zero shadow blur!)
-          ctx.fillStyle = '#ff6600';
-          ctx.shadowBlur = 0;
+          // Glowing Emerald Bomb Shell
+          ctx.fillStyle = '#00ff66';
+          ctx.shadowColor = '#00ff66';
+          ctx.shadowBlur = 18;
           ctx.beginPath();
           ctx.arc(0, 0, p.radius, 0, Math.PI * 2);
           ctx.fill();
 
           // Dark Metal Cap & Burning Fuse
-          ctx.fillStyle = '#221100';
+          ctx.fillStyle = '#112211';
           ctx.fillRect(-4, -p.radius - 4, 8, 4);
 
           ctx.fillStyle = '#ffe600';
-          ctx.shadowBlur = 0;
+          ctx.shadowColor = '#ffe600';
+          ctx.shadowBlur = 10;
           ctx.fillRect(-2, -p.radius - 8, 4, 4);
         } else {
           ctx.fillStyle = p.color;
@@ -4555,9 +4557,9 @@
           // Shield Barrier when Holding Spacebar
           if (player.isBlocking) {
             ctx.save();
-            ctx.strokeStyle = gameDifficulty === 'IMPOSSIBLE' ? '#ff0055' : (player.character === 'SENTINEL' ? '#ffe600' : (player.character === 'SHOTGUN' ? '#ff5500' : (player.character === 'ARCHER' ? '#ffe600' : '#00f0ff')));
-            ctx.shadowColor = gameDifficulty === 'IMPOSSIBLE' ? '#ff0055' : (player.character === 'SENTINEL' ? '#ffe600' : (player.character === 'SHOTGUN' ? '#ff5500' : (player.character === 'ARCHER' ? '#ffe600' : '#00f0ff')));
-            ctx.shadowBlur = 0;
+            ctx.strokeStyle = gameDifficulty === 'IMPOSSIBLE' ? '#ff0055' : (player.character === 'SENTINEL' ? '#ffe600' : (player.character === 'SHOTGUN' ? '#ff5500' : (player.character === 'ARCHER' ? '#00ff66' : '#00f0ff')));
+            ctx.shadowColor = gameDifficulty === 'IMPOSSIBLE' ? '#ff0055' : (player.character === 'SENTINEL' ? '#ffe600' : (player.character === 'SHOTGUN' ? '#ff5500' : (player.character === 'ARCHER' ? '#00ff66' : '#00f0ff')));
+            ctx.shadowBlur = 20;
             ctx.lineWidth = gameDifficulty === 'IMPOSSIBLE' ? 5 : 4;
             ctx.beginPath();
 
@@ -4657,14 +4659,15 @@
               ctx.fillRect(player.size / 2, -3, swordLength, 6);
             }
           } else if (player.character === 'ARCHER') {
-            // Crisp Golden Recurve Bow & Arrow Model (Zero shadow blur!)
+            // Detailed Emerald Recurve Bow & Drawn Arrow Model
             ctx.save();
             ctx.rotate(player.angle);
 
-            // Crisp Golden Curved Bow Arms
-            ctx.strokeStyle = '#ffe600';
-            ctx.shadowBlur = 0;
-            ctx.lineWidth = 4;
+            // Glowing Emerald Curved Bow Arms
+            ctx.strokeStyle = '#00ff66';
+            ctx.shadowColor = '#00ff66';
+            ctx.shadowBlur = 16;
+            ctx.lineWidth = 5;
 
             // Recurve Bow Curve
             ctx.beginPath();
@@ -4672,7 +4675,9 @@
             ctx.stroke();
 
             // Golden Bow Riser / Handle Grip
-            ctx.fillStyle = '#ff9900';
+            ctx.fillStyle = '#ffe600';
+            ctx.shadowColor = '#ffe600';
+            ctx.shadowBlur = 10;
             ctx.fillRect(player.size / 2 + 10, -5, 6, 10);
 
             // Bowstring
@@ -4692,8 +4697,9 @@
             ctx.stroke();
 
             // Drawn Arrow Shaft on Bowstring
-            ctx.fillStyle = '#ffe600';
-            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#00ff66';
+            ctx.shadowColor = '#00ff66';
+            ctx.shadowBlur = 12;
             ctx.fillRect(notchX, -2, 28, 4);
 
             // Arrowhead
@@ -4711,8 +4717,9 @@
             ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
             ctx.fillRect(-22, player.size / 2 + 10, 44, 6);
             const cdPct = player.archerBombCooldown > 0 ? (1 - player.archerBombCooldown / player.maxArcherBombCooldown) : 1;
-            ctx.fillStyle = cdPct >= 1 ? '#ffe600' : '#ff9900';
-            ctx.shadowBlur = 0;
+            ctx.fillStyle = cdPct >= 1 ? '#00ff66' : '#ff9900';
+            ctx.shadowColor = '#00ff66';
+            ctx.shadowBlur = cdPct >= 1 ? 10 : 0;
             ctx.fillRect(-20, player.size / 2 + 11, 40 * cdPct, 4);
             ctx.restore();
             ctx.shadowBlur = 0;
