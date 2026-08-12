@@ -4030,6 +4030,8 @@
        ========================================================================== */
     function render() {
       ctx.save();
+      ctx.shadowBlur = 0;
+      ctx.shadowColor = 'transparent';
 
       // Screen Shake FX
       if (screenShake > 0) {
@@ -4450,6 +4452,8 @@
           ctx.restore();
         }
 
+        ctx.shadowBlur = 0;
+        ctx.shadowColor = 'transparent';
         ctx.restore();
       });
 
@@ -4508,6 +4512,8 @@
           ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
           ctx.fill();
         }
+        ctx.shadowBlur = 0;
+        ctx.shadowColor = 'transparent';
         ctx.restore();
       });
 
@@ -4716,6 +4722,8 @@
             ctx.shadowBlur = cdPct >= 1 ? 10 : 0;
             ctx.fillRect(-20, player.size / 2 + 11, 40 * cdPct, 4);
             ctx.restore();
+            ctx.shadowBlur = 0;
+            ctx.shadowColor = 'transparent';
           } else if (player.character === 'SHOTGUN') {
             // Dual Shotgun Barrels & Reload Indicator
             ctx.save();
