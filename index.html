@@ -912,6 +912,17 @@
                 <div class="diff-desc">Arrows & Bomb</div>
               </div>
             </div>
+
+            <!-- Dynamic Interactive Ability Preview Box -->
+            <div id="char-ability-preview" style="margin-top: 8px; background: rgba(0, 0, 0, 0.45); border: 1.5px solid var(--accent-cyan); border-radius: 10px; padding: 10px; display: flex; align-items: center; justify-content: space-between;">
+              <div>
+                <div id="preview-ability-title" style="font-weight: 800; font-size: 0.88rem; color: #00f0ff;">🗡️ SQUARE KNIGHT ABILITIES</div>
+                <div id="preview-ability-desc" style="font-size: 0.78rem; color: #bbb; margin-top: 2px;">• Tap <span class="key-cap">SPACE / L-Click</span>: Slash & Deflect | • Hold <span class="key-cap">SPACE</span>: Directional Shield</div>
+              </div>
+              <div id="preview-ability-tag" style="background: rgba(0, 240, 255, 0.15); border: 1px solid #00f0ff; color: #00f0ff; font-weight: 800; font-size: 0.72rem; padding: 4px 8px; border-radius: 6px; letter-spacing: 0.5px;">
+                ⚡ DEFLECTOR BLADE
+              </div>
+            </div>
           </div>
 
           <!-- Right (Directly to the right of Archer card): 5 Difficulty Cards -->
@@ -2627,6 +2638,21 @@
       // Hide modals
       document.getElementById('start-modal').classList.remove('active');
       document.getElementById('gameover-modal').classList.remove('active');
+
+      // Floating Ability Tutorial Toast over Player
+      if (player.character === 'FROZEN_ARCHER') {
+        addFloatingText('💡 TIP: PRESS [1] FOR 360° ICE WAVE (300PX)!', width / 2, height / 2 - 60, '#00f0ff');
+      } else if (player.character === 'BURNING_SENTINEL') {
+        addFloatingText('💡 TIP: PRESS [SHIFT / E] FOR 10s FIRE DASH TRAIL!', width / 2, height / 2 - 60, '#ff3300');
+      } else if (player.character === 'SENTINEL') {
+        addFloatingText('💡 TIP: PRESS [SHIFT / E] FOR RAMMING DASH!', width / 2, height / 2 - 60, '#ffe600');
+      } else if (player.character === 'SHOTGUN') {
+        addFloatingText('💡 TIP: PRESS [E / R-CLICK] FOR HEAVY SLUG BOMB!', width / 2, height / 2 - 60, '#ff5500');
+      } else if (player.character === 'ARCHER') {
+        addFloatingText('💡 TIP: RELEASE [SPACE SHIELD] TO LAUNCH ARCHER BOMB!', width / 2, height / 2 - 60, '#00ff66');
+      } else {
+        addFloatingText('💡 TIP: HOLD [SPACE] TO BLOCK ENEMY BULLETS!', width / 2, height / 2 - 60, '#00f0ff');
+      }
 
       // Initial spawns
       for (let i = 0; i < 4; i++) spawnGreenSquare();
@@ -5768,8 +5794,85 @@
     /* Character Selector Event Listeners & State Handler */
     let selectedCharacter = 'KNIGHT';
 
+    function updateHUDControlsCard(charType) {
+      const card = document.querySelector('.controls-card');
+
+      const titleEl = document.getElementById('preview-ability-title');
+      const descEl = document.getElementById('preview-ability-desc');
+      const tagEl = document.getElementById('preview-ability-tag');
+
+      if (charType === 'BURNING_SENTINEL') {
+        if (card) {
+          card.innerHTML = `
+            <div class="control-item"><span class="key-cap">WASD</span> Move</div>
+            <div class="control-item"><span class="key-cap">Hold SPACE</span> 180° Magma Shield</div>
+            <div class="control-item"><span class="key-cap">SHIFT / E</span> 10s Fire Trail Dash</div>
+          `;
+        }
+        if (titleEl) { titleEl.textContent = '🛡️🔥 BURNING SENTINEL ABILITIES'; titleEl.style.color = '#ff3300'; }
+        if (descEl) descEl.innerHTML = `• Hold <span class="key-cap">SPACE</span>: 180° Magma Shield | • Press <span class="key-cap">SHIFT / E</span>: 10s Fire Dash Trail`;
+        if (tagEl) { tagEl.textContent = '🔥 10s FIRE TRAILS'; tagEl.style.borderColor = '#ff3300'; tagEl.style.color = '#ff3300'; tagEl.style.background = 'rgba(255, 51, 0, 0.15)'; }
+      } else if (charType === 'FROZEN_ARCHER') {
+        if (card) {
+          card.innerHTML = `
+            <div class="control-item"><span class="key-cap">WASD</span> Move</div>
+            <div class="control-item"><span class="key-cap">Aura</span> 300px 25% Frost Slow</div>
+            <div class="control-item"><span class="key-cap">Key 1</span> 360° Ice Wave</div>
+          `;
+        }
+        if (titleEl) { titleEl.textContent = '🏹❄️ FROZEN ARCHER ABILITIES'; titleEl.style.color = '#00f0ff'; }
+        if (descEl) descEl.innerHTML = `• Passive: 300px 25% Frost Slow Aura | • Press <span class="key-cap">1</span>: 360° Ice Wave Blast (300px)`;
+        if (tagEl) { tagEl.textContent = '❄️ 360° ICE WAVE [1]'; tagEl.style.borderColor = '#00f0ff'; tagEl.style.color = '#00f0ff'; tagEl.style.background = 'rgba(0, 240, 255, 0.15)'; }
+      } else if (charType === 'SENTINEL') {
+        if (card) {
+          card.innerHTML = `
+            <div class="control-item"><span class="key-cap">WASD</span> Move</div>
+            <div class="control-item"><span class="key-cap">Hold SPACE</span> 180° Shield</div>
+            <div class="control-item"><span class="key-cap">SHIFT / E</span> Ramming Dash</div>
+          `;
+        }
+        if (titleEl) { titleEl.textContent = '🛡️ SHIELD SENTINEL ABILITIES'; titleEl.style.color = '#ffe600'; }
+        if (descEl) descEl.innerHTML = `• Hold <span class="key-cap">SPACE / R-Click</span>: 180° Shield | • Press <span class="key-cap">SHIFT / E</span>: Ramming Dash Crush`;
+        if (tagEl) { tagEl.textContent = '🛡️ RAMMING DASH [SHIFT]'; tagEl.style.borderColor = '#ffe600'; tagEl.style.color = '#ffe600'; tagEl.style.background = 'rgba(255, 230, 0, 0.15)'; }
+      } else if (charType === 'SHOTGUN') {
+        if (card) {
+          card.innerHTML = `
+            <div class="control-item"><span class="key-cap">WASD</span> Move</div>
+            <div class="control-item"><span class="key-cap">SPACE / L-Click</span> Buckshot</div>
+            <div class="control-item"><span class="key-cap">E / R-Click</span> Heavy Explosive Slug</div>
+          `;
+        }
+        if (titleEl) { titleEl.textContent = '💥 SHOTGUN ENFORCER ABILITIES'; titleEl.style.color = '#ff5500'; }
+        if (descEl) descEl.innerHTML = `• Press <span class="key-cap">SPACE / L-Click</span>: 7-Pellet Buckshot | • Press <span class="key-cap">E / R-Click</span>: Heavy Slug Bomb`;
+        if (tagEl) { tagEl.textContent = '💥 HEAVY SLUG [E]'; tagEl.style.borderColor = '#ff5500'; tagEl.style.color = '#ff5500'; tagEl.style.background = 'rgba(255, 85, 0, 0.15)'; }
+      } else if (charType === 'ARCHER') {
+        if (card) {
+          card.innerHTML = `
+            <div class="control-item"><span class="key-cap">WASD</span> Move</div>
+            <div class="control-item"><span class="key-cap">Hold L-Click</span> Arrow Spray</div>
+            <div class="control-item"><span class="key-cap">Release SPACE</span> Archer Bomb</div>
+          `;
+        }
+        if (titleEl) { titleEl.textContent = '🏹 ARCHER RANGER ABILITIES'; titleEl.style.color = '#00ff66'; }
+        if (descEl) descEl.innerHTML = `• Hold <span class="key-cap">L-Click</span>: Rapid Arrow Spray | • Release <span class="key-cap">SPACE Barrier</span>: Launch Archer Bomb`;
+        if (tagEl) { tagEl.textContent = '💣 ARCHER BOMB [SPACE]'; tagEl.style.borderColor = '#00ff66'; tagEl.style.color = '#00ff66'; tagEl.style.background = 'rgba(0, 255, 102, 0.15)'; }
+      } else {
+        if (card) {
+          card.innerHTML = `
+            <div class="control-item"><span class="key-cap">WASD</span> Move</div>
+            <div class="control-item"><span class="key-cap">SPACE / L-Click</span> Slash & Deflect</div>
+            <div class="control-item"><span class="key-cap">Hold SPACE</span> Block Shield</div>
+          `;
+        }
+        if (titleEl) { titleEl.textContent = '🗡️ SQUARE KNIGHT ABILITIES'; titleEl.style.color = '#00f0ff'; }
+        if (descEl) descEl.innerHTML = `• Tap <span class="key-cap">SPACE / L-Click</span>: Slash & Deflect | • Hold <span class="key-cap">SPACE</span>: Directional Shield`;
+        if (tagEl) { tagEl.textContent = '🗡️ DEFLECTOR BLADE'; tagEl.style.borderColor = '#00f0ff'; tagEl.style.color = '#00f0ff'; tagEl.style.background = 'rgba(0, 240, 255, 0.15)'; }
+      }
+    }
+
     window.setCharacter = function(charType) {
       selectedCharacter = charType;
+      updateHUDControlsCard(charType);
       document.querySelectorAll('.char-card').forEach(card => {
         if (card.dataset.char === charType) {
           card.classList.add('active');
