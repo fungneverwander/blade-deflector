@@ -669,7 +669,35 @@
       width: 90vw;
       max-height: 90vh;
       padding: 20px 24px;
-      overflow-y: auto;
+      overflow-y: auto !important;
+      scrollbar-width: thin;
+      scrollbar-color: var(--accent-cyan) rgba(0, 0, 0, 0.4);
+    }
+
+    /* Custom Glowing Neon Scrollbars for Modal Cards */
+    .modal-card::-webkit-scrollbar,
+    .start-modal-card::-webkit-scrollbar {
+      width: 8px;
+      height: 8px;
+    }
+
+    .modal-card::-webkit-scrollbar-track,
+    .start-modal-card::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.4);
+      border-radius: 4px;
+    }
+
+    .modal-card::-webkit-scrollbar-thumb,
+    .start-modal-card::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, var(--accent-cyan), var(--accent-orange));
+      border-radius: 4px;
+      box-shadow: 0 0 10px var(--accent-cyan);
+    }
+
+    .modal-card::-webkit-scrollbar-thumb:hover,
+    .start-modal-card::-webkit-scrollbar-thumb:hover {
+      background: var(--accent-yellow);
+      box-shadow: 0 0 14px var(--accent-yellow);
     }
 
     .start-selectors-container {
