@@ -775,6 +775,11 @@
         <span id="diff-display" style="color: var(--accent-yellow); font-weight: 800; font-size: 0.85rem; letter-spacing: 1px;">🟡 NORMAL</span>
       </div>
 
+      <!-- Save Progress Button -->
+      <div class="hud-card" id="hud-save-btn" style="cursor: pointer; background: rgba(57, 255, 20, 0.12); border-color: #39ff14;" title="Save your game progress to device" onclick="saveGameProgress(true)">
+        <span style="color: #39ff14; font-weight: 800; font-size: 0.85rem; letter-spacing: 1px;">💾 SAVE</span>
+      </div>
+
       <!-- Score Display -->
       <div class="hud-card">
         <div>
@@ -932,11 +937,14 @@
         </div>
       </div>
 
-      <!-- Start Button & Achievements Button Row -->
-      <div style="display: flex; gap: 12px; width: 100%; margin-top: 12px;">
+      <!-- Start Button, Achievements & Save Progress Buttons Row -->
+      <div style="display: flex; gap: 10px; width: 100%; margin-top: 12px;">
         <button class="btn-primary" id="start-btn" style="flex: 2; padding: 16px; font-size: 1.1rem; letter-spacing: 1px;">ENTER ARENA ▶</button>
-        <button id="start-achievements-btn" style="flex: 1; padding: 16px; font-size: 0.95rem; font-weight: 800; background: rgba(255, 230, 0, 0.12); border: 2px solid var(--accent-yellow); color: var(--accent-yellow); border-radius: 14px; cursor: pointer; transition: all 0.2s ease;">
+        <button id="start-achievements-btn" style="flex: 1; padding: 16px; font-size: 0.92rem; font-weight: 800; background: rgba(255, 230, 0, 0.12); border: 2px solid var(--accent-yellow); color: var(--accent-yellow); border-radius: 14px; cursor: pointer; transition: all 0.2s ease;">
           🏆 ACHIEVEMENTS
+        </button>
+        <button id="start-save-btn" onclick="saveGameProgress(true)" style="flex: 1; padding: 16px; font-size: 0.92rem; font-weight: 800; background: rgba(57, 255, 20, 0.12); border: 2px solid #39ff14; color: #39ff14; border-radius: 14px; cursor: pointer; transition: all 0.2s ease;">
+          💾 SAVE PROGRESS
         </button>
       </div>
     </div>
@@ -971,8 +979,13 @@
         </div>
       </div>
 
+      <!-- Save Progress Button inside Achievements Modal -->
+      <button class="btn-primary" onclick="saveGameProgress(true)" style="width: 100%; margin-top: 12px; padding: 14px; font-size: 0.95rem; background: linear-gradient(135deg, #39ff14, #00b344); color: #000; font-weight: 800; letter-spacing: 1px;">
+        💾 SAVE PROGRESS & DOWNLOAD SAVE FILE
+      </button>
+
       <!-- Close Button -->
-      <button class="btn-primary" id="achievements-close-btn" style="width: 100%; margin-top: 16px; padding: 14px; font-size: 1rem; letter-spacing: 1px;">
+      <button class="btn-primary" id="achievements-close-btn" style="width: 100%; margin-top: 10px; padding: 14px; font-size: 1rem; letter-spacing: 1px;">
         ◀ BACK TO MENU
       </button>
     </div>
@@ -1179,6 +1192,7 @@
 
       <div style="margin-top: 18px; margin-bottom: 18px; display: flex; flex-direction: column; gap: 10px;">
         <button class="btn-primary" id="resume-btn" style="width: 100%;">RESUME GAME [ESC / P]</button>
+        <button class="btn-primary" id="pause-save-btn" onclick="saveGameProgress(true)" style="width: 100%; background: linear-gradient(135deg, #00ff66, #00b344); color: #040814; font-weight: 800;">💾 SAVE PROGRESS TO DEVICE</button>
         <button class="btn-primary" id="pause-restart-btn" style="width: 100%; background: linear-gradient(135deg, #ff0055, #ff6b00);">RESTART RUN</button>
         <button class="btn-primary" id="pause-mainmenu-btn" style="width: 100%; background: linear-gradient(135deg, var(--accent-yellow), var(--accent-orange)); color: #040814;">🏠 RETURN TO MAIN MENU</button>
       </div>
@@ -5171,6 +5185,60 @@
       if (modal) {
         modal.classList.remove('active');
       }
+    }
+
+    /* ==========================================================================
+       Save Game Progress Engine
+       ========================================================================== */
+    function saveGameProgress(downloadFile = true) {
+      if (typeof audio !== 'undefined' && audio.init) audio.init();
+
+      flameKillsAsArcher = parseInt(localStorage.getItem('blade_deflector_archer_flame_kills') || '0');
+      flameRamKillsAsSentinel = parseInt(localStorage.getItem('blade_deflector_sentinel_flame_ram_kills') || '0');
+
+      const saveData = {
+        game: 'Blade Deflector',
+        version: '1.0',
+        timestamp: new Date().toISOString(),
+        highScore: highScore || 0,
+        selectedCharacter: selectedCharacter || 'KNIGHT',
+        flameKillsAsArcher: flameKillsAsArcher || 0,
+        flameRamKillsAsSentinel: flameRamKillsAsSentinel || 0,
+        unlockedAchievements: [...unlockedAchievements],
+        currentWave: (typeof gameState !== 'undefined' && gameState === 'PLAYING') ? wave : 1,
+        currentScore: (typeof gameState !== 'undefined' && gameState === 'PLAYING') ? score : 0
+      };
+
+      // 1. Save to Device Local Storage
+      localStorage.setItem('blade_deflector_hi', saveData.highScore);
+      localStorage.setItem('blade_deflector_character', saveData.selectedCharacter);
+      localStorage.setItem('blade_deflector_archer_flame_kills', saveData.flameKillsAsArcher);
+      localStorage.setItem('blade_deflector_sentinel_flame_ram_kills', saveData.flameRamKillsAsSentinel);
+      localStorage.setItem('blade_deflector_achievements', JSON.stringify(saveData.unlockedAchievements));
+      localStorage.setItem('blade_deflector_full_save', JSON.stringify(saveData));
+
+      // 2. Download JSON Backup File to Device if requested
+      if (downloadFile) {
+        try {
+          const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(saveData, null, 2));
+          const downloadAnchor = document.createElement('a');
+          downloadAnchor.setAttribute("href", dataStr);
+          downloadAnchor.setAttribute("download", `blade_deflector_save_${Date.now()}.json`);
+          document.body.appendChild(downloadAnchor);
+          downloadAnchor.click();
+          downloadAnchor.remove();
+        } catch(e) {
+          console.log('Download anchor error:', e);
+        }
+      }
+
+      // 3. In-Game Toast & Audio Callout
+      if (typeof player !== 'undefined' && player && typeof addFloatingText === 'function') {
+        addFloatingText('💾 PROGRESS SAVED TO DEVICE!', player.x, player.y - 45, '#39ff14');
+      }
+      if (typeof audio !== 'undefined' && audio.playDeflect) audio.playDeflect();
+
+      alert(`💾 Progress successfully saved to your device!\n\n• High Score: ${saveData.highScore}\n• Character: ${saveData.selectedCharacter}\n• Unlocked Achievements: ${saveData.unlockedAchievements.length} / 2\n• Backup file downloaded to device downloads folder.`);
     }
 
     function updateAchievementsUI() {
