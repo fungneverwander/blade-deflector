@@ -4900,15 +4900,16 @@
           // Shield Barrier when Holding Spacebar
           if (player.isBlocking) {
             ctx.save();
-            ctx.strokeStyle = gameDifficulty === 'IMPOSSIBLE' ? '#ff0055' : (player.character === 'SENTINEL' ? '#ffe600' : (player.character === 'SHOTGUN' ? '#ff5500' : (player.character === 'ARCHER' ? '#00ff66' : '#00f0ff')));
-            ctx.shadowColor = gameDifficulty === 'IMPOSSIBLE' ? '#ff0055' : (player.character === 'SENTINEL' ? '#ffe600' : (player.character === 'SHOTGUN' ? '#ff5500' : (player.character === 'ARCHER' ? '#00ff66' : '#00f0ff')));
+            const shieldColor = gameDifficulty === 'IMPOSSIBLE' ? '#ff0055' : (player.character === 'BURNING_SENTINEL' ? '#ff3300' : (player.character === 'SENTINEL' ? '#ffe600' : (player.character === 'FROZEN_ARCHER' ? '#00f0ff' : (player.character === 'SHOTGUN' ? '#ff5500' : (player.character === 'ARCHER' ? '#00ff66' : '#00f0ff')))));
+            ctx.strokeStyle = shieldColor;
+            ctx.shadowColor = shieldColor;
             ctx.shadowBlur = 20;
             ctx.lineWidth = gameDifficulty === 'IMPOSSIBLE' ? 5 : 4;
             ctx.beginPath();
 
             const sentinelRangeMult = (player.buffs.range ? 1.4 : 1.0) * (player.permBuffs.permRange ? 1.5 : 1.0);
 
-            if (player.character === 'SENTINEL') {
+            if (player.character === 'SENTINEL' || player.character === 'BURNING_SENTINEL') {
               if (player.buffs.slash360) {
                 // 270° Shield Arc when Sentinel has 360° Slash/Barrier Buff!
                 ctx.arc(0, 0, player.size * 1.35 * sentinelRangeMult, player.angle - (3 * Math.PI / 4), player.angle + (3 * Math.PI / 4));
@@ -4928,7 +4929,7 @@
             }
             ctx.stroke();
 
-            ctx.fillStyle = gameDifficulty === 'IMPOSSIBLE' ? 'rgba(255, 0, 85, 0.25)' : (player.character === 'SENTINEL' ? 'rgba(255, 230, 0, 0.2)' : 'rgba(0, 240, 255, 0.18)');
+            ctx.fillStyle = gameDifficulty === 'IMPOSSIBLE' ? 'rgba(255, 0, 85, 0.25)' : (player.character === 'BURNING_SENTINEL' ? 'rgba(255, 51, 0, 0.25)' : (player.character === 'SENTINEL' ? 'rgba(255, 230, 0, 0.2)' : 'rgba(0, 240, 255, 0.18)'));
             ctx.fill();
             ctx.restore();
           }
@@ -5632,12 +5633,21 @@
 
       const charBadge = document.getElementById('char-display');
       if (charBadge) {
-        if (charType === 'SENTINEL') {
+        if (charType === 'BURNING_SENTINEL') {
+          charBadge.textContent = '🛡️🔥 BURNING SENTINEL';
+          charBadge.style.color = '#ff3300';
+        } else if (charType === 'FROZEN_ARCHER') {
+          charBadge.textContent = '🏹❄️ FROZEN ARCHER';
+          charBadge.style.color = '#00f0ff';
+        } else if (charType === 'SENTINEL') {
           charBadge.textContent = '🛡️ SENTINEL';
           charBadge.style.color = 'var(--accent-yellow)';
         } else if (charType === 'SHOTGUN') {
           charBadge.textContent = '💥 SHOTGUN';
           charBadge.style.color = '#ff5500';
+        } else if (charType === 'ARCHER') {
+          charBadge.textContent = '🏹 ARCHER';
+          charBadge.style.color = '#00ff66';
         } else {
           charBadge.textContent = '🗡️ KNIGHT';
           charBadge.style.color = 'var(--accent-cyan)';
@@ -5647,7 +5657,7 @@
       // If in active gameplay or paused, switch character dynamically!
       if (gameState === 'PLAYING' || gameState === 'PAUSED') {
         player.character = charType;
-        player.color = charType === 'SENTINEL' ? '#ffe600' : (charType === 'SHOTGUN' ? '#ff5500' : (charType === 'ARCHER' ? '#00ff66' : '#00f0ff'));
+        player.color = charType === 'BURNING_SENTINEL' ? '#ff3300' : (charType === 'FROZEN_ARCHER' ? '#00f0ff' : (charType === 'SENTINEL' ? '#ffe600' : (charType === 'SHOTGUN' ? '#ff5500' : (charType === 'ARCHER' ? '#00ff66' : '#00f0ff'))));
         player.dashActive = false;
         player.dashProgress = 0;
         player.dashCooldown = 0;
@@ -5656,7 +5666,7 @@
         player.shotgunCooldown = 0;
         player.archerCooldown = 0;
         player.archerBombCooldown = 0;
-        addFloatingText(`CLASS CHANGED TO ${charType === 'SENTINEL' ? 'SHIELD SENTINEL' : (charType === 'SHOTGUN' ? 'SHOTGUN ENFORCER' : (charType === 'ARCHER' ? 'ARCHER RANGER' : 'SQUARE KNIGHT'))}!`, width / 2, height / 2 - 50, player.color);
+        addFloatingText(`CLASS CHANGED TO ${charType === 'BURNING_SENTINEL' ? 'BURNING SENTINEL' : (charType === 'FROZEN_ARCHER' ? 'FROZEN ARCHER' : (charType === 'SENTINEL' ? 'SHIELD SENTINEL' : (charType === 'SHOTGUN' ? 'SHOTGUN ENFORCER' : (charType === 'ARCHER' ? 'ARCHER RANGER' : 'SQUARE KNIGHT'))))}!`, width / 2, height / 2 - 50, player.color);
       }
 
       if (audio && typeof audio.init === 'function') audio.init();
