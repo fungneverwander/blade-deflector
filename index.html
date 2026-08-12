@@ -1486,26 +1486,18 @@
     let frozenWaveActive = false;
     let frozenWaveRadius = 0;
 
-    window.addEventListener('contextmenu', (e) => {
-      e.preventDefault(); // Prevent right-click context menu so right click throws Archer bomb!
-    });
-
     window.addEventListener('mousemove', (e) => {
       mouse.x = e.clientX;
       mouse.y = e.clientY;
     });
 
     window.addEventListener('mousedown', (e) => {
-      if (gameState === 'PLAYING') {
-        if (e.button === 0) {
-          if (!keys['Space']) {
-            spaceDownTime = performance.now();
-            spaceWasTapped = true;
-            spaceIsHeld = true;
-            keys['Space'] = true;
-          }
-        } else if (e.button === 2) {
-          bombRequested = true;
+      if (e.button === 0 && gameState === 'PLAYING') {
+        if (!keys['Space']) {
+          spaceDownTime = performance.now();
+          spaceWasTapped = true;
+          spaceIsHeld = true;
+          keys['Space'] = true;
         }
       }
     });
@@ -1521,9 +1513,6 @@
     window.addEventListener('keydown', (e) => {
       if (e.code === 'Digit1' || e.code === 'Numpad1' || e.key === '1') {
         iceWaveRequested = true;
-      }
-      if (e.code === 'KeyE' || e.code === 'KeyQ' || e.code === 'KeyF' || e.code === 'KeyR') {
-        bombRequested = true;
       }
       if (e.code === 'Space') {
         e.preventDefault(); // Prevent browser from triggering focused buttons (Start/Restart) or scrolling
@@ -2703,14 +2692,11 @@
           }
         }
 
-        // Trigger Archer Bomb on Right-Click, Key E/Q/F/R, or Hold Spacebar
-        if (bombRequested || (spaceIsHeld && spaceDownTime > 0 && (performance.now() - spaceDownTime > 90))) {
-          bombRequested = false;
+        // Trigger Archer Bomb on RELEASING SHIELD!
+        if (shieldJustDropped) {
           if (player.archerBombCooldown <= 0) {
             player.archerBombCooldown = player.maxArcherBombCooldown;
             triggerArcherBombThrow(mouse.x, mouse.y);
-            spaceDownTime = 0;
-            spaceIsHeld = false;
           } else {
             addFloatingText(`⏳ BOMB RECHARGING (${(player.archerBombCooldown / 60).toFixed(1)}s)`, player.x, player.y - 35, '#ff9900');
           }
