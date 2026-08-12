@@ -882,45 +882,6 @@
         </div>
       </div>
 
-      <!-- Comprehensive Character Ability Tutorial Guide Matrix -->
-      <div class="guide-box" style="margin-top: 10px; margin-bottom: 14px; background: rgba(0, 240, 255, 0.05); border-color: var(--accent-cyan); padding: 12px;">
-        <div style="font-size: 0.88rem; font-weight: 800; color: #ffe600; text-align: center; margin-bottom: 8px; letter-spacing: 1px;">
-          ⚡ CLASS ABILITIES & HOTKEYS TUTORIAL ⚡
-        </div>
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; font-size: 0.78rem;">
-          <div style="background: rgba(0,0,0,0.4); padding: 8px; border-radius: 8px; border: 1px solid rgba(0,240,255,0.25);">
-            <div style="color: #00f0ff; font-weight: 800; font-size: 0.82rem;">🗡️ KNIGHT</div>
-            <div style="color: #ddd; margin-top: 2px;">• <span class="key-cap">SPACE / L-Click</span>: Slash & Deflect</div>
-            <div style="color: #ddd;">• <span class="key-cap">Hold SPACE</span>: Block Shield</div>
-          </div>
-          <div style="background: rgba(0,0,0,0.4); padding: 8px; border-radius: 8px; border: 1px solid rgba(255,230,0,0.25);">
-            <div style="color: #ffe600; font-weight: 800; font-size: 0.82rem;">🛡️ SENTINEL</div>
-            <div style="color: #ddd; margin-top: 2px;">• <span class="key-cap">Hold SPACE / R-Click</span>: 180° Shield</div>
-            <div style="color: #ddd;">• <span class="key-cap">SHIFT / E</span>: Ramming Dash</div>
-          </div>
-          <div style="background: rgba(0,0,0,0.4); padding: 8px; border-radius: 8px; border: 1px solid rgba(255,51,0,0.25);">
-            <div style="color: #ff3300; font-weight: 800; font-size: 0.82rem;">🛡️🔥 BURNING SENTINEL</div>
-            <div style="color: #ddd; margin-top: 2px;">• <span class="key-cap">Hold SPACE</span>: 180° Magma Shield</div>
-            <div style="color: #ddd;">• <span class="key-cap">SHIFT / E</span>: 10s Fire Trail Dash</div>
-          </div>
-          <div style="background: rgba(0,0,0,0.4); padding: 8px; border-radius: 8px; border: 1px solid rgba(255,85,0,0.25);">
-            <div style="color: #ff5500; font-weight: 800; font-size: 0.82rem;">💥 SHOTGUN</div>
-            <div style="color: #ddd; margin-top: 2px;">• <span class="key-cap">SPACE / L-Click</span>: Buckshot Blast</div>
-            <div style="color: #ddd;">• <span class="key-cap">E / R-Click</span>: Heavy Slug Bomb</div>
-          </div>
-          <div style="background: rgba(0,0,0,0.4); padding: 8px; border-radius: 8px; border: 1px solid rgba(0,255,102,0.25);">
-            <div style="color: #00ff66; font-weight: 800; font-size: 0.82rem;">🏹 ARCHER</div>
-            <div style="color: #ddd; margin-top: 2px;">• <span class="key-cap">Hold L-Click</span>: Arrow Spray</div>
-            <div style="color: #ddd;">• <span class="key-cap">Release SPACE</span>: Archer Bomb</div>
-          </div>
-          <div style="background: rgba(0,0,0,0.4); padding: 8px; border-radius: 8px; border: 1px solid rgba(0,240,255,0.25);">
-            <div style="color: #00f0ff; font-weight: 800; font-size: 0.82rem;">🏹❄️ FROZEN ARCHER</div>
-            <div style="color: #ddd; margin-top: 2px;">• <span class="key-cap">Passive</span>: 300px 25% Frost Slow</div>
-            <div style="color: #ddd;">• <span class="key-cap">Press 1</span>: 360° Ice Wave</div>
-          </div>
-        </div>
-      </div>
-
       <!-- Character Class Selector & Difficulty Selector Side-by-Side Container -->
       <div style="margin-bottom: 18px;">
         <!-- Top Row: Selectors Title Headers -->
@@ -1254,12 +1215,6 @@
     <div class="modal-card" style="max-width: 500px;">
       <h1 class="game-title" style="background: linear-gradient(135deg, var(--accent-cyan), var(--accent-yellow)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">GAME PAUSED</h1>
       <p class="subtitle">Take a breather! Resume, restart, or return to main menu below:</p>
-
-      <!-- Ability Controls Tutorial Matrix in Pause Menu -->
-      <div style="margin-top: 10px; margin-bottom: 14px; background: rgba(0, 0, 0, 0.4); padding: 12px; border-radius: 12px; border: 1px solid rgba(255, 230, 0, 0.25);">
-        <div style="font-size: 0.82rem; font-weight: 800; color: #ffe600; text-align: center; margin-bottom: 6px;">⚡ ACTIVE CLASS CONTROLS ⚡</div>
-        <div id="pause-ability-desc" style="font-size: 0.8rem; color: #ddd; text-align: center;">Hold SPACE / Left-Click to Slash & Deflect</div>
-      </div>
 
       <div style="margin-top: 18px; margin-bottom: 18px; display: flex; flex-direction: column; gap: 10px;">
         <button class="btn-primary" id="resume-btn" style="width: 100%;">RESUME GAME [ESC / P]</button>
@@ -5813,70 +5768,8 @@
     /* Character Selector Event Listeners & State Handler */
     let selectedCharacter = 'KNIGHT';
 
-    function updateHUDControlsCard(charType) {
-      const card = document.querySelector('.controls-card');
-      const pauseDesc = document.getElementById('pause-ability-desc');
-
-      if (charType === 'BURNING_SENTINEL') {
-        if (card) {
-          card.innerHTML = `
-            <div class="control-item"><span class="key-cap">WASD</span> Move</div>
-            <div class="control-item"><span class="key-cap">Hold SPACE</span> 180° Magma Shield</div>
-            <div class="control-item"><span class="key-cap">SHIFT / E</span> 10s Fire Trail Dash</div>
-          `;
-        }
-        if (pauseDesc) pauseDesc.innerHTML = `<strong style="color:#ff3300">BURNING SENTINEL:</strong> Hold <span class="key-cap">SPACE</span> for 180° Magma Shield | Press <span class="key-cap">SHIFT / E</span> for 10s Fire Trail Dash`;
-      } else if (charType === 'FROZEN_ARCHER') {
-        if (card) {
-          card.innerHTML = `
-            <div class="control-item"><span class="key-cap">WASD</span> Move</div>
-            <div class="control-item"><span class="key-cap">Aura</span> 300px 25% Frost Slow</div>
-            <div class="control-item"><span class="key-cap">Key 1</span> 360° Ice Wave</div>
-          `;
-        }
-        if (pauseDesc) pauseDesc.innerHTML = `<strong style="color:#00f0ff">FROZEN ARCHER:</strong> Passive 300px 25% Slow Aura | Press <span class="key-cap">1</span> for 360° Ice Wave Blast`;
-      } else if (charType === 'SENTINEL') {
-        if (card) {
-          card.innerHTML = `
-            <div class="control-item"><span class="key-cap">WASD</span> Move</div>
-            <div class="control-item"><span class="key-cap">Hold SPACE</span> 180° Shield</div>
-            <div class="control-item"><span class="key-cap">SHIFT / E</span> Ramming Dash</div>
-          `;
-        }
-        if (pauseDesc) pauseDesc.innerHTML = `<strong style="color:#ffe600">SHIELD SENTINEL:</strong> Hold <span class="key-cap">SPACE</span> for 180° Shield | Press <span class="key-cap">SHIFT / E</span> for Ramming Dash`;
-      } else if (charType === 'SHOTGUN') {
-        if (card) {
-          card.innerHTML = `
-            <div class="control-item"><span class="key-cap">WASD</span> Move</div>
-            <div class="control-item"><span class="key-cap">SPACE / L-Click</span> Buckshot</div>
-            <div class="control-item"><span class="key-cap">E / R-Click</span> Heavy Explosive Slug</div>
-          `;
-        }
-        if (pauseDesc) pauseDesc.innerHTML = `<strong style="color:#ff5500">SHOTGUN ENFORCER:</strong> Press <span class="key-cap">SPACE / L-Click</span> for Buckshot | Press <span class="key-cap">E / R-Click</span> for Heavy Slug`;
-      } else if (charType === 'ARCHER') {
-        if (card) {
-          card.innerHTML = `
-            <div class="control-item"><span class="key-cap">WASD</span> Move</div>
-            <div class="control-item"><span class="key-cap">Hold L-Click</span> Arrow Spray</div>
-            <div class="control-item"><span class="key-cap">Release SPACE</span> Archer Bomb</div>
-          `;
-        }
-        if (pauseDesc) pauseDesc.innerHTML = `<strong style="color:#00ff66">ARCHER RANGER:</strong> Hold <span class="key-cap">Left-Click</span> for Arrow Spray | Release <span class="key-cap">SPACE Shield</span> to launch Bomb`;
-      } else {
-        if (card) {
-          card.innerHTML = `
-            <div class="control-item"><span class="key-cap">WASD</span> Move</div>
-            <div class="control-item"><span class="key-cap">SPACE / L-Click</span> Slash & Deflect</div>
-            <div class="control-item"><span class="key-cap">Hold SPACE</span> Block Shield</div>
-          `;
-        }
-        if (pauseDesc) pauseDesc.innerHTML = `<strong style="color:#00f0ff">SQUARE KNIGHT:</strong> Tap <span class="key-cap">SPACE / L-Click</span> to Slash | Hold <span class="key-cap">SPACE</span> to Block`;
-      }
-    }
-
     window.setCharacter = function(charType) {
       selectedCharacter = charType;
-      updateHUDControlsCard(charType);
       document.querySelectorAll('.char-card').forEach(card => {
         if (card.dataset.char === charType) {
           card.classList.add('active');
