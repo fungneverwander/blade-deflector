@@ -957,10 +957,14 @@
       <p class="subtitle" style="margin-bottom: 16px;">Complete achievements to unlock permanent passive stat bonuses and arena rewards!</p>
 
       <!-- Achievement Summary Header -->
-      <div class="achievements-summary-bar" style="display: flex; gap: 12px; align-items: stretch; margin-bottom: 14px;">
-        <!-- Back to Main Menu Button directly to the left of UNLOCKED -->
+      <div class="achievements-summary-bar" style="display: flex; gap: 10px; align-items: stretch; margin-bottom: 14px;">
+        <!-- Back to Main Menu Button -->
         <button class="btn-primary" id="achievements-close-btn" style="flex: 0.85; padding: 10px 14px; font-size: 0.88rem; font-weight: 800; background: linear-gradient(135deg, var(--accent-yellow), var(--accent-orange)); color: #040814; border-radius: 12px; margin: 0; display: flex; align-items: center; justify-content: center; white-space: nowrap; cursor: pointer;">
           ◀ BACK TO MENU
+        </button>
+        <!-- Save Progress Button directly to its right -->
+        <button class="btn-primary" onclick="saveGameProgress(true)" style="flex: 0.75; padding: 10px 14px; font-size: 0.88rem; font-weight: 800; background: linear-gradient(135deg, #39ff14, #00b344); color: #000; border-radius: 12px; margin: 0; display: flex; align-items: center; justify-content: center; white-space: nowrap; cursor: pointer;">
+          💾 SAVE
         </button>
         <div class="summary-item" style="flex: 0.7;">
           <span class="summary-label">UNLOCKED</span>
@@ -992,11 +996,6 @@
           </div>
         </div>
       </div>
-
-      <!-- Save Progress Button inside Achievements Modal -->
-      <button class="btn-primary" onclick="saveGameProgress(true)" style="width: 100%; margin-top: 12px; padding: 14px; font-size: 0.95rem; background: linear-gradient(135deg, #39ff14, #00b344); color: #000; font-weight: 800; letter-spacing: 1px;">
-        💾 SAVE PROGRESS & DOWNLOAD SAVE FILE
-      </button>
     </div>
   </div>
 
