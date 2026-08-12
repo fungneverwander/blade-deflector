@@ -1920,9 +1920,11 @@
     let triangleKillHealCounter = 0;
     let minionPactTimer = 0;
 
-    function handleEnemyKillEffects(ex, ey) {
-      // Track Archer & Sentinel Flame Kills Achievements
-      checkFlameKillsAchievement();
+    function handleEnemyKillEffects(ex, ey, enemyType = '') {
+      // Track Archer Flame Kills Achievement (ONLY FOR FLAME KNIGHTS!)
+      if (enemyType === 'SWORD_DEFLECTOR' || enemyType === 'FLAME_KNIGHT') {
+        checkFlameKillsAchievement();
+      }
 
       // 1. Nova Burst: Shoot 8 projectiles in all directions!
       if (player.crescentBuffs.novaKill) {
@@ -3114,9 +3116,10 @@
               addFloatingText(`+${Math.round(200 * getScoreMult())} DASH CRUSH!`, e.x, e.y - 20, crushColor);
               score += Math.round(200 * getScoreMult());
               const ex = e.x, ey = e.y;
+              const enemyType = e.type;
               enemies.splice(i, 1);
-              checkFlameRamKillsAchievement();
-              handleEnemyKillEffects(ex, ey);
+              checkFlameRamKillsAchievement(enemyType);
+              handleEnemyKillEffects(ex, ey, enemyType);
             }
           }
         }
@@ -4312,9 +4315,10 @@
               audio.playEnemyKill();
               score += Math.round(100 * getScoreMult());
               const ex = e.x, ey = e.y;
+              const enemyType = e.type;
               enemies.splice(j, 1);
-              checkFlameRamKillsAchievement();
-              handleEnemyKillEffects(ex, ey);
+              checkFlameRamKillsAchievement(enemyType);
+              handleEnemyKillEffects(ex, ey, enemyType);
             }
             }
           }
@@ -5168,8 +5172,9 @@
       }
     }
 
-    function checkFlameRamKillsAchievement() {
+    function checkFlameRamKillsAchievement(enemyType = '') {
       if (typeof gameDifficulty !== 'undefined' && gameDifficulty === 'TEST') return; // NO ACHIEVEMENTS IN TEST MODE!
+      if (enemyType !== 'SWORD_DEFLECTOR' && enemyType !== 'FLAME_KNIGHT') return; // MUST BE A FLAME KNIGHT!
       if (player.character === 'SENTINEL' || player.character === 'BURNING_SENTINEL') {
         flameRamKillsAsSentinel++;
         localStorage.setItem('blade_deflector_sentinel_flame_ram_kills', flameRamKillsAsSentinel);
