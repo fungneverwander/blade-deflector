@@ -1863,7 +1863,9 @@
     let projectiles = [];
     let particles = [];
     let floatingTexts = [];
+    let flameKnights = [];
     let allies = [];
+    let fireTrails = [];
     let flameKillsCounter = 0;
     let ghostKillsCounter = 0;
     let triangleKillHealCounter = 0;
@@ -2545,6 +2547,7 @@
       particles = [];
       floatingTexts = [];
       allies = [];
+      fireTrails = [];
       flameKillsCounter = 0;
       ghostKillsCounter = 0;
       updateHeartsUI();
@@ -3013,7 +3016,20 @@
         player.y += Math.sin(player.dashAngle) * dashSpeed;
 
         // Spark trail
-        createSparks(player.x, player.y, 3, '#ffe600', 4);
+        const dashColor = player.character === 'BURNING_SENTINEL' ? '#ff3300' : '#ffe600';
+        createSparks(player.x, player.y, 3, dashColor, 4);
+
+        // Leave persistent 10-Second Fire Dash Trail for Burning Sentinel! (600 frames = 10 full seconds)
+        if (player.character === 'BURNING_SENTINEL') {
+          fireTrails.push({
+            x: player.x,
+            y: player.y,
+            radius: 26,
+            life: 600, // 10 FULL SECONDS!
+            maxLife: 600,
+            damageTimer: 0
+          });
+        }
 
         // Ramming Collision with Enemies during Dash
         for (let i = enemies.length - 1; i >= 0; i--) {
@@ -4236,6 +4252,55 @@
         }
       }
 
+      // Update 10-Second Burning Sentinel Fire Dash Trails
+      for (let i = fireTrails.length - 1; i >= 0; i--) {
+        const ft = fireTrails[i];
+        ft.life--;
+
+        // Ember spark particles rising from fire trail
+        if (Math.random() < 0.35) {
+          particles.push({
+            x: ft.x + (Math.random() - 0.5) * ft.radius,
+            y: ft.y + (Math.random() - 0.5) * ft.radius,
+            vx: (Math.random() - 0.5) * 1.2,
+            vy: -Math.random() * 2 - 0.5,
+            size: Math.random() * 4 + 2,
+            color: Math.random() < 0.5 ? '#ff3300' : '#ffe600',
+            life: 0.5,
+            decay: 0.05
+          });
+        }
+
+        // Damage enemies standing in/touching the 10s fire trail (every 12 frames)
+        ft.damageTimer++;
+        if (ft.damageTimer >= 12) {
+          ft.damageTimer = 0;
+          for (let j = enemies.length - 1; j >= 0; j--) {
+            const e = enemies[j];
+            const dx = e.x - ft.x;
+            const dy = e.y - ft.y;
+            if (Math.sqrt(dx * dx + dy * dy) <= ft.radius + e.size / 2) {
+              createSparks(e.x, e.y, 6, '#ff4400', 4);
+              if (e.type === 'PURPLE_BOSS' || e.type === 'CRESCENT_BOSS' || e.type === 'TRIANGLE_BOSS' || e.type === 'MINI_HEXAGON') {
+                e.hp -= 1;
+                addFloatingText('🔥 FIRE TRAIL BURN!', e.x, e.y - 30, '#ff4400');
+              } else {
+                audio.playEnemyKill();
+                score += Math.round(100 * getScoreMult());
+                const ex = e.x, ey = e.y;
+                enemies.splice(j, 1);
+                checkFlameRamKillsAchievement();
+                handleEnemyKillEffects(ex, ey);
+              }
+            }
+          }
+        }
+
+        if (ft.life <= 0) {
+          fireTrails.splice(i, 1);
+        }
+      }
+
       // Update Floating Score / Text Callouts
       for (let i = floatingTexts.length - 1; i >= 0; i--) {
         const ft = floatingTexts[i];
@@ -4777,6 +4842,27 @@
         ctx.shadowColor = '#ffe600';
         ctx.shadowBlur = 10;
         ctx.fillRect(al.size / 2, -3, al.swordLength, 6);
+        ctx.restore();
+      });
+
+      // Render 10-Second Fire Dash Trails for Burning Sentinel
+      fireTrails.forEach(ft => {
+        ctx.save();
+        const alpha = Math.min(1.0, ft.life / 60); // Smooth fade out during last second
+        ctx.globalAlpha = alpha * 0.75;
+
+        // Outer Flame Radial Glow
+        const flameGradient = ctx.createRadialGradient(ft.x, ft.y, 2, ft.x, ft.y, ft.radius);
+        flameGradient.addColorStop(0, '#ffe600');
+        flameGradient.addColorStop(0.5, '#ff3300');
+        flameGradient.addColorStop(1, 'rgba(255, 0, 0, 0)');
+
+        ctx.fillStyle = flameGradient;
+        ctx.shadowColor = '#ff3300';
+        ctx.shadowBlur = 14;
+        ctx.beginPath();
+        ctx.arc(ft.x, ft.y, ft.radius, 0, Math.PI * 2);
+        ctx.fill();
         ctx.restore();
       });
 
