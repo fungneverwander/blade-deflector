@@ -212,7 +212,7 @@
 
     /* Modal Overlay Screens (Start, Game Over, Pause) */
     .modal-overlay {
-      position: absolute;
+      position: fixed;
       top: 0;
       left: 0;
       width: 100%;
@@ -227,6 +227,8 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+      touch-action: pan-y !important;
+      -webkit-overflow-scrolling: touch !important;
     }
 
     .modal-overlay.active {
@@ -245,6 +247,9 @@
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85), 0 0 40px rgba(255, 120, 0, 0.2);
       transform: translateY(20px) scale(0.95);
       transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      touch-action: pan-y !important;
+      -webkit-overflow-scrolling: touch !important;
+      overflow-y: auto !important;
     }
 
     .modal-overlay.active .modal-card {
@@ -1665,8 +1670,14 @@
       }, { passive: false });
     }
 
-    // Global Touch Support & Mobile Pull-To-Refresh Prevention
+    // Global Touch Support & Mobile Menu Touch Scroll Handling
     window.addEventListener('touchmove', (e) => {
+      // Allow finger scrolling inside modal menus on mobile!
+      const isInsideModal = e.target.closest && (e.target.closest('.modal-card') || e.target.closest('.modal-overlay'));
+      if (isInsideModal && gameState !== 'PLAYING') {
+        return; // Allow native mobile touch scrolling down the menu!
+      }
+
       if (e.cancelable) e.preventDefault();
       if (e.touches.length > 0 && !touchAimActive) {
         mouse.x = e.touches[0].clientX;
