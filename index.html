@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Blade Deflector - Square Knight Action Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>BLADE DEFLECTOR - Top-Down Shield Slash Arena</title>
   <meta name="description" content="Defend against green biting squares and deflect incoming projectiles in this fast-paced square knight action game!">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -525,8 +525,160 @@
       pointer-events: none;
       z-index: 20;
       background: radial-gradient(circle, rgba(0, 240, 255, 0.4) 0%, rgba(255, 230, 0, 0.1) 80%);
-      opacity: 0;
-      transition: opacity 0.08s ease;
+    /* Mobile & Tablet Controls Layer */
+    #mobile-controls {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 15;
+      display: none; /* Auto-enabled on touch / small screens */
+    }
+
+    @media (pointer: coarse), (max-width: 900px) {
+      #mobile-controls {
+        display: block;
+      }
+      .controls-card {
+        display: none !important; /* Hide keyboard WASD hints on mobile */
+      }
+    }
+
+    .v-joystick-base {
+      position: absolute;
+      bottom: 24px;
+      width: 110px;
+      height: 110px;
+      border-radius: 50%;
+      background: rgba(0, 240, 255, 0.08);
+      border: 2px solid rgba(0, 240, 255, 0.3);
+      backdrop-filter: blur(4px);
+      pointer-events: auto;
+      touch-action: none;
+    }
+
+    #v-joystick-move {
+      left: 24px;
+    }
+
+    #v-joystick-aim {
+      right: 140px;
+    }
+
+    .v-joystick-stick {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 44px;
+      height: 44px;
+      margin-top: -22px;
+      margin-left: -22px;
+      border-radius: 50%;
+      background: radial-gradient(circle, #00f0ff 0%, rgba(0, 240, 255, 0.6) 100%);
+      box-shadow: 0 0 15px rgba(0, 240, 255, 0.8);
+      pointer-events: none;
+      transition: transform 0.05s ease-out;
+    }
+
+    .touch-btn {
+      position: absolute;
+      bottom: 28px;
+      right: 24px;
+      width: 96px;
+      height: 96px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(0, 240, 255, 0.3) 0%, rgba(0, 240, 255, 0.1) 100%);
+      border: 2px solid var(--accent-cyan);
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
+      color: #ffffff;
+      font-weight: 800;
+      font-size: 0.8rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 2px;
+      pointer-events: auto;
+      touch-action: none;
+      user-select: none;
+      cursor: pointer;
+    }
+
+    .touch-btn:active {
+      transform: scale(0.92);
+      background: rgba(0, 240, 255, 0.5);
+    }
+
+    .touch-btn-shop {
+      position: absolute;
+      bottom: 140px;
+      right: 28px;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: rgba(255, 230, 0, 0.15);
+      border: 2px solid var(--accent-yellow);
+      box-shadow: 0 0 12px rgba(255, 230, 0, 0.4);
+      color: var(--accent-yellow);
+      font-weight: 800;
+      font-size: 1.1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      pointer-events: auto;
+      touch-action: none;
+      user-select: none;
+      cursor: pointer;
+    }
+
+    /* Mobile Phone & Tablet Modal Responsive Styles */
+    @media (max-width: 768px) {
+      .modal-card {
+        padding: 14px !important;
+        max-width: 95vw !important;
+        max-height: 92vh !important;
+        overflow-y: auto !important;
+      }
+      .game-title {
+        font-size: 1.7rem !important;
+        letter-spacing: 2px !important;
+      }
+      .diff-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 6px !important;
+      }
+      .hud-top {
+        gap: 4px !important;
+        padding: 6px 10px !important;
+      }
+      .hud-card {
+        padding: 4px 8px !important;
+      }
+      .score-value {
+        font-size: 0.95rem !important;
+      }
+      .v-joystick-base {
+        width: 90px;
+        height: 90px;
+        bottom: 16px;
+      }
+      #v-joystick-move { left: 16px; }
+      #v-joystick-aim { right: 116px; }
+      .touch-btn {
+        width: 80px;
+        height: 80px;
+        bottom: 16px;
+        right: 16px;
+        font-size: 0.7rem;
+      }
+      .touch-btn-shop {
+        bottom: 110px;
+        right: 20px;
+        width: 48px;
+        height: 48px;
+      }
     }
   </style>
 </head>
@@ -605,6 +757,30 @@
         <span style="font-size: 1.1rem; line-height: 1;">⏸️</span>
       </button>
     </div>
+  </div>
+
+  <!-- Mobile & Tablet Touch Controllers Layer -->
+  <div id="mobile-controls">
+    <!-- Left Movement Analog Stick -->
+    <div class="v-joystick-base" id="v-joystick-move">
+      <div class="v-joystick-stick" id="v-stick-move"></div>
+    </div>
+
+    <!-- Right Aim Analog Stick -->
+    <div class="v-joystick-base" id="v-joystick-aim">
+      <div class="v-joystick-stick" id="v-stick-aim"></div>
+    </div>
+
+    <!-- Main Touch Action Button (Spacebar Emulation) -->
+    <button class="touch-btn" id="touch-btn-action">
+      <span id="touch-action-icon" style="font-size: 1.4rem;">⚔️</span>
+      <span id="touch-action-label">ATTACK</span>
+    </button>
+
+    <!-- Shop Buy Touch Button (TAB Emulation) -->
+    <button class="touch-btn-shop" id="touch-btn-shop" title="Buy at Shop Pedestal">
+      🛒
+    </button>
   </div>
 
   <!-- Start / Controls Modal -->
@@ -1250,14 +1426,176 @@
       resetInputFlags();
     });
 
-    window.addEventListener('mousemove', (e) => {
-      mouse.x = e.clientX;
-      mouse.y = e.clientY;
-    });
+    // Mobile Touch Controllers & Virtual Joysticks
+    let touchJoystickDx = 0;
+    let touchJoystickDy = 0;
+    let touchJoystickActive = false;
+    let touchAimAngle = 0;
+    let touchAimActive = false;
+
+    // Movement Virtual Joystick Handlers
+    const vJoystickMove = document.getElementById('v-joystick-move');
+    const vStickMove = document.getElementById('v-stick-move');
+    let moveTouchId = null;
+    let moveCenter = { x: 0, y: 0 };
+
+    if (vJoystickMove) {
+      vJoystickMove.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (moveTouchId === null && e.changedTouches.length > 0) {
+          const t = e.changedTouches[0];
+          moveTouchId = t.identifier;
+          const rect = vJoystickMove.getBoundingClientRect();
+          moveCenter = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+          updateMoveJoystick(t.clientX, t.clientY);
+        }
+      }, { passive: false });
+
+      window.addEventListener('touchmove', (e) => {
+        for (let i = 0; i < e.changedTouches.length; i++) {
+          const t = e.changedTouches[i];
+          if (t.identifier === moveTouchId) {
+            updateMoveJoystick(t.clientX, t.clientY);
+            break;
+          }
+        }
+      }, { passive: false });
+
+      const endMoveTouch = (e) => {
+        for (let i = 0; i < e.changedTouches.length; i++) {
+          if (e.changedTouches[i].identifier === moveTouchId) {
+            moveTouchId = null;
+            touchJoystickDx = 0;
+            touchJoystickDy = 0;
+            touchJoystickActive = false;
+            if (vStickMove) vStickMove.style.transform = 'translate(0px, 0px)';
+            break;
+          }
+        }
+      };
+
+      window.addEventListener('touchend', endMoveTouch);
+      window.addEventListener('touchcancel', endMoveTouch);
+    }
+
+    function updateMoveJoystick(clientX, clientY) {
+      const dx = clientX - moveCenter.x;
+      const dy = clientY - moveCenter.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const maxRadius = 40;
+
+      const clampedDist = Math.min(dist, maxRadius);
+      const angle = Math.atan2(dy, dx);
+
+      const px = Math.cos(angle) * clampedDist;
+      const py = Math.sin(angle) * clampedDist;
+
+      if (vStickMove) vStickMove.style.transform = `translate(${px}px, ${py}px)`;
+
+      touchJoystickDx = Math.cos(angle) * (clampedDist / maxRadius);
+      touchJoystickDy = Math.sin(angle) * (clampedDist / maxRadius);
+      touchJoystickActive = true;
+    }
+
+    // Aim Virtual Joystick Handlers
+    const vJoystickAim = document.getElementById('v-joystick-aim');
+    const vStickAim = document.getElementById('v-stick-aim');
+    let aimTouchId = null;
+    let aimCenter = { x: 0, y: 0 };
+
+    if (vJoystickAim) {
+      vJoystickAim.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (aimTouchId === null && e.changedTouches.length > 0) {
+          const t = e.changedTouches[0];
+          aimTouchId = t.identifier;
+          const rect = vJoystickAim.getBoundingClientRect();
+          aimCenter = { x: rect.left + rect.width / 2, y: rect.top + rect.height / 2 };
+          updateAimJoystick(t.clientX, t.clientY);
+        }
+      }, { passive: false });
+
+      window.addEventListener('touchmove', (e) => {
+        for (let i = 0; i < e.changedTouches.length; i++) {
+          const t = e.changedTouches[i];
+          if (t.identifier === aimTouchId) {
+            updateAimJoystick(t.clientX, t.clientY);
+            break;
+          }
+        }
+      }, { passive: false });
+
+      const endAimTouch = (e) => {
+        for (let i = 0; i < e.changedTouches.length; i++) {
+          if (e.changedTouches[i].identifier === aimTouchId) {
+            aimTouchId = null;
+            touchAimActive = false;
+            if (vStickAim) vStickAim.style.transform = 'translate(0px, 0px)';
+            break;
+          }
+        }
+      };
+
+      window.addEventListener('touchend', endAimTouch);
+      window.addEventListener('touchcancel', endAimTouch);
+    }
+
+    function updateAimJoystick(clientX, clientY) {
+      const dx = clientX - aimCenter.x;
+      const dy = clientY - aimCenter.y;
+      const dist = Math.sqrt(dx * dx + dy * dy);
+      const maxRadius = 40;
+
+      const clampedDist = Math.min(dist, maxRadius);
+      const angle = Math.atan2(dy, dx);
+
+      const px = Math.cos(angle) * clampedDist;
+      const py = Math.sin(angle) * clampedDist;
+
+      if (vStickAim) vStickAim.style.transform = `translate(${px}px, ${py}px)`;
+
+      touchAimAngle = angle;
+      touchAimActive = true;
+    }
+
+    // Touch Action Button Handlers (Spacebar Emulation)
+    const touchBtnAction = document.getElementById('touch-btn-action');
+    if (touchBtnAction) {
+      touchBtnAction.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (gameState === 'PLAYING') {
+          keys['Space'] = true;
+          spaceDownTime = performance.now();
+          spaceWasTapped = true;
+          spaceIsHeld = true;
+        }
+      }, { passive: false });
+
+      const endTouchAction = (e) => {
+        e.preventDefault();
+        keys['Space'] = false;
+        spaceIsHeld = false;
+        spaceDownTime = 0;
+      };
+
+      touchBtnAction.addEventListener('touchend', endTouchAction, { passive: false });
+      touchBtnAction.addEventListener('touchcancel', endTouchAction, { passive: false });
+    }
+
+    // Touch Shop Buy Button Handlers (TAB Emulation)
+    const touchBtnShop = document.getElementById('touch-btn-shop');
+    if (touchBtnShop) {
+      touchBtnShop.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (gameState === 'PLAYING') {
+          tabWasPressed = true;
+        }
+      }, { passive: false });
+    }
 
     // Touch Support for mobile / cursor alignment
     window.addEventListener('touchmove', (e) => {
-      if (e.touches.length > 0) {
+      if (e.touches.length > 0 && !touchAimActive) {
         mouse.x = e.touches[0].clientX;
         mouse.y = e.touches[0].clientY;
       }
@@ -2563,9 +2901,18 @@
       if (keys['KeyA'] || keys['ArrowLeft']) dx -= 1;
       if (keys['KeyD'] || keys['ArrowRight']) dx += 1;
 
+      // Add Touch Joystick Input!
+      if (touchJoystickActive) {
+        dx += touchJoystickDx;
+        dy += touchJoystickDy;
+      }
+
       if (dx !== 0 && dy !== 0) {
-        dx *= 0.7071;
-        dy *= 0.7071;
+        let mag = Math.sqrt(dx * dx + dy * dy);
+        if (mag > 1) {
+          dx /= mag;
+          dy /= mag;
+        }
       }
 
       player.x += dx * moveSpeed;
@@ -2575,8 +2922,14 @@
       player.x = Math.max(player.size / 2, Math.min(width - player.size / 2, player.x));
       player.y = Math.max(player.size / 2, Math.min(height - player.size / 2, player.y));
 
-      // Player Aim Angle towards mouse
-      player.angle = Math.atan2(mouse.y - player.y, mouse.x - player.x);
+      // Player Aim Angle towards mouse (or touch aim pad)
+      if (touchAimActive) {
+        player.angle = touchAimAngle;
+        mouse.x = player.x + Math.cos(touchAimAngle) * 100;
+        mouse.y = player.y + Math.sin(touchAimAngle) * 100;
+      } else {
+        player.angle = Math.atan2(mouse.y - player.y, mouse.x - player.x);
+      }
 
       // Decrement Invulnerability
       if (player.invulnerableTimer > 0) player.invulnerableTimer--;
