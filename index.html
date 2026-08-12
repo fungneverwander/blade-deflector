@@ -1977,19 +1977,8 @@
           target.x += Math.cos(pushAngle) * 35;
           target.y += Math.sin(pushAngle) * 35;
 
-          if (target.type === 'PURPLE_BOSS' || target.type === 'CRESCENT_BOSS' || target.type === 'TRIANGLE_BOSS') {
-            target.hp -= 3;
-            addFloatingText(`AOE CRASH! ${target.hp} HP`, target.x, target.y - 30, '#ff5500');
-            if (target.hp <= 0) {
-              createSparks(target.x, target.y, 50, target.color, 12);
-              audio.playDeflect();
-              let bossScore = target.type === 'TRIANGLE_BOSS' ? 5000 : (target.type === 'CRESCENT_BOSS' ? 3000 : 2000);
-              score += Math.round(bossScore * getScoreMult());
-              enemies.splice(k, 1);
-              if (target.type === 'PURPLE_BOSS') openRewardModal();
-              else if (target.type === 'CRESCENT_BOSS') openCrescentRewardModal();
-              else openTriangleRewardModal();
-            }
+          if (isBossOrMini(target)) {
+            damageBossOrMini(target, 3);
           } else {
             createSparks(target.x, target.y, 20, '#ff5500', 7);
             audio.playEnemyKill();
@@ -2054,20 +2043,9 @@
             target.speed *= 0.3; // Frostbite slow!
           }
 
-          if (target.type === 'PURPLE_BOSS' || target.type === 'CRESCENT_BOSS' || target.type === 'TRIANGLE_BOSS' || target.type === 'MINI_HEXAGON') {
+          if (isBossOrMini(target)) {
             let bonusDmg = player.triangleBuffs.fireAttacks ? 6 : 4;
-            target.hp -= bonusDmg;
-            addFloatingText(`BOMB CRASH! ${target.hp} HP`, target.x, target.y - 30, sparkColor);
-            if (target.hp <= 0) {
-              createSparks(target.x, target.y, 50, target.color, 12);
-              audio.playDeflect();
-              let bossScore = target.type === 'TRIANGLE_BOSS' ? 5000 : (target.type === 'CRESCENT_BOSS' ? 3000 : (target.type === 'MINI_HEXAGON' ? 600 : 2000));
-              score += Math.round(bossScore * getScoreMult());
-              enemies.splice(k, 1);
-              if (target.type === 'PURPLE_BOSS') openRewardModal();
-              else if (target.type === 'CRESCENT_BOSS') openCrescentRewardModal();
-              else if (target.type === 'TRIANGLE_BOSS') openTriangleRewardModal();
-            }
+            damageBossOrMini(target, bonusDmg);
           } else {
             createSparks(target.x, target.y, 22, sparkColor, 7);
             audio.playEnemyKill();
@@ -2194,6 +2172,35 @@
       if (gameDifficulty === 'HARD') return 2.5;
       if (gameDifficulty === 'NORMAL') return 1.5;
       return 1.0;
+    }
+
+    function isBossOrMini(e) {
+      return e && (e.type === 'PURPLE_BOSS' || e.type === 'CRESCENT_BOSS' || e.type === 'TRIANGLE_BOSS' || 
+                  e.type === 'MINI_HEXAGON' || e.type === 'MINI_CRESCENT' || e.type === 'MINI_TRIANGLE');
+    }
+
+    function damageBossOrMini(e, dmg) {
+      if (!e) return false;
+      e.hp -= dmg;
+      createSparks(e.x, e.y, 18, e.color || '#ffe600', 7);
+      audio.playEnemyKill();
+      addFloatingText(`HIT! ${e.hp} HP`, e.x, e.y - 30, e.color || '#ffe600');
+
+      if (e.hp <= 0) {
+        createSparks(e.x, e.y, 50, e.color || '#ffe600', 12);
+        audio.playDeflect();
+        let bossScore = e.type === 'TRIANGLE_BOSS' ? 5000 : (e.type === 'CRESCENT_BOSS' ? 3000 : (e.type === 'MINI_TRIANGLE' ? 850 : (e.type === 'MINI_CRESCENT' ? 750 : (e.type === 'MINI_HEXAGON' ? 600 : 2000))));
+        score += Math.round(bossScore * getScoreMult());
+        const ex = e.x, ey = e.y;
+        const idx = enemies.indexOf(e);
+        if (idx !== -1) enemies.splice(idx, 1);
+        handleEnemyKillEffects(ex, ey);
+        if (e.type === 'PURPLE_BOSS') openRewardModal();
+        else if (e.type === 'CRESCENT_BOSS') openCrescentRewardModal();
+        else if (e.type === 'TRIANGLE_BOSS') openTriangleRewardModal();
+        return true;
+      }
+      return false;
     }
 
     function spawnGreenSquare() {
@@ -2990,23 +2997,10 @@
             e.x += Math.cos(pushAngle) * 35;
             e.y += Math.sin(pushAngle) * 35;
 
-            if (e.type === 'PURPLE_BOSS' || e.type === 'CRESCENT_BOSS' || e.type === 'TRIANGLE_BOSS' || e.type === 'MINI_HEXAGON') {
+            if (isBossOrMini(e)) {
               if (!e.hitByIceWave) {
                 e.hitByIceWave = true;
-                e.hp -= 4;
-                createSparks(e.x, e.y, 25, '#00f0ff', 8);
-                audio.playEnemyKill();
-                addFloatingText(`ICE WAVE HIT! ${e.hp} HP`, e.x, e.y - 30, '#00f0ff');
-                if (e.hp <= 0) {
-                  createSparks(e.x, e.y, 50, e.color, 12);
-                  audio.playDeflect();
-                  let bossScore = e.type === 'TRIANGLE_BOSS' ? 5000 : (e.type === 'CRESCENT_BOSS' ? 3000 : (e.type === 'MINI_HEXAGON' ? 600 : 2000));
-                  score += Math.round(bossScore * getScoreMult());
-                  enemies.splice(i, 1);
-                  if (e.type === 'PURPLE_BOSS') openRewardModal();
-                  else if (e.type === 'CRESCENT_BOSS') openCrescentRewardModal();
-                  else if (e.type === 'TRIANGLE_BOSS') openTriangleRewardModal();
-                }
+                damageBossOrMini(e, 4);
               }
             } else {
               createSparks(e.x, e.y, 20, '#00f0ff', 7);
@@ -4101,67 +4095,49 @@
                 projectiles.splice(i, 1);
                 break;
               }
-              if (e.type === 'PURPLE_BOSS') {
+              if (isBossOrMini(e)) {
                 let bonusDmg = player.triangleBuffs.fireAttacks ? 2 : 1;
-                e.hp -= bonusDmg;
-                createSparks(e.x, e.y, 22, '#ffe600', 8);
-                audio.playEnemyKill();
                 projectiles.splice(i, 1);
-                addFloatingText(`DEFLECT HIT! ${e.hp} HP`, e.x, e.y - 35, '#ffe600');
+                damageBossOrMini(e, bonusDmg);
+                break;
+              } else if (e.type === 'SHIELD_BASHER') {
+                // Check if hit front shield while active
+                let isBlocked = false;
+                if (e.shieldActive && e.shieldBrokenTimer <= 0) {
+                  const angleToAttacker = Math.atan2(p.y - e.y, p.x - e.x);
+                  let diff = Math.abs(angleToAttacker - e.angle);
+                  while (diff > Math.PI) diff -= Math.PI * 2;
+                  diff = Math.abs(diff);
 
-                if (e.hp <= 0) {
-                  createSparks(e.x, e.y, 45, '#9d00ff', 12);
-                  audio.playDeflect();
-                  score += Math.round(2000 * getScoreMult());
-                  enemies.splice(j, 1);
-                  openRewardModal(); // Open Legendary Upgrade Modal!
+                  if (diff <= Math.PI / 2) {
+                    isBlocked = true;
+                  }
                 }
-              } else if (e.type === 'CRESCENT_BOSS') {
-                let bonusDmg = player.triangleBuffs.fireAttacks ? 2 : 1;
-                e.hp -= bonusDmg;
-                createSparks(e.x, e.y, 22, '#00ffaa', 8);
-                audio.playEnemyKill();
-                projectiles.splice(i, 1);
-                addFloatingText(`DEFLECT HIT! ${e.hp} HP`, e.x, e.y - 35, '#00ffaa');
 
-                if (e.hp <= 0) {
-                  createSparks(e.x, e.y, 50, '#00ffaa', 12);
-                  audio.playDeflect();
-                  score += Math.round(3000 * getScoreMult());
-                  enemies.splice(j, 1);
-                  openCrescentRewardModal();
+                if (isBlocked) {
+                  audio.playBlock();
+                  createSparks(e.x, e.y, 12, '#ff9900', 5);
+                  addFloatingText('ENEMY SHIELD BLOCKED!', e.x, e.y - 30, '#ff9900');
+                  projectiles.splice(i, 1);
+                  break;
                 }
-              } else if (e.type === 'TRIANGLE_BOSS') {
-                let bonusDmg = player.triangleBuffs.fireAttacks ? 2 : 1;
-                e.hp -= bonusDmg;
-                createSparks(e.x, e.y, 22, '#ff3300', 8);
+
+                // Otherwise take damage!
+                e.hp--;
+                createSparks(e.x, e.y, 16, '#ff9900', 6);
                 audio.playEnemyKill();
+                addFloatingText(`BASHER HIT! ${e.hp} HP`, e.x, e.y - 35, '#ff9900');
                 projectiles.splice(i, 1);
-                addFloatingText(`DEFLECT HIT! ${e.hp} HP`, e.x, e.y - 35, '#ff3300');
 
                 if (e.hp <= 0) {
-                  createSparks(e.x, e.y, 60, '#ff3300', 14);
+                  createSparks(e.x, e.y, 30, '#ff9900', 9);
                   audio.playDeflect();
-                  score += Math.round(5000 * getScoreMult());
-                  enemies.splice(j, 1);
-                  openTriangleRewardModal();
-                }
-              } else if (e.type === 'MINI_HEXAGON') {
-                let bonusDmg = player.triangleBuffs.fireAttacks ? 2 : 1;
-                e.hp -= bonusDmg;
-                createSparks(e.x, e.y, 18, '#bf00ff', 7);
-                audio.playEnemyKill();
-                projectiles.splice(i, 1);
-                addFloatingText(`DEFLECT HIT! ${e.hp} HP`, e.x, e.y - 30, '#bf00ff');
-
-                if (e.hp <= 0) {
-                  createSparks(e.x, e.y, 35, '#bf00ff', 9);
-                  audio.playDeflect();
-                  score += Math.round(600 * getScoreMult());
+                  score += Math.round(300 * getScoreMult());
                   const ex = e.x, ey = e.y;
                   enemies.splice(j, 1);
                   handleEnemyKillEffects(ex, ey);
                 }
+                break;
               } else {
                 // Explode normal enemy!
                 createSparks(e.x, e.y, 25, '#ffe600', 8);
@@ -4172,8 +4148,8 @@
                 enemies.splice(j, 1);
                 projectiles.splice(i, 1);
                 handleEnemyKillEffects(ex, ey);
+                break;
               }
-              break;
             }
           }
           continue;
@@ -4247,11 +4223,8 @@
           al.y += Math.sin(angle) * al.speed;
 
           if (minDist <= al.size / 2 + nearestEnemy.size / 2 + 10) {
-            if (nearestEnemy.type === 'PURPLE_BOSS' || nearestEnemy.type === 'CRESCENT_BOSS' || nearestEnemy.type === 'TRIANGLE_BOSS' || nearestEnemy.type === 'MINI_HEXAGON' || nearestEnemy.type === 'MINI_CRESCENT' || nearestEnemy.type === 'MINI_TRIANGLE') {
-              nearestEnemy.hp -= 2;
-              createSparks(nearestEnemy.x, nearestEnemy.y, 16, '#ff6600', 6);
-              audio.playEnemyKill();
-              addFloatingText('-2 HP', nearestEnemy.x, nearestEnemy.y - 30, '#ff6600');
+            if (isBossOrMini(nearestEnemy)) {
+              damageBossOrMini(nearestEnemy, 2);
             } else {
               const eIdx = enemies.indexOf(nearestEnemy);
               if (eIdx !== -1) {
@@ -4298,17 +4271,16 @@
             const dy = e.y - ft.y;
             if (Math.sqrt(dx * dx + dy * dy) <= ft.radius + e.size / 2) {
               createSparks(e.x, e.y, 6, '#ff4400', 4);
-              if (e.type === 'PURPLE_BOSS' || e.type === 'CRESCENT_BOSS' || e.type === 'TRIANGLE_BOSS' || e.type === 'MINI_HEXAGON') {
-                e.hp -= 1;
-                addFloatingText('🔥 FIRE TRAIL BURN!', e.x, e.y - 30, '#ff4400');
-              } else {
-                audio.playEnemyKill();
-                score += Math.round(100 * getScoreMult());
-                const ex = e.x, ey = e.y;
-                enemies.splice(j, 1);
-                checkFlameRamKillsAchievement();
-                handleEnemyKillEffects(ex, ey);
-              }
+            if (isBossOrMini(e)) {
+              damageBossOrMini(e, 1);
+            } else {
+              audio.playEnemyKill();
+              score += Math.round(100 * getScoreMult());
+              const ex = e.x, ey = e.y;
+              enemies.splice(j, 1);
+              checkFlameRamKillsAchievement();
+              handleEnemyKillEffects(ex, ey);
+            }
             }
           }
         }
