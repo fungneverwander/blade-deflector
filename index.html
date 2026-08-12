@@ -1068,6 +1068,9 @@
 
       <div style="display: flex; gap: 10px; width: 100%; margin-top: 10px;">
         <button class="btn-primary" id="restart-btn" style="flex: 2;">PLAY AGAIN ▶</button>
+        <button onclick="openAchievementsModal()" style="flex: 1; padding: 14px; font-size: 0.92rem; font-weight: 800; background: rgba(255, 230, 0, 0.12); border: 2px solid var(--accent-yellow); color: var(--accent-yellow); border-radius: 14px; cursor: pointer; transition: all 0.2s ease;">
+          🏆 ACHIEVEMENTS
+        </button>
         <button onclick="saveGameProgress(true)" style="flex: 1; padding: 14px; font-size: 0.92rem; font-weight: 800; background: rgba(57, 255, 20, 0.12); border: 2px solid #39ff14; color: #39ff14; border-radius: 14px; cursor: pointer; transition: all 0.2s ease;">
           💾 SAVE
         </button>
@@ -1203,6 +1206,7 @@
 
       <div style="margin-top: 18px; margin-bottom: 18px; display: flex; flex-direction: column; gap: 10px;">
         <button class="btn-primary" id="resume-btn" style="width: 100%;">RESUME GAME [ESC / P]</button>
+        <button class="btn-primary" onclick="openAchievementsModal()" style="width: 100%; background: linear-gradient(135deg, #ffe600, #ff9900); color: #040814; font-weight: 800;">🏆 ACHIEVEMENTS & BONUSES</button>
         <button class="btn-primary" id="pause-save-btn" onclick="saveGameProgress(true)" style="width: 100%; background: linear-gradient(135deg, #00ff66, #00b344); color: #040814; font-weight: 800;">💾 SAVE PROGRESS TO DEVICE</button>
         <button class="btn-primary" id="pause-restart-btn" style="width: 100%; background: linear-gradient(135deg, #ff0055, #ff6b00);">RESTART RUN</button>
         <button class="btn-primary" id="pause-mainmenu-btn" style="width: 100%; background: linear-gradient(135deg, var(--accent-yellow), var(--accent-orange)); color: #040814;">🏠 RETURN TO MAIN MENU</button>
