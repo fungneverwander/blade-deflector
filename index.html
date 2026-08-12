@@ -640,13 +640,13 @@
     }
 
     /* Mobile Phone & Tablet Modal Responsive Styles */
-    @media (pointer: coarse), (max-width: 960px), (max-height: 500px) {
-      .guide-box, .subtitle {
-        display: none !important; /* Hide explanation box on all touch & mobile devices (portrait & landscape) */
+    @media (pointer: coarse), (max-width: 1200px), (max-height: 700px) {
+      .guide-box, .subtitle, #start-guide-box, #start-subtitle {
+        display: none !important; /* Hide explanation box on all touch & mobile devices */
       }
     }
 
-    @media (max-width: 960px), (max-height: 500px) {
+    @media (max-width: 1200px), (max-height: 700px) {
       .modal-card {
         padding: 12px !important;
         max-width: 95vw !important;
@@ -800,9 +800,9 @@
   <div class="modal-overlay active" id="start-modal">
     <div class="modal-card" style="max-width: 960px;">
       <h1 class="game-title">BLADE DEFLECTOR</h1>
-      <p class="subtitle">Equip your energy blade. Slash swarming biting squares and deflect incoming projectiles!</p>
+      <p class="subtitle" id="start-subtitle">Equip your energy blade. Slash swarming biting squares and deflect incoming projectiles!</p>
       
-      <div class="guide-box">
+      <div class="guide-box" id="start-guide-box">
         <div class="guide-row">
           <div class="guide-badge gb-green">🟩</div>
           <div class="guide-desc"><strong>Green Biting Squares:</strong> Swarm and bite you! Lose 1 heart per bite. Slash them before they reach you.</div>
@@ -1615,11 +1615,20 @@
       }
     }, { passive: false });
 
-    window.addEventListener('touchstart', (e) => {
-      if (e.cancelable && e.touches.length === 1 && e.touches[0].clientY < 60) {
-        e.preventDefault();
+    // Global Mobile & Touch Check to hide Start Menu Explanation Box on Mobile
+    function checkMobileGuideBox() {
+      const isMobile = ('ontouchstart' in window) || (navigator.maxTouchPoints > 0) || (window.innerWidth <= 1024);
+      if (isMobile) {
+        const gb = document.getElementById('start-guide-box');
+        const st = document.getElementById('start-subtitle');
+        if (gb) gb.style.setProperty('display', 'none', 'important');
+        if (st) st.style.setProperty('display', 'none', 'important');
       }
-    }, { passive: false });
+    }
+    window.addEventListener('DOMContentLoaded', checkMobileGuideBox);
+    window.addEventListener('load', checkMobileGuideBox);
+    window.addEventListener('resize', checkMobileGuideBox);
+    checkMobileGuideBox();
 
     /* ==========================================================================
        Game Entities & Systems
