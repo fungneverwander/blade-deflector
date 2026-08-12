@@ -31,7 +31,9 @@
       padding: 0;
       user-select: none;
       -webkit-user-select: none;
-      -webkit-text-size-adjust: 100%;
+      -webkit-text-size-adjust: none !important;
+      -moz-text-size-adjust: none !important;
+      text-size-adjust: none !important;
       touch-action: manipulation;
     }
 
@@ -1428,6 +1430,12 @@
       canvas.height = height * dpr;
       canvas.style.width = width + 'px';
       canvas.style.height = height + 'px';
+
+      document.documentElement.style.width = width + 'px';
+      document.documentElement.style.height = height + 'px';
+      document.body.style.width = width + 'px';
+      document.body.style.height = height + 'px';
+
       ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transformation matrix before scaling!
       ctx.scale(dpr, dpr);
     }
