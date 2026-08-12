@@ -5795,12 +5795,13 @@
         if (card) {
           card.innerHTML = `
             <div class="control-item"><span class="key-cap">WASD</span> Move</div>
-            <div class="control-item"><span class="key-cap">Aura</span> 300px 25% Frost Slow</div>
+            <div class="control-item"><span class="key-cap">Tap SPACE / L-Click</span> Frost Arrow</div>
+            <div class="control-item"><span class="key-cap">Release SPACE</span> Frost Nova Bomb</div>
             <div class="control-item"><span class="key-cap">Key 1</span> 360° Ice Wave</div>
           `;
         }
         if (titleEl) { titleEl.textContent = '🏹❄️ EQUIPPED: FROZEN ARCHER'; titleEl.style.color = '#00f0ff'; }
-        if (descEl) descEl.innerHTML = `• Passive: 300px 25% Frost Slow Aura | • Press <span class="key-cap">1</span>: 360° Ice Wave Blast (300px)`;
+        if (descEl) descEl.innerHTML = `• Tap <span class="key-cap">SPACE / L-Click</span>: Frost Arrow | • Release <span class="key-cap">SPACE Shield</span>: Frost Nova Bomb | • Press <span class="key-cap">1</span>: 360° Ice Wave`;
         if (tagEl) { tagEl.textContent = '❄️ 360° ICE WAVE [1]'; tagEl.style.borderColor = '#00f0ff'; tagEl.style.color = '#00f0ff'; tagEl.style.background = 'rgba(0, 240, 255, 0.15)'; }
       } else if (charType === 'SENTINEL') {
         if (card) {
