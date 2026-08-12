@@ -640,10 +640,13 @@
     }
 
     /* Mobile Phone & Tablet Modal Responsive Styles */
-    @media (max-width: 768px) {
+    @media (pointer: coarse), (max-width: 960px), (max-height: 500px) {
       .guide-box, .subtitle {
-        display: none !important; /* Hide explanation box on mobile for compact layout */
+        display: none !important; /* Hide explanation box on all touch & mobile devices (portrait & landscape) */
       }
+    }
+
+    @media (max-width: 960px), (max-height: 500px) {
       .modal-card {
         padding: 12px !important;
         max-width: 95vw !important;
