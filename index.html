@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, shrink-to-fit=no, viewport-fit=cover">
   <title>BLADE DEFLECTOR - Top-Down Shield Slash Arena</title>
   <meta name="description" content="Defend against green biting squares and deflect incoming projectiles in this fast-paced square knight action game!">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -31,6 +31,8 @@
       padding: 0;
       user-select: none;
       -webkit-user-select: none;
+      -webkit-text-size-adjust: 100%;
+      touch-action: manipulation;
     }
 
     body, html {
@@ -1675,6 +1677,26 @@
     window.addEventListener('load', checkMobileGuideBox);
     window.addEventListener('resize', checkMobileGuideBox);
     checkMobileGuideBox();
+
+    // Block iOS Safari & Mobile Gesture / Double-Tap / Pinch Zooming
+    document.addEventListener('gesturestart', (e) => { if (e.cancelable) e.preventDefault(); }, { passive: false });
+    document.addEventListener('gesturechange', (e) => { if (e.cancelable) e.preventDefault(); }, { passive: false });
+    document.addEventListener('gestureend', (e) => { if (e.cancelable) e.preventDefault(); }, { passive: false });
+
+    let lastTouchTime = 0;
+    document.addEventListener('touchend', (e) => {
+      const now = performance.now();
+      if (now - lastTouchTime <= 300) {
+        if (e.cancelable) e.preventDefault();
+      }
+      lastTouchTime = now;
+    }, { passive: false });
+
+    document.addEventListener('touchstart', (e) => {
+      if (e.touches.length > 1 && e.cancelable) {
+        e.preventDefault(); // Block multi-touch pinch zoom
+      }
+    }, { passive: false });
 
     /* ==========================================================================
        Game Entities & Systems
