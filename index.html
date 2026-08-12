@@ -984,42 +984,14 @@
         </div>
       </div>
 
-      <!-- Comprehensive Class Ability Tutorial Guide Matrix in Achievements Modal -->
-      <div class="guide-box" style="margin-top: 14px; margin-bottom: 12px; background: rgba(0, 240, 255, 0.05); border-color: var(--accent-cyan); padding: 14px;">
-        <div style="font-size: 0.9rem; font-weight: 800; color: #ffe600; text-align: center; margin-bottom: 10px; letter-spacing: 1px;">
-          ⚡ ALL CHARACTER CLASS ABILITIES & CONTROLS GUIDE ⚡
+      <!-- Dynamic Interactive Ability Showcase Card in Achievements Modal -->
+      <div id="ach-ability-preview" style="margin-top: 14px; margin-bottom: 12px; background: rgba(0, 0, 0, 0.45); border: 1.5px solid var(--accent-cyan); border-radius: 12px; padding: 14px; display: flex; align-items: center; justify-content: space-between;">
+        <div>
+          <div id="ach-preview-title" style="font-weight: 800; font-size: 0.95rem; color: #00f0ff;">🗡️ EQUIPPED CLASS: SQUARE KNIGHT</div>
+          <div id="ach-preview-desc" style="font-size: 0.82rem; color: #ddd; margin-top: 4px;">• Tap <span class="key-cap">SPACE / L-Click</span>: Slash & Deflect | • Hold <span class="key-cap">SPACE</span>: Directional Shield</div>
         </div>
-        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; font-size: 0.78rem;">
-          <div style="background: rgba(0,0,0,0.45); padding: 10px; border-radius: 8px; border: 1px solid rgba(0,240,255,0.25);">
-            <div style="color: #00f0ff; font-weight: 800; font-size: 0.85rem;">🗡️ SQUARE KNIGHT</div>
-            <div style="color: #ddd; margin-top: 4px;">• <span class="key-cap">SPACE / L-Click</span>: Slash & Deflect</div>
-            <div style="color: #ddd;">• <span class="key-cap">Hold SPACE</span>: Directional Shield</div>
-          </div>
-          <div style="background: rgba(0,0,0,0.45); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,230,0,0.25);">
-            <div style="color: #ffe600; font-weight: 800; font-size: 0.85rem;">🛡️ SHIELD SENTINEL</div>
-            <div style="color: #ddd; margin-top: 4px;">• <span class="key-cap">Hold SPACE / R-Click</span>: 180° Shield</div>
-            <div style="color: #ddd;">• <span class="key-cap">SHIFT / E</span>: Ramming Dash Crush</div>
-          </div>
-          <div style="background: rgba(0,0,0,0.45); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,51,0,0.25);">
-            <div style="color: #ff3300; font-weight: 800; font-size: 0.85rem;">🛡️🔥 BURNING SENTINEL</div>
-            <div style="color: #ddd; margin-top: 4px;">• <span class="key-cap">Hold SPACE</span>: 180° Magma Shield</div>
-            <div style="color: #ddd;">• <span class="key-cap">SHIFT / E</span>: 10s Fire Dash Trail</div>
-          </div>
-          <div style="background: rgba(0,0,0,0.45); padding: 10px; border-radius: 8px; border: 1px solid rgba(255,85,0,0.25);">
-            <div style="color: #ff5500; font-weight: 800; font-size: 0.85rem;">💥 SHOTGUN ENFORCER</div>
-            <div style="color: #ddd; margin-top: 4px;">• <span class="key-cap">SPACE / L-Click</span>: 7-Pellet Buckshot</div>
-            <div style="color: #ddd;">• <span class="key-cap">E / R-Click</span>: Heavy Slug Bomb</div>
-          </div>
-          <div style="background: rgba(0,0,0,0.45); padding: 10px; border-radius: 8px; border: 1px solid rgba(0,255,102,0.25);">
-            <div style="color: #00ff66; font-weight: 800; font-size: 0.85rem;">🏹 ARCHER RANGER</div>
-            <div style="color: #ddd; margin-top: 4px;">• <span class="key-cap">Hold L-Click</span>: Rapid Arrow Spray</div>
-            <div style="color: #ddd;">• <span class="key-cap">Release SPACE</span>: Launch Archer Bomb</div>
-          </div>
-          <div style="background: rgba(0,0,0,0.45); padding: 10px; border-radius: 8px; border: 1px solid rgba(0,240,255,0.25);">
-            <div style="color: #00f0ff; font-weight: 800; font-size: 0.85rem;">🏹❄️ FROZEN ARCHER</div>
-            <div style="color: #ddd; margin-top: 4px;">• <span class="key-cap">Passive</span>: 300px 25% Frost Slow</div>
-            <div style="color: #ddd;">• <span class="key-cap">Press 1</span>: 360° Ice Wave Blast</div>
-          </div>
+        <div id="ach-preview-tag" style="background: rgba(0, 240, 255, 0.15); border: 1px solid #00f0ff; color: #00f0ff; font-weight: 800; font-size: 0.78rem; padding: 6px 12px; border-radius: 8px; letter-spacing: 0.5px;">
+          ⚡ DEFLECTOR BLADE
         </div>
       </div>
 
@@ -5825,9 +5797,9 @@
     function updateHUDControlsCard(charType) {
       const card = document.querySelector('.controls-card');
 
-      const titleEl = document.getElementById('preview-ability-title');
-      const descEl = document.getElementById('preview-ability-desc');
-      const tagEl = document.getElementById('preview-ability-tag');
+      const titleEl = document.getElementById('ach-preview-title');
+      const descEl = document.getElementById('ach-preview-desc');
+      const tagEl = document.getElementById('ach-preview-tag');
 
       if (charType === 'BURNING_SENTINEL') {
         if (card) {
@@ -5837,7 +5809,7 @@
             <div class="control-item"><span class="key-cap">SHIFT / E</span> 10s Fire Trail Dash</div>
           `;
         }
-        if (titleEl) { titleEl.textContent = '🛡️🔥 BURNING SENTINEL ABILITIES'; titleEl.style.color = '#ff3300'; }
+        if (titleEl) { titleEl.textContent = '🛡️🔥 EQUIPPED CLASS: BURNING SENTINEL'; titleEl.style.color = '#ff3300'; }
         if (descEl) descEl.innerHTML = `• Hold <span class="key-cap">SPACE</span>: 180° Magma Shield | • Press <span class="key-cap">SHIFT / E</span>: 10s Fire Dash Trail`;
         if (tagEl) { tagEl.textContent = '🔥 10s FIRE TRAILS'; tagEl.style.borderColor = '#ff3300'; tagEl.style.color = '#ff3300'; tagEl.style.background = 'rgba(255, 51, 0, 0.15)'; }
       } else if (charType === 'FROZEN_ARCHER') {
@@ -5848,7 +5820,7 @@
             <div class="control-item"><span class="key-cap">Key 1</span> 360° Ice Wave</div>
           `;
         }
-        if (titleEl) { titleEl.textContent = '🏹❄️ FROZEN ARCHER ABILITIES'; titleEl.style.color = '#00f0ff'; }
+        if (titleEl) { titleEl.textContent = '🏹❄️ EQUIPPED CLASS: FROZEN ARCHER'; titleEl.style.color = '#00f0ff'; }
         if (descEl) descEl.innerHTML = `• Passive: 300px 25% Frost Slow Aura | • Press <span class="key-cap">1</span>: 360° Ice Wave Blast (300px)`;
         if (tagEl) { tagEl.textContent = '❄️ 360° ICE WAVE [1]'; tagEl.style.borderColor = '#00f0ff'; tagEl.style.color = '#00f0ff'; tagEl.style.background = 'rgba(0, 240, 255, 0.15)'; }
       } else if (charType === 'SENTINEL') {
@@ -5859,7 +5831,7 @@
             <div class="control-item"><span class="key-cap">SHIFT / E</span> Ramming Dash</div>
           `;
         }
-        if (titleEl) { titleEl.textContent = '🛡️ SHIELD SENTINEL ABILITIES'; titleEl.style.color = '#ffe600'; }
+        if (titleEl) { titleEl.textContent = '🛡️ EQUIPPED CLASS: SHIELD SENTINEL'; titleEl.style.color = '#ffe600'; }
         if (descEl) descEl.innerHTML = `• Hold <span class="key-cap">SPACE / R-Click</span>: 180° Shield | • Press <span class="key-cap">SHIFT / E</span>: Ramming Dash Crush`;
         if (tagEl) { tagEl.textContent = '🛡️ RAMMING DASH [SHIFT]'; tagEl.style.borderColor = '#ffe600'; tagEl.style.color = '#ffe600'; tagEl.style.background = 'rgba(255, 230, 0, 0.15)'; }
       } else if (charType === 'SHOTGUN') {
@@ -5870,7 +5842,7 @@
             <div class="control-item"><span class="key-cap">E / R-Click</span> Heavy Explosive Slug</div>
           `;
         }
-        if (titleEl) { titleEl.textContent = '💥 SHOTGUN ENFORCER ABILITIES'; titleEl.style.color = '#ff5500'; }
+        if (titleEl) { titleEl.textContent = '💥 EQUIPPED CLASS: SHOTGUN ENFORCER'; titleEl.style.color = '#ff5500'; }
         if (descEl) descEl.innerHTML = `• Press <span class="key-cap">SPACE / L-Click</span>: 7-Pellet Buckshot | • Press <span class="key-cap">E / R-Click</span>: Heavy Slug Bomb`;
         if (tagEl) { tagEl.textContent = '💥 HEAVY SLUG [E]'; tagEl.style.borderColor = '#ff5500'; tagEl.style.color = '#ff5500'; tagEl.style.background = 'rgba(255, 85, 0, 0.15)'; }
       } else if (charType === 'ARCHER') {
@@ -5881,7 +5853,7 @@
             <div class="control-item"><span class="key-cap">Release SPACE</span> Archer Bomb</div>
           `;
         }
-        if (titleEl) { titleEl.textContent = '🏹 ARCHER RANGER ABILITIES'; titleEl.style.color = '#00ff66'; }
+        if (titleEl) { titleEl.textContent = '🏹 EQUIPPED CLASS: ARCHER RANGER'; titleEl.style.color = '#00ff66'; }
         if (descEl) descEl.innerHTML = `• Hold <span class="key-cap">L-Click</span>: Rapid Arrow Spray | • Release <span class="key-cap">SPACE Barrier</span>: Launch Archer Bomb`;
         if (tagEl) { tagEl.textContent = '💣 ARCHER BOMB [SPACE]'; tagEl.style.borderColor = '#00ff66'; tagEl.style.color = '#00ff66'; tagEl.style.background = 'rgba(0, 255, 102, 0.15)'; }
       } else {
@@ -5892,9 +5864,9 @@
             <div class="control-item"><span class="key-cap">Hold SPACE</span> Block Shield</div>
           `;
         }
-        if (titleEl) { titleEl.textContent = '🗡️ SQUARE KNIGHT ABILITIES'; titleEl.style.color = '#00f0ff'; }
+        if (titleEl) { titleEl.textContent = '🗡️ EQUIPPED CLASS: SQUARE KNIGHT'; titleEl.style.color = '#00f0ff'; }
         if (descEl) descEl.innerHTML = `• Tap <span class="key-cap">SPACE / L-Click</span>: Slash & Deflect | • Hold <span class="key-cap">SPACE</span>: Directional Shield`;
-        if (tagEl) { tagEl.textContent = '🗡️ DEFLECTOR BLADE'; tagEl.style.borderColor = '#00f0ff'; tagEl.style.color = '#00f0ff'; tagEl.style.background = 'rgba(0, 240, 255, 0.15)'; }
+        if (tagEl) { tagEl.textContent = '⚡ DEFLECTOR BLADE'; tagEl.style.borderColor = '#00f0ff'; tagEl.style.color = '#00f0ff'; tagEl.style.background = 'rgba(0, 240, 255, 0.15)'; }
       }
     }
 
