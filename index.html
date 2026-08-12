@@ -4031,7 +4031,7 @@
     function render() {
       ctx.save();
       ctx.shadowBlur = 0;
-      ctx.shadowColor = 'transparent';
+      ctx.shadowColor = 'rgba(0, 0, 0, 0)';
 
       // Screen Shake FX
       if (screenShake > 0) {
@@ -4453,7 +4453,7 @@
         }
 
         ctx.shadowBlur = 0;
-        ctx.shadowColor = 'transparent';
+        ctx.shadowColor = 'rgba(0, 0, 0, 0)';
         ctx.restore();
       });
 
@@ -4513,7 +4513,7 @@
           ctx.fill();
         }
         ctx.shadowBlur = 0;
-        ctx.shadowColor = 'transparent';
+        ctx.shadowColor = 'rgba(0, 0, 0, 0)';
         ctx.restore();
       });
 
@@ -4723,7 +4723,7 @@
             ctx.fillRect(-20, player.size / 2 + 11, 40 * cdPct, 4);
             ctx.restore();
             ctx.shadowBlur = 0;
-            ctx.shadowColor = 'transparent';
+            ctx.shadowColor = 'rgba(0, 0, 0, 0)';
           } else if (player.character === 'SHOTGUN') {
             // Dual Shotgun Barrels & Reload Indicator
             ctx.save();
