@@ -1977,8 +1977,9 @@
     function triggerArcherBombThrow(targetX, targetY) {
       const angle = Math.atan2(targetY - player.y, targetX - player.x);
       const dist = Math.sqrt((targetX - player.x) ** 2 + (targetY - player.y) ** 2);
-      const bombSpeed = 7.5; // Slow deliberate thrown arc speed!
+      const bombSpeed = 8.5; // Smooth thrown arc speed!
       const totalFlightFrames = Math.max(1, Math.round(dist / bombSpeed));
+      const isIce = player.character === 'FROZEN_ARCHER';
 
       projectiles.push({
         x: player.x,
@@ -1986,26 +1987,29 @@
         vx: Math.cos(angle) * bombSpeed,
         vy: Math.sin(angle) * bombSpeed,
         radius: 12,
-        color: '#00ff66',
+        color: isIce ? '#00f0ff' : '#00ff66',
         deflected: true,
         isArcherBomb: true,
+        isFrostBomb: isIce,
         targetX: targetX,
         targetY: targetY,
+        totalFlightFrames: totalFlightFrames,
         flightFramesLeft: totalFlightFrames,
         spinAngle: 0
       });
 
       audio.playSlash();
-      addFloatingText('💣 BOMB THROWN!', player.x, player.y - 30, '#00ff66');
+      addFloatingText(isIce ? '❄️ FROST BOMB THROWN!' : '💣 BOMB THROWN!', player.x, player.y - 30, isIce ? '#00f0ff' : '#00ff66');
     }
 
-    function detonateArcherBomb(impactX, impactY) {
-      const bombRadius = player.buffs.range ? 220 : 150;
+    function detonateArcherBomb(impactX, impactY, isFrost = false) {
+      const bombRadius = player.buffs.range ? 230 : 160;
       audio.playDeflect();
       screenShake = 18;
-      createSparks(impactX, impactY, 45, '#00ff66', 10);
+      const sparkColor = isFrost ? '#00f0ff' : '#00ff66';
+      createSparks(impactX, impactY, 45, sparkColor, 10);
       createSparks(impactX, impactY, 30, '#ffe600', 8);
-      addFloatingText('💥 ARCHER BOMB EXPLOSION!', impactX, impactY - 40, '#00ff66');
+      addFloatingText(isFrost ? '❄️ FROST NOVA EXPLOSION!' : '💥 ARCHER BOMB EXPLOSION!', impactX, impactY - 40, sparkColor);
 
       for (let k = enemies.length - 1; k >= 0; k--) {
         const target = enemies[k];
@@ -2015,13 +2019,17 @@
 
         if (dist <= bombRadius + target.size / 2) {
           const pushAngle = Math.atan2(dy, dx);
-          target.x += Math.cos(pushAngle) * 40;
-          target.y += Math.sin(pushAngle) * 40;
+          target.x += Math.cos(pushAngle) * 45;
+          target.y += Math.sin(pushAngle) * 45;
+
+          if (isFrost) {
+            target.speed *= 0.3; // Frostbite slow!
+          }
 
           if (target.type === 'PURPLE_BOSS' || target.type === 'CRESCENT_BOSS' || target.type === 'TRIANGLE_BOSS' || target.type === 'MINI_HEXAGON') {
             let bonusDmg = player.triangleBuffs.fireAttacks ? 6 : 4;
             target.hp -= bonusDmg;
-            addFloatingText(`BOMB CRASH! ${target.hp} HP`, target.x, target.y - 30, '#00ff66');
+            addFloatingText(`BOMB CRASH! ${target.hp} HP`, target.x, target.y - 30, sparkColor);
             if (target.hp <= 0) {
               createSparks(target.x, target.y, 50, target.color, 12);
               audio.playDeflect();
@@ -2033,7 +2041,7 @@
               else if (target.type === 'TRIANGLE_BOSS') openTriangleRewardModal();
             }
           } else {
-            createSparks(target.x, target.y, 22, '#00ff66', 7);
+            createSparks(target.x, target.y, 22, sparkColor, 7);
             audio.playEnemyKill();
             score += Math.round(150 * getScoreMult());
             const ex = target.x, ey = target.y;
@@ -3873,20 +3881,24 @@
             });
           }
 
-          // Check if bomb reached destination or collided with an enemy
+          // Check if bomb reached destination or hit enemy after initial launch frames
           let destDist = Math.sqrt((p.x - p.targetX) ** 2 + (p.y - p.targetY) ** 2);
           let hitEnemy = false;
-          for (let j = 0; j < enemies.length; j++) {
-            let e = enemies[j];
-            let edist = Math.sqrt((e.x - p.x) ** 2 + (e.y - p.y) ** 2);
-            if (edist <= e.size / 2 + p.radius) {
-              hitEnemy = true;
-              break;
+          
+          // Arm bomb after 3 frames of flight so it doesn't instantly detonate at launch position
+          if (p.flightFramesLeft < ((p.totalFlightFrames || 10) - 3)) {
+            for (let j = 0; j < enemies.length; j++) {
+              let e = enemies[j];
+              let edist = Math.sqrt((e.x - p.x) ** 2 + (e.y - p.y) ** 2);
+              if (edist <= e.size / 2 + p.radius) {
+                hitEnemy = true;
+                break;
+              }
             }
           }
 
-          if (p.flightFramesLeft <= 0 || destDist <= 12 || hitEnemy) {
-            detonateArcherBomb(p.x, p.y);
+          if (p.flightFramesLeft <= 0 || destDist <= 14 || hitEnemy) {
+            detonateArcherBomb(p.x, p.y, p.isFrostBomb);
             projectiles.splice(i, 1);
             continue;
           }
