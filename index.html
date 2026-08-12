@@ -1200,66 +1200,73 @@
 
   <!-- Pause Modal Overlay -->
   <div class="modal-overlay" id="pause-modal">
-    <div class="modal-card" style="max-width: 500px;">
-      <h1 class="game-title" style="background: linear-gradient(135deg, var(--accent-cyan), var(--accent-yellow)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">GAME PAUSED</h1>
-      <p class="subtitle">Take a breather! Resume, restart, or return to main menu below:</p>
+    <div class="modal-card" style="max-width: 820px; width: 92%;">
+      <div style="display: flex; gap: 24px; align-items: flex-start; text-align: left;">
+        
+        <!-- Left Column: Title, Subtitle, Action Buttons & Character Class Selector -->
+        <div style="flex: 1.2; display: flex; flex-direction: column;">
+          <h1 class="game-title" style="background: linear-gradient(135deg, var(--accent-cyan), var(--accent-yellow)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-align: left;">GAME PAUSED</h1>
+          <p class="subtitle" style="text-align: left; margin-bottom: 14px;">Take a breather! Resume, save, switch class, or adjust difficulty on the right:</p>
 
-      <div style="margin-top: 18px; margin-bottom: 18px; display: flex; flex-direction: column; gap: 10px;">
-        <button class="btn-primary" id="resume-btn" style="width: 100%;">RESUME GAME [ESC / P]</button>
-        <button class="btn-primary" onclick="openAchievementsModal()" style="width: 100%; background: linear-gradient(135deg, #ffe600, #ff9900); color: #040814; font-weight: 800;">🏆 ACHIEVEMENTS & BONUSES</button>
-        <button class="btn-primary" id="pause-save-btn" onclick="saveGameProgress(true)" style="width: 100%; background: linear-gradient(135deg, #00ff66, #00b344); color: #040814; font-weight: 800;">💾 SAVE PROGRESS TO DEVICE</button>
-        <button class="btn-primary" id="pause-restart-btn" style="width: 100%; background: linear-gradient(135deg, #ff0055, #ff6b00);">RESTART RUN</button>
-        <button class="btn-primary" id="pause-mainmenu-btn" style="width: 100%; background: linear-gradient(135deg, var(--accent-yellow), var(--accent-orange)); color: #040814;">🏠 RETURN TO MAIN MENU</button>
-      </div>
+          <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px;">
+            <button class="btn-primary" id="resume-btn" style="width: 100%;">RESUME GAME [ESC / P]</button>
+            <button class="btn-primary" onclick="openAchievementsModal()" style="width: 100%; background: linear-gradient(135deg, #ffe600, #ff9900); color: #040814; font-weight: 800;">🏆 ACHIEVEMENTS & BONUSES</button>
+            <button class="btn-primary" id="pause-save-btn" onclick="saveGameProgress(true)" style="width: 100%; background: linear-gradient(135deg, #00ff66, #00b344); color: #040814; font-weight: 800;">💾 SAVE PROGRESS TO DEVICE</button>
+            <button class="btn-primary" id="pause-restart-btn" style="width: 100%; background: linear-gradient(135deg, #ff0055, #ff6b00);">RESTART RUN</button>
+            <button class="btn-primary" id="pause-mainmenu-btn" style="width: 100%; background: linear-gradient(135deg, var(--accent-yellow), var(--accent-orange)); color: #040814;">🏠 RETURN TO MAIN MENU</button>
+          </div>
 
-      <!-- Pause Character Class Selector -->
-      <div style="margin-bottom: 16px;">
-        <div class="score-label" style="margin-bottom: 8px; text-align: center;">CHANGE CHARACTER CLASS</div>
-        <div class="diff-grid" style="grid-template-columns: repeat(4, 1fr); gap: 6px;">
-          <div class="diff-card char-card active" data-char="KNIGHT" onclick="setCharacter('KNIGHT')">
-            <div class="diff-title" style="color: var(--accent-cyan);">🗡️ KNIGHT</div>
-            <div class="diff-desc">Sword & Shield</div>
-          </div>
-          <div class="diff-card char-card" data-char="SENTINEL" onclick="setCharacter('SENTINEL')">
-            <div class="diff-title" style="color: var(--accent-yellow);">🛡️ SENTINEL</div>
-            <div class="diff-desc">Shield & Dash</div>
-          </div>
-          <div class="diff-card char-card" data-char="SHOTGUN" onclick="setCharacter('SHOTGUN')">
-            <div class="diff-title" style="color: #ff5500;">💥 SHOTGUN</div>
-            <div class="diff-desc">Buckshot</div>
-          </div>
-          <div class="diff-card char-card" data-char="ARCHER" onclick="setCharacter('ARCHER')">
-            <div class="diff-title" style="color: #ffe600;">🏹 ARCHER</div>
-            <div class="diff-desc">Arrows & Bomb</div>
+          <!-- Pause Character Class Selector -->
+          <div>
+            <div class="score-label" style="margin-bottom: 8px; text-align: left;">CHANGE CHARACTER CLASS</div>
+            <div class="diff-grid" style="grid-template-columns: repeat(4, 1fr); gap: 6px;">
+              <div class="diff-card char-card active" data-char="KNIGHT" onclick="setCharacter('KNIGHT')">
+                <div class="diff-title" style="color: var(--accent-cyan);">🗡️ KNIGHT</div>
+                <div class="diff-desc">Sword</div>
+              </div>
+              <div class="diff-card char-card" data-char="SENTINEL" onclick="setCharacter('SENTINEL')">
+                <div class="diff-title" style="color: var(--accent-yellow);">🛡️ SENTINEL</div>
+                <div class="diff-desc">Shield</div>
+              </div>
+              <div class="diff-card char-card" data-char="SHOTGUN" onclick="setCharacter('SHOTGUN')">
+                <div class="diff-title" style="color: #ff5500;">💥 SHOTGUN</div>
+                <div class="diff-desc">Buckshot</div>
+              </div>
+              <div class="diff-card char-card" data-char="ARCHER" onclick="setCharacter('ARCHER')">
+                <div class="diff-title" style="color: #ffe600;">🏹 ARCHER</div>
+                <div class="diff-desc">Bow</div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <!-- Difficulty Mode Selector inside Pause Menu (Hidden in TEST Mode) -->
-      <div id="pause-diff-container">
-        <div class="score-label" style="margin-bottom: 10px; text-align: center;">CHANGE DIFFICULTY</div>
-        <div class="diff-grid" style="grid-template-columns: repeat(5, 1fr);">
-          <div class="diff-card" data-diff="TEST" onclick="setDifficulty('TEST')">
-            <div class="diff-title" style="color: #00f0ff;">🛠️ TEST</div>
-            <div class="diff-desc">Immortal</div>
-          </div>
-          <div class="diff-card" data-diff="EASY" onclick="setDifficulty('EASY')">
-            <div class="diff-title" style="color: var(--accent-cyan);">🟢 EASY</div>
-            <div class="diff-desc">7 Hearts</div>
-          </div>
-          <div class="diff-card active" data-diff="NORMAL" onclick="setDifficulty('NORMAL')">
-            <div class="diff-title" style="color: var(--accent-yellow);">🟡 NORMAL</div>
-            <div class="diff-desc">5H | 1.5X</div>
-          </div>
-          <div class="diff-card" data-diff="HARD" onclick="setDifficulty('HARD')">
-            <div class="diff-title" style="color: var(--accent-pink);">🔴 HARD</div>
-            <div class="diff-desc">3H | 2.5X</div>
-          </div>
-          <div class="diff-card" data-diff="IMPOSSIBLE" onclick="setDifficulty('IMPOSSIBLE')">
-            <div class="diff-title" style="color: #ff0055;">💀 HARDCORE</div>
-            <div class="diff-desc">1H | 5.0X</div>
+        <!-- Right Column: Difficulty Mode Selector -->
+        <div id="pause-diff-container" style="flex: 0.9; background: rgba(0, 0, 0, 0.35); border: 1px solid rgba(255, 255, 255, 0.12); border-radius: 14px; padding: 16px; align-self: stretch;">
+          <div class="score-label" style="margin-bottom: 12px; text-align: center;">CHANGE DIFFICULTY</div>
+          <div class="diff-grid" style="grid-template-columns: 1fr; gap: 8px;">
+            <div class="diff-card" data-diff="TEST" onclick="setDifficulty('TEST')">
+              <div class="diff-title" style="color: #00f0ff;">🛠️ TEST MODE</div>
+              <div class="diff-desc">Immortal Practice</div>
+            </div>
+            <div class="diff-card" data-diff="EASY" onclick="setDifficulty('EASY')">
+              <div class="diff-title" style="color: var(--accent-cyan);">🟢 EASY</div>
+              <div class="diff-desc">7 Hearts | 1.0X</div>
+            </div>
+            <div class="diff-card active" data-diff="NORMAL" onclick="setDifficulty('NORMAL')">
+              <div class="diff-title" style="color: var(--accent-yellow);">🟡 NORMAL</div>
+              <div class="diff-desc">5 Hearts | 1.5X</div>
+            </div>
+            <div class="diff-card" data-diff="HARD" onclick="setDifficulty('HARD')">
+              <div class="diff-title" style="color: var(--accent-pink);">🔴 HARD</div>
+              <div class="diff-desc">3 Hearts | 2.5X</div>
+            </div>
+            <div class="diff-card" data-diff="IMPOSSIBLE" onclick="setDifficulty('IMPOSSIBLE')">
+              <div class="diff-title" style="color: #ff0055;">💀 IMPOSSIBLE</div>
+              <div class="diff-desc">1 Heart | 5.0X</div>
+            </div>
           </div>
         </div>
+
       </div>
     </div>
   </div>
