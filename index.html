@@ -667,37 +667,44 @@
     .start-modal-card {
       max-width: 860px;
       width: 90vw;
-      max-height: 90vh;
+      max-height: 80vh;
       padding: 20px 24px;
-      overflow-y: auto !important;
-      scrollbar-width: thin;
-      scrollbar-color: var(--accent-cyan) rgba(0, 0, 0, 0.4);
+      overflow-y: scroll !important;
+      scrollbar-width: auto;
+      scrollbar-color: var(--accent-cyan) rgba(255, 140, 0, 0.2);
     }
 
-    /* Custom Glowing Neon Scrollbars for Modal Cards */
+    /* Custom Glowing Neon Scrollbars for Modal Cards (Always Visible) */
     .modal-card::-webkit-scrollbar,
-    .start-modal-card::-webkit-scrollbar {
-      width: 8px;
-      height: 8px;
+    .start-modal-card::-webkit-scrollbar,
+    ::-webkit-scrollbar {
+      width: 10px !important;
+      height: 10px !important;
+      display: block !important;
     }
 
     .modal-card::-webkit-scrollbar-track,
-    .start-modal-card::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.4);
-      border-radius: 4px;
+    .start-modal-card::-webkit-scrollbar-track,
+    ::-webkit-scrollbar-track {
+      background: rgba(0, 0, 0, 0.6) !important;
+      border: 1px solid rgba(0, 240, 255, 0.2) !important;
+      border-radius: 6px !important;
     }
 
     .modal-card::-webkit-scrollbar-thumb,
-    .start-modal-card::-webkit-scrollbar-thumb {
-      background: linear-gradient(180deg, var(--accent-cyan), var(--accent-orange));
-      border-radius: 4px;
-      box-shadow: 0 0 10px var(--accent-cyan);
+    .start-modal-card::-webkit-scrollbar-thumb,
+    ::-webkit-scrollbar-thumb {
+      background: linear-gradient(180deg, #00f0ff 0%, #ff9900 100%) !important;
+      border-radius: 6px !important;
+      border: 1px solid #00f0ff !important;
+      box-shadow: 0 0 12px rgba(0, 240, 255, 0.8) !important;
     }
 
     .modal-card::-webkit-scrollbar-thumb:hover,
-    .start-modal-card::-webkit-scrollbar-thumb:hover {
-      background: var(--accent-yellow);
-      box-shadow: 0 0 14px var(--accent-yellow);
+    .start-modal-card::-webkit-scrollbar-thumb:hover,
+    ::-webkit-scrollbar-thumb:hover {
+      background: #ffe600 !important;
+      box-shadow: 0 0 18px #ffe600 !important;
     }
 
     .start-selectors-container {
