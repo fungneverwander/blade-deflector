@@ -3023,7 +3023,21 @@
       // Update 360° Ice Wave Expansion & Damage Logic
       if (frozenWaveActive) {
         frozenWaveRadius += 14;
-        createSparks(player.x, player.y, 5, '#00f0ff', 6);
+        
+        // Spawn shimmering frost crystal particles along wave perimeter
+        for (let k = 0; k < 4; k++) {
+          const randAngle = Math.random() * Math.PI * 2;
+          particles.push({
+            x: player.x + Math.cos(randAngle) * frozenWaveRadius,
+            y: player.y + Math.sin(randAngle) * frozenWaveRadius,
+            vx: Math.cos(randAngle) * 3,
+            vy: Math.sin(randAngle) * 3,
+            size: Math.random() * 5 + 2,
+            color: Math.random() < 0.5 ? '#ffffff' : '#00f0ff',
+            life: 0.6,
+            decay: 0.06
+          });
+        }
 
         // Damage all enemies within 300px wave radius!
         for (let i = enemies.length - 1; i >= 0; i--) {
@@ -4879,6 +4893,60 @@
         ctx.fillRect(al.size / 2, -3, al.swordLength, 6);
         ctx.restore();
       });
+
+      // Render 360° Frost Crystal Shockwave Animation
+      if (frozenWaveActive) {
+        ctx.save();
+        ctx.translate(player.x, player.y);
+
+        // 1. Concentric Radial Wave Gradient Ring (Primary Blast Wave)
+        const waveGradient = ctx.createRadialGradient(0, 0, Math.max(0, frozenWaveRadius - 25), 0, 0, frozenWaveRadius + 15);
+        waveGradient.addColorStop(0, 'rgba(0, 240, 255, 0)');
+        waveGradient.addColorStop(0.5, 'rgba(0, 240, 255, 0.45)');
+        waveGradient.addColorStop(0.85, 'rgba(255, 255, 255, 0.95)');
+        waveGradient.addColorStop(1, 'rgba(0, 240, 255, 0)');
+
+        ctx.fillStyle = waveGradient;
+        ctx.beginPath();
+        ctx.arc(0, 0, frozenWaveRadius + 15, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 2. Glowing Outer Ice Shockwave Ring
+        ctx.strokeStyle = '#ffffff';
+        ctx.shadowColor = '#00f0ff';
+        ctx.shadowBlur = 28;
+        ctx.lineWidth = 5;
+        ctx.beginPath();
+        ctx.arc(0, 0, frozenWaveRadius, 0, Math.PI * 2);
+        ctx.stroke();
+
+        // 3. Secondary Cyan Echo Wave Ring
+        ctx.strokeStyle = 'rgba(0, 240, 255, 0.7)';
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        ctx.arc(0, 0, Math.max(0, frozenWaveRadius - 18), 0, Math.PI * 2);
+        ctx.stroke();
+
+        // 4. Radial Frosted Ice Spikes protruding outwards along expanding shockwave
+        const numSpikes = 14;
+        ctx.fillStyle = '#ffffff';
+        ctx.shadowColor = '#00f0ff';
+        ctx.shadowBlur = 15;
+        for (let s = 0; s < numSpikes; s++) {
+          const sAngle = (s / numSpikes) * Math.PI * 2 + (frozenWaveRadius * 0.05);
+          const innerR = frozenWaveRadius - 12;
+          const outerR = frozenWaveRadius + 16;
+          
+          ctx.beginPath();
+          ctx.moveTo(Math.cos(sAngle - 0.1) * innerR, Math.sin(sAngle - 0.1) * innerR);
+          ctx.lineTo(Math.cos(sAngle) * outerR, Math.sin(sAngle) * outerR);
+          ctx.lineTo(Math.cos(sAngle + 0.1) * innerR, Math.sin(sAngle + 0.1) * innerR);
+          ctx.closePath();
+          ctx.fill();
+        }
+
+        ctx.restore();
+      }
 
       // Render 10-Second Fire Dash Trails for Burning Sentinel
       fireTrails.forEach(ft => {
