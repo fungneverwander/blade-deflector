@@ -5178,8 +5178,23 @@
       }
     }
 
+    let previousActiveModalId = null;
+
     function openAchievementsModal() {
-      audio.init();
+      if (typeof audio !== 'undefined' && audio.init) audio.init();
+
+      // Find currently active modal (if any)
+      const allModals = ['start-modal', 'pause-modal', 'gameover-modal', 'shop-modal', 'reward-modal', 'crescent-reward-modal', 'triangle-reward-modal'];
+      previousActiveModalId = null;
+      for (const id of allModals) {
+        const m = document.getElementById(id);
+        if (m && m.classList.contains('active')) {
+          previousActiveModalId = id;
+          m.classList.remove('active'); // Hide previous modal temporarily while viewing achievements
+          break;
+        }
+      }
+
       const modal = document.getElementById('achievements-modal');
       if (modal) {
         updateAchievementsUI();
@@ -5191,6 +5206,15 @@
       const modal = document.getElementById('achievements-modal');
       if (modal) {
         modal.classList.remove('active');
+      }
+
+      // Return to previous modal if there was one active
+      if (previousActiveModalId) {
+        const prevModal = document.getElementById(previousActiveModalId);
+        if (prevModal) {
+          prevModal.classList.add('active');
+        }
+        previousActiveModalId = null;
       }
     }
 
@@ -5398,8 +5422,14 @@
     function returnToMainMenu() {
       gameState = 'START';
       resetInputFlags();
-      document.getElementById('pause-modal').classList.remove('active');
-      document.getElementById('gameover-modal').classList.remove('active');
+      previousActiveModalId = null;
+
+      const allModals = ['pause-modal', 'achievements-modal', 'gameover-modal', 'shop-modal', 'reward-modal', 'crescent-reward-modal', 'triangle-reward-modal'];
+      allModals.forEach(id => {
+        const m = document.getElementById(id);
+        if (m) m.classList.remove('active');
+      });
+
       document.getElementById('start-modal').classList.add('active');
     }
 
