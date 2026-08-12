@@ -1481,6 +1481,11 @@
     let spaceIsHeld = false;
     let spaceWasTapped = false;
     let tabWasPressed = false;
+    let bombRequested = false;
+
+    window.addEventListener('contextmenu', (e) => {
+      e.preventDefault(); // Prevent right-click context menu so right click throws Archer bomb!
+    });
 
     window.addEventListener('mousemove', (e) => {
       mouse.x = e.clientX;
@@ -1488,12 +1493,16 @@
     });
 
     window.addEventListener('mousedown', (e) => {
-      if (e.button === 0 && gameState === 'PLAYING') {
-        if (!keys['Space']) {
-          spaceDownTime = performance.now();
-          spaceWasTapped = true;
-          spaceIsHeld = true;
-          keys['Space'] = true;
+      if (gameState === 'PLAYING') {
+        if (e.button === 0) {
+          if (!keys['Space']) {
+            spaceDownTime = performance.now();
+            spaceWasTapped = true;
+            spaceIsHeld = true;
+            keys['Space'] = true;
+          }
+        } else if (e.button === 2) {
+          bombRequested = true;
         }
       }
     });
@@ -1507,6 +1516,9 @@
     });
 
     window.addEventListener('keydown', (e) => {
+      if (e.code === 'KeyE' || e.code === 'KeyQ' || e.code === 'KeyF' || e.code === 'KeyR') {
+        bombRequested = true;
+      }
       if (e.code === 'Space') {
         e.preventDefault(); // Prevent browser from triggering focused buttons (Start/Restart) or scrolling
         if (!keys['Space'] && gameState === 'PLAYING') {
@@ -1532,6 +1544,7 @@
       for (let k in keys) keys[k] = false;
       spaceIsHeld = false;
       spaceWasTapped = false;
+      bombRequested = false;
       spaceDownTime = 0;
       if (typeof player !== 'undefined' && player) {
         player.isBlocking = false;
@@ -2647,17 +2660,20 @@
 
       // 1. Check Character Input Mechanics
       if (player.character === 'ARCHER' || player.character === 'FROZEN_ARCHER') {
-        // ARCHER & FROZEN ARCHER: Firing Arrows & Slow Physical Bomb
+        // ARCHER & FROZEN ARCHER: Firing Arrows & Physical Bomb Throw
         if (player.archerCooldown > 0) player.archerCooldown--;
         if (player.archerBombCooldown > 0) player.archerBombCooldown--;
 
-        // Hold Spacebar for > 90ms triggers Thrown Bomb!
-        if (spaceIsHeld && spaceDownTime > 0 && (performance.now() - spaceDownTime > 90)) {
+        // Trigger Archer Bomb on Right-Click, Key E/Q/F/R, or Hold Spacebar
+        if (bombRequested || (spaceIsHeld && spaceDownTime > 0 && (performance.now() - spaceDownTime > 90))) {
+          bombRequested = false;
           if (player.archerBombCooldown <= 0) {
             player.archerBombCooldown = player.maxArcherBombCooldown;
             triggerArcherBombThrow(mouse.x, mouse.y);
             spaceDownTime = 0;
             spaceIsHeld = false;
+          } else {
+            addFloatingText(`⏳ BOMB RECHARGING (${(player.archerBombCooldown / 60).toFixed(1)}s)`, player.x, player.y - 35, '#ff9900');
           }
         }
 
