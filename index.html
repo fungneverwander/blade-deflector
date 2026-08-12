@@ -639,6 +639,43 @@
       cursor: pointer;
     }
 
+    .start-modal-card {
+      max-width: 960px;
+      width: 95vw;
+      max-height: 94vh;
+      overflow-y: auto;
+    }
+
+    .start-selectors-container {
+      display: flex;
+      flex-direction: row;
+      gap: 16px;
+      margin-bottom: 14px;
+    }
+
+    .selector-section {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .section-title {
+      text-align: center;
+      margin-bottom: 8px;
+    }
+
+    .char-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 6px;
+    }
+
+    .diff-grid-5 {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 6px;
+    }
+
     /* Mobile Phone & Tablet Modal Responsive Styles */
     @media (pointer: coarse), (max-width: 1200px), (max-height: 700px) {
       .guide-box, .subtitle, #start-guide-box, #start-subtitle {
@@ -646,7 +683,28 @@
       }
     }
 
-    @media (max-width: 1200px), (max-height: 700px) {
+    @media (max-width: 850px), (max-height: 600px) {
+      .start-selectors-container {
+        flex-direction: column !important;
+        gap: 12px !important;
+      }
+      .char-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 6px !important;
+      }
+      .diff-grid-5 {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 6px !important;
+      }
+      .diff-title {
+        font-size: 0.85rem !important;
+      }
+      .diff-desc {
+        font-size: 0.7rem !important;
+      }
+      .diff-card {
+        padding: 8px 6px !important;
+      }
       .modal-card {
         padding: 12px !important;
         max-width: 95vw !important;
@@ -657,10 +715,6 @@
         font-size: 1.5rem !important;
         letter-spacing: 2px !important;
         margin-bottom: 8px !important;
-      }
-      .diff-grid {
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 6px !important;
       }
       .hud-top {
         gap: 4px !important;
@@ -798,65 +852,57 @@
 
   <!-- Start / Controls Modal -->
   <div class="modal-overlay active" id="start-modal">
-    <div class="modal-card" style="max-width: 960px;">
+    <div class="modal-card start-modal-card">
       <h1 class="game-title">BLADE DEFLECTOR</h1>
-      <p class="subtitle" id="start-subtitle">Equip your energy blade. Slash swarming biting squares and deflect incoming projectiles!</p>
-      
-      <!-- Character Class Selector & Difficulty Selector Side-by-Side Container -->
-      <div style="margin-bottom: 18px;">
-        <!-- Top Row: Selectors Title Headers -->
-        <div style="display: flex; gap: 16px; margin-bottom: 8px;">
-          <div class="score-label" style="flex: 1.1; text-align: center;">SELECT CHARACTER CLASS</div>
-          <div class="score-label" style="flex: 1; text-align: center;">SELECT DIFFICULTY</div>
-        </div>
 
-        <!-- Cards Row: 4 Character Cards on Left + 5 Difficulty Cards on Right -->
-        <div style="display: flex; gap: 16px; align-items: stretch;">
-          <!-- Left: 4 Character Cards -->
-          <div style="flex: 1.1;">
-            <div class="diff-grid" style="grid-template-columns: repeat(4, 1fr); gap: 6px;">
-              <div class="diff-card char-card active" data-char="KNIGHT" onclick="setCharacter('KNIGHT')">
-                <div class="diff-title" style="color: var(--accent-cyan);">🗡️ KNIGHT</div>
-                <div class="diff-desc">Sword & Shield</div>
-              </div>
-              <div class="diff-card char-card" data-char="SENTINEL" onclick="setCharacter('SENTINEL')">
-                <div class="diff-title" style="color: var(--accent-yellow);">🛡️ SENTINEL</div>
-                <div class="diff-desc">Shield & Ram</div>
-              </div>
-              <div class="diff-card char-card" data-char="SHOTGUN" onclick="setCharacter('SHOTGUN')">
-                <div class="diff-title" style="color: #ff5500;">💥 SHOTGUN</div>
-                <div class="diff-desc">Buckshot & Shield</div>
-              </div>
-              <div class="diff-card char-card" data-char="ARCHER" onclick="setCharacter('ARCHER')">
-                <div class="diff-title" style="color: #00ff66;">🏹 ARCHER</div>
-                <div class="diff-desc">Arrows & Bomb</div>
-              </div>
+      <!-- Selectors Container -->
+      <div class="start-selectors-container">
+        <!-- Character Class Selection Section -->
+        <div class="selector-section">
+          <div class="score-label section-title">SELECT CHARACTER CLASS</div>
+          <div class="char-grid">
+            <div class="diff-card char-card active" data-char="KNIGHT" onclick="setCharacter('KNIGHT')">
+              <div class="diff-title" style="color: var(--accent-cyan);">🗡️ KNIGHT</div>
+              <div class="diff-desc">Sword & Shield</div>
+            </div>
+            <div class="diff-card char-card" data-char="SENTINEL" onclick="setCharacter('SENTINEL')">
+              <div class="diff-title" style="color: var(--accent-yellow);">🛡️ SENTINEL</div>
+              <div class="diff-desc">Shield & Ram</div>
+            </div>
+            <div class="diff-card char-card" data-char="SHOTGUN" onclick="setCharacter('SHOTGUN')">
+              <div class="diff-title" style="color: #ff5500;">💥 SHOTGUN</div>
+              <div class="diff-desc">Buckshot & Shield</div>
+            </div>
+            <div class="diff-card char-card" data-char="ARCHER" onclick="setCharacter('ARCHER')">
+              <div class="diff-title" style="color: #00ff66;">🏹 ARCHER</div>
+              <div class="diff-desc">Arrows & Bomb</div>
             </div>
           </div>
+        </div>
 
-          <!-- Right (Directly to the right of Archer card): 5 Difficulty Cards -->
-          <div style="flex: 1;">
-            <div class="diff-grid" style="grid-template-columns: repeat(5, 1fr); gap: 6px;">
-              <div class="diff-card" data-diff="TEST" onclick="setDifficulty('TEST')">
-                <div class="diff-title" style="color: #00f0ff;">🛠️ TEST</div>
-                <div class="diff-desc">Immortal</div>
-              </div>
-              <div class="diff-card" data-diff="EASY" onclick="setDifficulty('EASY')">
-                <div class="diff-title" style="color: var(--accent-cyan);">🟢 EASY</div>
-                <div class="diff-desc">7 Hearts</div>
-              </div>
-              <div class="diff-card active" data-diff="NORMAL" onclick="setDifficulty('NORMAL')">
-                <div class="diff-title" style="color: var(--accent-yellow);">🟡 NORMAL</div>
-                <div class="diff-desc">5H | 1.5X</div>
-              </div>
-              <div class="diff-card" data-diff="HARD" onclick="setDifficulty('HARD')">
-                <div class="diff-title" style="color: var(--accent-pink);">🔴 HARD</div>
-                <div class="diff-desc">3H | 2.5X</div>
-              </div>
-              <div class="diff-card" data-diff="IMPOSSIBLE" onclick="setDifficulty('IMPOSSIBLE')">
-                <div class="diff-title" style="color: #ff0055; text-shadow: 0 0 8px #ff0055;">💀 IMPOSSIBLE</div>
-                <div class="diff-desc">1H | 5.0X</div>
-              </div>
+        <!-- Difficulty Selection Section -->
+        <div class="selector-section">
+          <div class="score-label section-title">SELECT DIFFICULTY</div>
+          <div class="diff-grid-5">
+            <div class="diff-card" data-diff="TEST" onclick="setDifficulty('TEST')">
+              <div class="diff-title" style="color: #00f0ff;">🛠️ TEST</div>
+              <div class="diff-desc">Immortal Practice</div>
+            </div>
+            <div class="diff-card" data-diff="EASY" onclick="setDifficulty('EASY')">
+              <div class="diff-title" style="color: var(--accent-cyan);">🟢 EASY</div>
+              <div class="diff-desc">7 Hearts • 360° Shield</div>
+            </div>
+            <div class="diff-card active" data-diff="NORMAL" onclick="setDifficulty('NORMAL')">
+              <div class="diff-title" style="color: var(--accent-yellow);">🟡 NORMAL</div>
+              <div class="diff-desc">6 Hearts • 180° Shield</div>
+            </div>
+            <div class="diff-card" data-diff="HARD" onclick="setDifficulty('HARD')">
+              <div class="diff-title" style="color: var(--accent-pink);">🔴 HARD</div>
+              <div class="diff-desc">4 Hearts • 180° Shield</div>
+            </div>
+            <div class="diff-card" data-diff="IMPOSSIBLE" onclick="setDifficulty('IMPOSSIBLE')">
+              <div class="diff-title" style="color: #ff0055;">💀 HARDCORE</div>
+              <div class="diff-desc">1 Heart • 60° Precision</div>
             </div>
           </div>
         </div>
