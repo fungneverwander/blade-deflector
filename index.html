@@ -962,14 +962,24 @@
       <p class="subtitle" style="margin-bottom: 16px;">Complete achievements to unlock permanent passive stat bonuses and arena rewards!</p>
 
       <!-- Achievement Summary Header -->
-      <div class="achievements-summary-bar">
-        <div class="summary-item">
+      <div class="achievements-summary-bar" style="display: flex; gap: 12px; align-items: stretch; margin-bottom: 14px;">
+        <div class="summary-item" style="flex: 0.7;">
           <span class="summary-label">UNLOCKED</span>
-          <strong id="ach-unlocked-count" style="color: #ffe600; font-size: 1.1rem;">0 / 0</strong>
+          <strong id="ach-unlocked-count" style="color: #ffe600; font-size: 1.1rem;">0 / 2</strong>
         </div>
-        <div class="summary-item">
+        <div class="summary-item" style="flex: 1;">
           <span class="summary-label">ACTIVE STAT BONUSES</span>
           <strong id="ach-active-bonuses" style="color: var(--accent-cyan); font-size: 1.05rem;">None Active</strong>
+        </div>
+        <!-- Dynamic Interactive Ability Showcase Item directly to the right of Stat Bonus -->
+        <div class="summary-item" id="ach-ability-preview" style="flex: 2.2; display: flex; justify-content: space-between; align-items: center; background: rgba(0, 0, 0, 0.45); border: 1.5px solid var(--accent-cyan); border-radius: 12px; padding: 10px 14px;">
+          <div>
+            <div id="ach-preview-title" style="font-weight: 800; font-size: 0.85rem; color: #00f0ff;">🗡️ EQUIPPED: SQUARE KNIGHT</div>
+            <div id="ach-preview-desc" style="font-size: 0.75rem; color: #ddd; margin-top: 2px;">• Tap <span class="key-cap">SPACE / L-Click</span>: Slash | • Hold <span class="key-cap">SPACE</span>: Shield</div>
+          </div>
+          <div id="ach-preview-tag" style="background: rgba(0, 240, 255, 0.15); border: 1px solid #00f0ff; color: #00f0ff; font-weight: 800; font-size: 0.7rem; padding: 4px 8px; border-radius: 6px; white-space: nowrap;">
+            ⚡ DEFLECTOR BLADE
+          </div>
         </div>
       </div>
 
@@ -981,17 +991,6 @@
           <div style="font-size: 0.88rem; color: var(--text-muted); max-width: 440px; margin: 8px auto 0 auto; line-height: 1.45;">
             The achievement engine is initialized. Unlockable achievements, milestones, and stat bonus rewards will appear here!
           </div>
-        </div>
-      </div>
-
-      <!-- Dynamic Interactive Ability Showcase Card in Achievements Modal -->
-      <div id="ach-ability-preview" style="margin-top: 14px; margin-bottom: 12px; background: rgba(0, 0, 0, 0.45); border: 1.5px solid var(--accent-cyan); border-radius: 12px; padding: 14px; display: flex; align-items: center; justify-content: space-between;">
-        <div>
-          <div id="ach-preview-title" style="font-weight: 800; font-size: 0.95rem; color: #00f0ff;">🗡️ EQUIPPED CLASS: SQUARE KNIGHT</div>
-          <div id="ach-preview-desc" style="font-size: 0.82rem; color: #ddd; margin-top: 4px;">• Tap <span class="key-cap">SPACE / L-Click</span>: Slash & Deflect | • Hold <span class="key-cap">SPACE</span>: Directional Shield</div>
-        </div>
-        <div id="ach-preview-tag" style="background: rgba(0, 240, 255, 0.15); border: 1px solid #00f0ff; color: #00f0ff; font-weight: 800; font-size: 0.78rem; padding: 6px 12px; border-radius: 8px; letter-spacing: 0.5px;">
-          ⚡ DEFLECTOR BLADE
         </div>
       </div>
 
