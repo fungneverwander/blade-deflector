@@ -1482,6 +1482,9 @@
     let spaceWasTapped = false;
     let tabWasPressed = false;
     let bombRequested = false;
+    let iceWaveRequested = false;
+    let frozenWaveActive = false;
+    let frozenWaveRadius = 0;
 
     window.addEventListener('contextmenu', (e) => {
       e.preventDefault(); // Prevent right-click context menu so right click throws Archer bomb!
@@ -1516,6 +1519,9 @@
     });
 
     window.addEventListener('keydown', (e) => {
+      if (e.code === 'Digit1' || e.code === 'Numpad1' || e.key === '1') {
+        iceWaveRequested = true;
+      }
       if (e.code === 'KeyE' || e.code === 'KeyQ' || e.code === 'KeyF' || e.code === 'KeyR') {
         bombRequested = true;
       }
@@ -1545,6 +1551,7 @@
       spaceIsHeld = false;
       spaceWasTapped = false;
       bombRequested = false;
+      iceWaveRequested = false;
       spaceDownTime = 0;
       if (typeof player !== 'undefined' && player) {
         player.isBlocking = false;
@@ -2490,6 +2497,9 @@
       player.shotgunCooldown = 0;
       player.archerCooldown = 0;
       player.archerBombCooldown = 0;
+      player.frozenWaveCooldown = 0;
+      frozenWaveActive = false;
+      frozenWaveRadius = 0;
       player.isBlocking = false;
       player.wasBlocking = false;
       player.shieldBrokenTimer = 0;
@@ -2663,6 +2673,35 @@
         // ARCHER & FROZEN ARCHER: Firing Arrows & Physical Bomb Throw
         if (player.archerCooldown > 0) player.archerCooldown--;
         if (player.archerBombCooldown > 0) player.archerBombCooldown--;
+        if (player.frozenWaveCooldown > 0) player.frozenWaveCooldown--;
+
+        // Passive 300px Frost Aura Slow for Frozen Archer
+        if (player.character === 'FROZEN_ARCHER') {
+          enemies.forEach(e => {
+            const edx = e.x - player.x;
+            const edy = e.y - player.y;
+            const edist = Math.sqrt(edx * edx + edy * edy);
+            if (edist <= 300) {
+              e.speed *= 0.5; // Passive 50% Frost Aura Slow!
+            }
+          });
+        }
+
+        // Active Ability: Press [1] for 360° Ice Wave (300px)
+        if (iceWaveRequested && player.character === 'FROZEN_ARCHER') {
+          iceWaveRequested = false;
+          if (player.frozenWaveCooldown <= 0) {
+            player.frozenWaveCooldown = 240; // 4 second cooldown
+            frozenWaveActive = true;
+            frozenWaveRadius = 15;
+            audio.playDeflect();
+            screenShake = 16;
+            createSparks(player.x, player.y, 40, '#00f0ff', 10);
+            addFloatingText('❄️ 360° ICE WAVE (300PX)!', player.x, player.y - 45, '#00f0ff');
+          } else {
+            addFloatingText(`⏳ ICE WAVE RECHARGING (${(player.frozenWaveCooldown / 60).toFixed(1)}s)`, player.x, player.y - 35, '#00f0ff');
+          }
+        }
 
         // Trigger Archer Bomb on Right-Click, Key E/Q/F/R, or Hold Spacebar
         if (bombRequested || (spaceIsHeld && spaceDownTime > 0 && (performance.now() - spaceDownTime > 90))) {
@@ -2907,6 +2946,59 @@
               screenShake = 12;
             }
           }
+        }
+      }
+
+      // Update 360° Ice Wave Expansion & Damage Logic
+      if (frozenWaveActive) {
+        frozenWaveRadius += 14;
+        createSparks(player.x, player.y, 5, '#00f0ff', 6);
+
+        // Damage all enemies within 300px wave radius!
+        for (let i = enemies.length - 1; i >= 0; i--) {
+          const e = enemies[i];
+          const edx = e.x - player.x;
+          const edy = e.y - player.y;
+          const edist = Math.sqrt(edx * edx + edy * edy);
+
+          if (Math.abs(edist - frozenWaveRadius) < 28 || edist <= frozenWaveRadius) {
+            // Knockback
+            const pushAngle = Math.atan2(edy, edx);
+            e.x += Math.cos(pushAngle) * 35;
+            e.y += Math.sin(pushAngle) * 35;
+
+            if (e.type === 'PURPLE_BOSS' || e.type === 'CRESCENT_BOSS' || e.type === 'TRIANGLE_BOSS' || e.type === 'MINI_HEXAGON') {
+              if (!e.hitByIceWave) {
+                e.hitByIceWave = true;
+                e.hp -= 4;
+                createSparks(e.x, e.y, 25, '#00f0ff', 8);
+                audio.playEnemyKill();
+                addFloatingText(`ICE WAVE HIT! ${e.hp} HP`, e.x, e.y - 30, '#00f0ff');
+                if (e.hp <= 0) {
+                  createSparks(e.x, e.y, 50, e.color, 12);
+                  audio.playDeflect();
+                  let bossScore = e.type === 'TRIANGLE_BOSS' ? 5000 : (e.type === 'CRESCENT_BOSS' ? 3000 : (e.type === 'MINI_HEXAGON' ? 600 : 2000));
+                  score += Math.round(bossScore * getScoreMult());
+                  enemies.splice(i, 1);
+                  if (e.type === 'PURPLE_BOSS') openRewardModal();
+                  else if (e.type === 'CRESCENT_BOSS') openCrescentRewardModal();
+                  else if (e.type === 'TRIANGLE_BOSS') openTriangleRewardModal();
+                }
+              }
+            } else {
+              createSparks(e.x, e.y, 20, '#00f0ff', 7);
+              audio.playEnemyKill();
+              score += Math.round(150 * getScoreMult());
+              const ex = e.x, ey = e.y;
+              enemies.splice(i, 1);
+              handleEnemyKillEffects(ex, ey);
+            }
+          }
+        }
+
+        if (frozenWaveRadius >= 300) {
+          frozenWaveActive = false;
+          enemies.forEach(e => e.hitByIceWave = false);
         }
       }
 
@@ -4794,8 +4886,23 @@
               const swordLength = player.isBlocking ? 30 : player.swordLength;
               ctx.fillRect(player.size / 2, -3, swordLength, 6);
             }
-          } else if (player.character === 'ARCHER') {
-            // Detailed Emerald Recurve Bow & Drawn Arrow Model
+          } else if (player.character === 'ARCHER' || player.character === 'FROZEN_ARCHER') {
+            // Render 300px Passive Frost Aura Ring for Frozen Archer
+            if (player.character === 'FROZEN_ARCHER') {
+              ctx.save();
+              ctx.strokeStyle = 'rgba(0, 240, 255, 0.35)';
+              ctx.shadowColor = '#00f0ff';
+              ctx.shadowBlur = 12;
+              ctx.lineWidth = 2.5;
+              ctx.setLineDash([10, 8]);
+              ctx.beginPath();
+              ctx.arc(0, 0, 300, 0, Math.PI * 2);
+              ctx.stroke();
+              ctx.setLineDash([]);
+              ctx.restore();
+            }
+
+            // Detailed Recurve Bow & Drawn Arrow Model
             ctx.save();
             ctx.rotate(player.angle);
 
