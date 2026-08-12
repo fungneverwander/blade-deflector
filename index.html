@@ -531,6 +531,9 @@
       pointer-events: none;
       z-index: 20;
       background: radial-gradient(circle, rgba(0, 240, 255, 0.4) 0%, rgba(255, 230, 0, 0.1) 80%);
+      opacity: 0;
+      transition: opacity 0.1s ease;
+    }
     /* Mobile & Tablet Controls Layer */
     #mobile-controls {
       position: absolute;
@@ -4388,10 +4391,10 @@
             ctx.fillRect(e.size / 2, -3, e.swordLength, 6);
           }
         } else if (e.type === 'GREEN_BITER') {
-          // Biting Green Square
+          // Biting Green Square (Zero shadow blur!)
           ctx.fillStyle = e.color;
-          ctx.shadowColor = e.color;
-          ctx.shadowBlur = 12;
+          ctx.shadowBlur = 0;
+          ctx.shadowColor = 'rgba(0, 0, 0, 0)';
 
           // Split jaw effect when close to biting!
           const jawOffset = e.jawOpen * 8;
@@ -4522,8 +4525,8 @@
         ctx.save();
         ctx.globalAlpha = Math.max(0, pt.life);
         ctx.fillStyle = pt.color;
-        ctx.shadowColor = pt.color;
-        ctx.shadowBlur = 6;
+        ctx.shadowBlur = 0;
+        ctx.shadowColor = 'rgba(0, 0, 0, 0)';
         ctx.fillRect(pt.x - pt.size / 2, pt.y - pt.size / 2, pt.size, pt.size);
         ctx.restore();
       });
