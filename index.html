@@ -5156,6 +5156,7 @@
     const unlockedAchievements = new Set(JSON.parse(localStorage.getItem('blade_deflector_achievements') || '[]'));
 
     function checkFlameKillsAchievement() {
+      if (typeof gameDifficulty !== 'undefined' && gameDifficulty === 'TEST') return; // NO ACHIEVEMENTS IN TEST MODE!
       if (player.character === 'ARCHER' || player.character === 'FROZEN_ARCHER') {
         flameKillsAsArcher++;
         localStorage.setItem('blade_deflector_archer_flame_kills', flameKillsAsArcher);
@@ -5168,6 +5169,7 @@
     }
 
     function checkFlameRamKillsAchievement() {
+      if (typeof gameDifficulty !== 'undefined' && gameDifficulty === 'TEST') return; // NO ACHIEVEMENTS IN TEST MODE!
       if (player.character === 'SENTINEL' || player.character === 'BURNING_SENTINEL') {
         flameRamKillsAsSentinel++;
         localStorage.setItem('blade_deflector_sentinel_flame_ram_kills', flameRamKillsAsSentinel);
