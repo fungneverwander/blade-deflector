@@ -2469,7 +2469,9 @@
 
       // Apply Difficulty Settings
       player.character = selectedCharacter || 'KNIGHT';
-      if (player.character === 'FROZEN_ARCHER') {
+      if (player.character === 'BURNING_SENTINEL') {
+        player.color = '#ff3300';
+      } else if (player.character === 'FROZEN_ARCHER') {
         player.color = '#00f0ff';
       } else if (player.character === 'SENTINEL') {
         player.color = '#ffe600';
@@ -2811,10 +2813,24 @@
             }
           }
         }
-      } else if (player.character === 'SENTINEL') {
+      } else if (player.character === 'SENTINEL' || player.character === 'BURNING_SENTINEL') {
         // Shield Sentinel has ALWAYS-ACTIVE passive shield (unless currently dashing!)
         // Decrement Dash Cooldown
         if (player.dashCooldown > 0) player.dashCooldown--;
+
+        // Passive Flame Trail for Burning Sentinel
+        if (player.character === 'BURNING_SENTINEL' && Math.random() < 0.6) {
+          particles.push({
+            x: player.x + (Math.random() - 0.5) * player.size,
+            y: player.y + (Math.random() - 0.5) * player.size,
+            vx: (Math.random() - 0.5) * 1.5,
+            vy: (Math.random() - 0.5) * 1.5,
+            size: Math.random() * 5 + 3,
+            color: '#ff4400',
+            life: 0.8,
+            decay: 0.04
+          });
+        }
 
         // Tap Spacebar triggers RAMMING DASH ATTACK!
         if (spaceWasTapped) {
@@ -2826,8 +2842,9 @@
             player.dashAngle = Math.atan2(mouse.y - player.y, mouse.x - player.x);
             player.invulnerableTimer = 18; // Invulnerable during dash
             audio.playSlash();
-            createSparks(player.x, player.y, 25, '#ffe600', 8);
-            addFloatingText('⚡ RAMMING DASH!', player.x, player.y - 30, '#ffe600');
+            const dashColor = player.character === 'BURNING_SENTINEL' ? '#ff3300' : '#ffe600';
+            createSparks(player.x, player.y, 30, dashColor, 9);
+            addFloatingText(player.character === 'BURNING_SENTINEL' ? '🔥 METEOR DASH!' : '⚡ RAMMING DASH!', player.x, player.y - 30, dashColor);
 
             // 1. Slash Beam Permanent Buff for Sentinel: Fires a Dash Energy Wave forward!
             if (player.permBuffs.projectileSlash) {
@@ -3028,13 +3045,15 @@
               }
             } else {
               // Destroy regular enemy on impact!
-              createSparks(e.x, e.y, 20, '#ffe600', 7);
+              const crushColor = player.character === 'BURNING_SENTINEL' ? '#ff3300' : '#ffe600';
+              createSparks(e.x, e.y, 22, crushColor, 8);
               audio.playEnemyKill();
               screenShake = 8;
-              addFloatingText(`+${Math.round(200 * getScoreMult())} DASH CRUSH!`, e.x, e.y - 20, '#ffe600');
+              addFloatingText(`+${Math.round(200 * getScoreMult())} DASH CRUSH!`, e.x, e.y - 20, crushColor);
               score += Math.round(200 * getScoreMult());
               const ex = e.x, ey = e.y;
               enemies.splice(i, 1);
+              checkFlameRamKillsAchievement();
               handleEnemyKillEffects(ex, ey);
             }
           }
@@ -5018,9 +5037,11 @@
        Achievement System Core Architecture
        ========================================================================== */
     const achievements = [
-      { id: 'FLAME_SLAYER', name: 'FLAME SLAYER', desc: 'Kill 50 Flame Knights as Archer', target: 50 }
+      { id: 'FLAME_SLAYER', name: 'FLAME SLAYER', desc: 'Kill 50 Flame Knights as Archer', target: 50 },
+      { id: 'RAM_SLAYER', name: 'RAM SLAYER', desc: 'Kill 70 Flame Knights by Ramming as Sentinel', target: 70 }
     ];
     let flameKillsAsArcher = parseInt(localStorage.getItem('blade_deflector_archer_flame_kills') || '0');
+    let flameRamKillsAsSentinel = parseInt(localStorage.getItem('blade_deflector_sentinel_flame_ram_kills') || '0');
     const unlockedAchievements = new Set(JSON.parse(localStorage.getItem('blade_deflector_achievements') || '[]'));
 
     function checkFlameKillsAchievement() {
@@ -5031,6 +5052,18 @@
           unlockedAchievements.add('FLAME_SLAYER');
           localStorage.setItem('blade_deflector_achievements', JSON.stringify([...unlockedAchievements]));
           addFloatingText('🏆 UNLOCKED: FLAME SLAYER & FROZEN ARCHER!', player.x, player.y - 45, '#ffe600');
+        }
+      }
+    }
+
+    function checkFlameRamKillsAchievement() {
+      if (player.character === 'SENTINEL' || player.character === 'BURNING_SENTINEL') {
+        flameRamKillsAsSentinel++;
+        localStorage.setItem('blade_deflector_sentinel_flame_ram_kills', flameRamKillsAsSentinel);
+        if (flameRamKillsAsSentinel >= 70 && !unlockedAchievements.has('RAM_SLAYER')) {
+          unlockedAchievements.add('RAM_SLAYER');
+          localStorage.setItem('blade_deflector_achievements', JSON.stringify([...unlockedAchievements]));
+          addFloatingText('🏆 UNLOCKED: RAM SLAYER & BURNING SENTINEL!', player.x, player.y - 45, '#ff3300');
         }
       }
     }
@@ -5056,22 +5089,33 @@
       const countEl = document.getElementById('ach-unlocked-count');
       const bonusEl = document.getElementById('ach-active-bonuses');
       
-      const isUnlocked = unlockedAchievements.has('FLAME_SLAYER') || flameKillsAsArcher >= 50;
-      if (isUnlocked && !unlockedAchievements.has('FLAME_SLAYER')) {
+      const isFlameUnlocked = unlockedAchievements.has('FLAME_SLAYER') || flameKillsAsArcher >= 50;
+      if (isFlameUnlocked && !unlockedAchievements.has('FLAME_SLAYER')) {
         unlockedAchievements.add('FLAME_SLAYER');
         localStorage.setItem('blade_deflector_achievements', JSON.stringify([...unlockedAchievements]));
       }
 
-      if (countEl) countEl.textContent = `${isUnlocked ? 1 : 0} / 1`;
-      if (bonusEl) bonusEl.textContent = isUnlocked ? '❄️ Frozen Archer Unlocked' : 'None Active';
+      const isRamUnlocked = unlockedAchievements.has('RAM_SLAYER') || flameRamKillsAsSentinel >= 70;
+      if (isRamUnlocked && !unlockedAchievements.has('RAM_SLAYER')) {
+        unlockedAchievements.add('RAM_SLAYER');
+        localStorage.setItem('blade_deflector_achievements', JSON.stringify([...unlockedAchievements]));
+      }
+
+      const totalUnlocked = (isFlameUnlocked ? 1 : 0) + (isRamUnlocked ? 1 : 0);
+
+      if (countEl) countEl.textContent = `${totalUnlocked} / 2`;
+      if (bonusEl) {
+        bonusEl.textContent = totalUnlocked > 0 ? `${isFlameUnlocked ? '❄️ Frozen Archer ' : ''}${isRamUnlocked ? '🔥 Burning Sentinel' : ''} Unlocked` : 'None Active';
+      }
 
       if (listContainer) {
         listContainer.innerHTML = `
-          <div class="shop-item-card" style="border-color: ${isUnlocked ? '#00f0ff' : 'rgba(255,255,255,0.15)'}; background: ${isUnlocked ? 'rgba(0, 240, 255, 0.08)' : 'rgba(0,0,0,0.4)'}; padding: 18px;">
+          <!-- Achievement 1: FLAME SLAYER -->
+          <div class="shop-item-card" style="border-color: ${isFlameUnlocked ? '#00f0ff' : 'rgba(255,255,255,0.15)'}; background: ${isFlameUnlocked ? 'rgba(0, 240, 255, 0.08)' : 'rgba(0,0,0,0.4)'}; padding: 18px; margin-bottom: 12px;">
             <div style="display: flex; gap: 14px; align-items: center;">
-              <div style="font-size: 2.2rem;">${isUnlocked ? '🏹❄️' : '🔒'}</div>
+              <div style="font-size: 2.2rem;">${isFlameUnlocked ? '🏹❄️' : '🔒'}</div>
               <div style="flex: 1;">
-                <div style="font-size: 1.05rem; font-weight: 800; color: ${isUnlocked ? '#00f0ff' : '#ffffff'};">FLAME SLAYER</div>
+                <div style="font-size: 1.05rem; font-weight: 800; color: ${isFlameUnlocked ? '#00f0ff' : '#ffffff'};">FLAME SLAYER</div>
                 <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">Kill 50 Flame Knights as the Archer class.</div>
                 <div style="font-size: 0.78rem; font-weight: 800; color: #ffe600; margin-top: 6px;">Progress: ${Math.min(50, flameKillsAsArcher)} / 50 Slain</div>
               </div>
@@ -5081,17 +5125,46 @@
                 <div style="font-size: 0.75rem; letter-spacing: 1px; color: var(--text-muted); font-weight: 800;">BONUS UNLOCK</div>
                 <div style="font-size: 0.9rem; font-weight: 800; color: #00f0ff;">❄️ Frozen Archer Side Class</div>
               </div>
-              <button class="btn-primary" id="select-frozen-archer-btn" ${!isUnlocked ? 'disabled' : ''} style="padding: 10px 16px; font-size: 0.82rem; ${isUnlocked ? 'background: linear-gradient(135deg, #00f0ff, #0088ff); color: #000;' : ''}">
-                ${selectedCharacter === 'FROZEN_ARCHER' ? 'EQUIPPED ✔' : (isUnlocked ? 'EQUIP FROZEN ARCHER' : 'LOCKED 🔒')}
+              <button class="btn-primary" id="select-frozen-archer-btn" ${!isFlameUnlocked ? 'disabled' : ''} style="padding: 10px 16px; font-size: 0.82rem; ${isFlameUnlocked ? 'background: linear-gradient(135deg, #00f0ff, #0088ff); color: #000;' : ''}">
+                ${selectedCharacter === 'FROZEN_ARCHER' ? 'EQUIPPED ✔' : (isFlameUnlocked ? 'EQUIP FROZEN ARCHER' : 'LOCKED 🔒')}
+              </button>
+            </div>
+          </div>
+
+          <!-- Achievement 2: RAM SLAYER -->
+          <div class="shop-item-card" style="border-color: ${isRamUnlocked ? '#ff3300' : 'rgba(255,255,255,0.15)'}; background: ${isRamUnlocked ? 'rgba(255, 51, 0, 0.08)' : 'rgba(0,0,0,0.4)'}; padding: 18px;">
+            <div style="display: flex; gap: 14px; align-items: center;">
+              <div style="font-size: 2.2rem;">${isRamUnlocked ? '🛡️🔥' : '🔒'}</div>
+              <div style="flex: 1;">
+                <div style="font-size: 1.05rem; font-weight: 800; color: ${isRamUnlocked ? '#ff3300' : '#ffffff'};">RAM SLAYER</div>
+                <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">Kill 70 Flame Knights by Ramming as the Sentinel class.</div>
+                <div style="font-size: 0.78rem; font-weight: 800; color: #ffe600; margin-top: 6px;">Progress: ${Math.min(70, flameRamKillsAsSentinel)} / 70 Rammed</div>
+              </div>
+            </div>
+            <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="font-size: 0.75rem; letter-spacing: 1px; color: var(--text-muted); font-weight: 800;">BONUS UNLOCK</div>
+                <div style="font-size: 0.9rem; font-weight: 800; color: #ff3300;">🔥 Burning Sentinel Side Class</div>
+              </div>
+              <button class="btn-primary" id="select-burning-sentinel-btn" ${!isRamUnlocked ? 'disabled' : ''} style="padding: 10px 16px; font-size: 0.82rem; ${isRamUnlocked ? 'background: linear-gradient(135deg, #ff3300, #ff6600); color: #fff;' : ''}">
+                ${selectedCharacter === 'BURNING_SENTINEL' ? 'EQUIPPED ✔' : (isRamUnlocked ? 'EQUIP BURNING SENTINEL' : 'LOCKED 🔒')}
               </button>
             </div>
           </div>
         `;
 
-        const equipBtn = document.getElementById('select-frozen-archer-btn');
-        if (equipBtn && isUnlocked) {
-          equipBtn.addEventListener('click', () => {
+        const equipFrozenBtn = document.getElementById('select-frozen-archer-btn');
+        if (equipFrozenBtn && isFlameUnlocked) {
+          equipFrozenBtn.addEventListener('click', () => {
             setCharacter('FROZEN_ARCHER');
+            updateAchievementsUI();
+          });
+        }
+
+        const equipBurningBtn = document.getElementById('select-burning-sentinel-btn');
+        if (equipBurningBtn && isRamUnlocked) {
+          equipBurningBtn.addEventListener('click', () => {
+            setCharacter('BURNING_SENTINEL');
             updateAchievementsUI();
           });
         }
