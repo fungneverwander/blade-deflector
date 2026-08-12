@@ -598,15 +598,7 @@
     }
 
     .touch-btn {
-      position: absolute;
-      bottom: 28px;
-      right: 24px;
-      width: 96px;
-      height: 96px;
       border-radius: 50%;
-      background: radial-gradient(circle, rgba(0, 240, 255, 0.3) 0%, rgba(0, 240, 255, 0.1) 100%);
-      border: 2px solid var(--accent-cyan);
-      box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
       color: #ffffff;
       font-weight: 800;
       font-size: 0.8rem;
@@ -623,15 +615,39 @@
 
     .touch-btn:active {
       transform: scale(0.92);
-      background: rgba(0, 240, 255, 0.5);
+      background: rgba(0, 240, 255, 0.5) !important;
+    }
+
+    #mobile-attack-cluster {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      display: flex;
+      gap: 12px;
+      align-items: flex-end;
+      pointer-events: auto;
+      touch-action: none;
+    }
+
+    .touch-btn-primary-attack {
+      width: 82px !important;
+      height: 82px !important;
+      background: radial-gradient(circle, rgba(0, 240, 255, 0.4) 0%, rgba(0, 240, 255, 0.15) 100%) !important;
+      border: 2px solid var(--accent-cyan) !important;
+      box-shadow: 0 0 16px rgba(0, 240, 255, 0.5) !important;
+    }
+
+    .touch-btn-secondary-shield {
+      width: 72px !important;
+      height: 72px !important;
+      background: radial-gradient(circle, rgba(255, 230, 0, 0.35) 0%, rgba(255, 230, 0, 0.1) 100%) !important;
+      border: 2px solid var(--accent-yellow) !important;
+      box-shadow: 0 0 14px rgba(255, 230, 0, 0.4) !important;
     }
 
     .touch-btn-shop {
-      position: absolute;
-      bottom: 140px;
-      right: 28px;
-      width: 56px;
-      height: 56px;
+      width: 52px !important;
+      height: 52px !important;
       border-radius: 50%;
       background: rgba(255, 230, 0, 0.15);
       border: 2px solid var(--accent-yellow);
@@ -866,16 +882,25 @@
       <div class="v-joystick-stick" id="v-stick-aim"></div>
     </div>
 
-    <!-- Main Touch Action Button (Spacebar Emulation) -->
-    <button class="touch-btn" id="touch-btn-action">
-      <span id="touch-action-icon" style="font-size: 1.4rem;">⚔️</span>
-      <span id="touch-action-label">ATTACK</span>
-    </button>
+    <!-- Dedicated Mobile Attack & Action Buttons Cluster -->
+    <div id="mobile-attack-cluster">
+      <!-- Primary Weapon Attack Button -->
+      <button class="touch-btn touch-btn-primary-attack" id="touch-btn-attack">
+        <span id="touch-attack-icon" style="font-size: 1.4rem;">⚔️</span>
+        <span id="touch-attack-label" style="font-size: 0.65rem; font-weight: 800;">ATTACK</span>
+      </button>
 
-    <!-- Shop Buy Touch Button (TAB Emulation) -->
-    <button class="touch-btn-shop" id="touch-btn-shop" title="Buy at Shop Pedestal">
-      🛒
-    </button>
+      <!-- Shield / Block Button -->
+      <button class="touch-btn touch-btn-secondary-shield" id="touch-btn-shield">
+        <span id="touch-shield-icon" style="font-size: 1.3rem;">🛡️</span>
+        <span id="touch-shield-label" style="font-size: 0.65rem; font-weight: 800;">SHIELD</span>
+      </button>
+
+      <!-- Shop Buy Touch Button -->
+      <button class="touch-btn-shop" id="touch-btn-shop" title="Buy at Shop Pedestal">
+        🛒
+      </button>
+    </div>
   </div>
 
   <!-- Start / Controls Modal -->
@@ -1635,29 +1660,78 @@
       touchAimActive = true;
     }
 
-    // Touch Action Button Handlers (Spacebar Emulation)
-    const touchBtnAction = document.getElementById('touch-btn-action');
-    if (touchBtnAction) {
-      touchBtnAction.addEventListener('touchstart', (e) => {
+    // Mobile Auto-Aim Assistant for Touch Attacks
+    function getMobileAutoAimTarget() {
+      let nearest = null;
+      let minDst = 240;
+      enemies.forEach(e => {
+        const dst = Math.sqrt((e.x - player.x) ** 2 + (e.y - player.y) ** 2);
+        if (dst < minDst) {
+          minDst = dst;
+          nearest = e;
+        }
+      });
+      return nearest;
+    }
+
+    // Touch Attack Button Handler (Primary Weapon Strike)
+    const touchBtnAttack = document.getElementById('touch-btn-attack');
+    if (touchBtnAttack) {
+      touchBtnAttack.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        if (gameState === 'PLAYING') {
+          // Auto-aim at nearest enemy if available
+          const target = getMobileAutoAimTarget();
+          if (target) {
+            const aimAngle = Math.atan2(target.y - player.y, target.x - player.x);
+            player.angle = aimAngle;
+            mouse.x = player.x + Math.cos(aimAngle) * 100;
+            mouse.y = player.y + Math.sin(aimAngle) * 100;
+          }
+          spaceWasTapped = true;
+          createSparks(player.x, player.y, 10, '#00f0ff', 4);
+        }
+      }, { passive: false });
+    }
+
+    // Touch Shield Button Handler (Hold to Block & Drop Bomb)
+    const touchBtnShield = document.getElementById('touch-btn-shield');
+    if (touchBtnShield) {
+      touchBtnShield.addEventListener('touchstart', (e) => {
         e.preventDefault();
         if (gameState === 'PLAYING') {
           keys['Space'] = true;
           spaceDownTime = performance.now();
-          spaceWasTapped = true;
           spaceIsHeld = true;
         }
       }, { passive: false });
 
-      const endTouchAction = (e) => {
+      const endTouchShield = (e) => {
         e.preventDefault();
         keys['Space'] = false;
         spaceIsHeld = false;
         spaceDownTime = 0;
       };
 
-      touchBtnAction.addEventListener('touchend', endTouchAction, { passive: false });
-      touchBtnAction.addEventListener('touchcancel', endTouchAction, { passive: false });
+      touchBtnShield.addEventListener('touchend', endTouchShield, { passive: false });
+      touchBtnShield.addEventListener('touchcancel', endTouchShield, { passive: false });
     }
+
+    // Canvas Tap-To-Attack Gesture System
+    canvas.addEventListener('touchstart', (e) => {
+      if (gameState === 'PLAYING' && e.touches.length === 1) {
+        const t = e.touches[0];
+        // If not tapping controls, trigger weapon attack to touch point!
+        const isControlTouch = e.target.closest('#mobile-controls') || e.target.closest('#hud-layer');
+        if (!isControlTouch) {
+          mouse.x = t.clientX;
+          mouse.y = t.clientY;
+          player.angle = Math.atan2(mouse.y - player.y, mouse.x - player.x);
+          spaceWasTapped = true;
+          createSparks(t.clientX, t.clientY, 8, '#00ff66', 5);
+        }
+      }
+    }, { passive: false });
 
     // Touch Shop Buy Button Handlers (TAB Emulation)
     const touchBtnShop = document.getElementById('touch-btn-shop');
