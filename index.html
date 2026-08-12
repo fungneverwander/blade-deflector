@@ -1175,43 +1175,44 @@
   <div class="modal-overlay" id="pause-modal">
     <div class="modal-card" style="max-width: 500px;">
       <h1 class="game-title" style="background: linear-gradient(135deg, var(--accent-cyan), var(--accent-yellow)); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">GAME PAUSED</h1>
-      <p class="subtitle">Take a breather! Resume or adjust your difficulty below:</p>
+      <p class="subtitle">Take a breather! Resume, restart, or return to main menu below:</p>
 
-      <div style="margin-top: 18px; margin-bottom: 22px;">
-        <button class="btn-primary" id="resume-btn" style="width: 100%; margin-bottom: 12px;">RESUME GAME [ESC / P]</button>
+      <div style="margin-top: 18px; margin-bottom: 18px; display: flex; flex-direction: column; gap: 10px;">
+        <button class="btn-primary" id="resume-btn" style="width: 100%;">RESUME GAME [ESC / P]</button>
         <button class="btn-primary" id="pause-restart-btn" style="width: 100%; background: linear-gradient(135deg, #ff0055, #ff6b00);">RESTART RUN</button>
+        <button class="btn-primary" id="pause-mainmenu-btn" style="width: 100%; background: linear-gradient(135deg, var(--accent-yellow), var(--accent-orange)); color: #040814;">🏠 RETURN TO MAIN MENU</button>
       </div>
 
       <!-- Pause Character Class Selector -->
       <div style="margin-bottom: 16px;">
         <div class="score-label" style="margin-bottom: 8px; text-align: center;">CHANGE CHARACTER CLASS</div>
-        <div class="diff-grid" style="grid-template-columns: repeat(3, 1fr); gap: 8px;">
+        <div class="diff-grid" style="grid-template-columns: repeat(4, 1fr); gap: 6px;">
           <div class="diff-card char-card active" data-char="KNIGHT" onclick="setCharacter('KNIGHT')">
             <div class="diff-title" style="color: var(--accent-cyan);">🗡️ KNIGHT</div>
             <div class="diff-desc">Sword & Shield</div>
           </div>
           <div class="diff-card char-card" data-char="SENTINEL" onclick="setCharacter('SENTINEL')">
             <div class="diff-title" style="color: var(--accent-yellow);">🛡️ SENTINEL</div>
-            <div class="diff-desc">180° Shield & Dash</div>
+            <div class="diff-desc">Shield & Dash</div>
           </div>
           <div class="diff-card char-card" data-char="SHOTGUN" onclick="setCharacter('SHOTGUN')">
             <div class="diff-title" style="color: #ff5500;">💥 SHOTGUN</div>
-            <div class="diff-desc">Buckshot & Shield</div>
+            <div class="diff-desc">Buckshot</div>
           </div>
           <div class="diff-card char-card" data-char="ARCHER" onclick="setCharacter('ARCHER')">
-            <div class="diff-title" style="color: #00ff66;">🏹 ARCHER</div>
+            <div class="diff-title" style="color: #ffe600;">🏹 ARCHER</div>
             <div class="diff-desc">Arrows & Bomb</div>
           </div>
         </div>
       </div>
 
-      <!-- Difficulty Mode Selector inside Pause Menu -->
-      <div>
+      <!-- Difficulty Mode Selector inside Pause Menu (Hidden in TEST Mode) -->
+      <div id="pause-diff-container">
         <div class="score-label" style="margin-bottom: 10px; text-align: center;">CHANGE DIFFICULTY</div>
         <div class="diff-grid" style="grid-template-columns: repeat(5, 1fr);">
           <div class="diff-card" data-diff="TEST" onclick="setDifficulty('TEST')">
             <div class="diff-title" style="color: #00f0ff;">🛠️ TEST</div>
-            <div class="diff-desc">Immortal | 0.0X</div>
+            <div class="diff-desc">Immortal</div>
           </div>
           <div class="diff-card" data-diff="EASY" onclick="setDifficulty('EASY')">
             <div class="diff-title" style="color: var(--accent-cyan);">🟢 EASY</div>
@@ -1219,15 +1220,15 @@
           </div>
           <div class="diff-card active" data-diff="NORMAL" onclick="setDifficulty('NORMAL')">
             <div class="diff-title" style="color: var(--accent-yellow);">🟡 NORMAL</div>
-            <div class="diff-desc">5 Hearts | 1.5X</div>
+            <div class="diff-desc">5H | 1.5X</div>
           </div>
           <div class="diff-card" data-diff="HARD" onclick="setDifficulty('HARD')">
             <div class="diff-title" style="color: var(--accent-pink);">🔴 HARD</div>
-            <div class="diff-desc">3 Hearts | 2.5X</div>
+            <div class="diff-desc">3H | 2.5X</div>
           </div>
           <div class="diff-card" data-diff="IMPOSSIBLE" onclick="setDifficulty('IMPOSSIBLE')">
-            <div class="diff-title" style="color: #ff0055;">💀 IMPOSSIBLE</div>
-            <div class="diff-desc">1 Heart | 5.0X</div>
+            <div class="diff-title" style="color: #ff0055;">💀 HARDCORE</div>
+            <div class="diff-desc">1H | 5.0X</div>
           </div>
         </div>
       </div>
@@ -2451,7 +2452,17 @@
 
       // Apply Difficulty Settings
       player.character = selectedCharacter || 'KNIGHT';
-      player.color = player.character === 'SENTINEL' ? '#ffe600' : (player.character === 'SHOTGUN' ? '#ff5500' : (player.character === 'ARCHER' ? '#00ff66' : '#00f0ff'));
+      if (player.character === 'FROZEN_ARCHER') {
+        player.color = '#00f0ff';
+      } else if (player.character === 'SENTINEL') {
+        player.color = '#ffe600';
+      } else if (player.character === 'SHOTGUN') {
+        player.color = '#ff5500';
+      } else if (player.character === 'ARCHER') {
+        player.color = '#00ff66';
+      } else {
+        player.color = '#00f0ff';
+      }
       player.dashActive = false;
       player.dashProgress = 0;
       player.dashCooldown = 0;
@@ -2627,18 +2638,18 @@
       player.wasBlocking = player.isBlocking;
 
       // 1. Check Character Input Mechanics
-      if (player.character === 'ARCHER') {
-        // ARCHER RANGER: Energy Arrow Shots & Shield Drop Bomb Throw
+      if (player.character === 'ARCHER' || player.character === 'FROZEN_ARCHER') {
+        // ARCHER & FROZEN ARCHER: Firing Arrows & Slow Physical Bomb
         if (player.archerCooldown > 0) player.archerCooldown--;
         if (player.archerBombCooldown > 0) player.archerBombCooldown--;
 
-        // Shield Drop Bomb Throw!
-        if (shieldJustDropped) {
+        // Hold Spacebar for > 90ms triggers Thrown Bomb!
+        if (spaceIsHeld && spaceDownTime > 0 && (performance.now() - spaceDownTime > 90)) {
           if (player.archerBombCooldown <= 0) {
-            player.archerBombCooldown = player.maxArcherBombCooldown; // 1.5s cooldown (90 frames)
+            player.archerBombCooldown = player.maxArcherBombCooldown;
             triggerArcherBombThrow(mouse.x, mouse.y);
-          } else {
-            addFloatingText(`⏳ BOMB RECHARGING (${(player.archerBombCooldown / 60).toFixed(1)}s)`, player.x, player.y - 35, '#ff9900');
+            spaceDownTime = 0;
+            spaceIsHeld = false;
           }
         }
 
@@ -2651,8 +2662,9 @@
 
             audio.playSlash();
             screenShake = 6;
-            createSparks(player.x, player.y, 14, '#00ff66', 6);
-            addFloatingText('🏹 ARROW SHOT!', player.x, player.y - 30, '#00ff66');
+            const arrowColor = player.character === 'FROZEN_ARCHER' ? '#00f0ff' : '#00ff66';
+            createSparks(player.x, player.y, 14, arrowColor, 6);
+            addFloatingText(player.character === 'FROZEN_ARCHER' ? '❄️ FROST ARROW!' : '🏹 ARROW SHOT!', player.x, player.y - 30, arrowColor);
 
             const numArrows = player.buffs.slash360 ? 8 : 1;
             const arrowSpeed = 13.5 * (player.buffs.range ? 1.4 : 1.0) * (player.permBuffs.permRange ? 1.5 : 1.0);
@@ -2669,9 +2681,10 @@
                 vx: Math.cos(aAngle) * arrowSpeed,
                 vy: Math.sin(aAngle) * arrowSpeed,
                 radius: 7,
-                color: '#00ff66',
+                color: arrowColor,
                 deflected: true,
                 isArrow: true,
+                isIceArrow: player.character === 'FROZEN_ARCHER',
                 angle: aAngle
               });
             }
@@ -4883,8 +4896,23 @@
     /* ==========================================================================
        Achievement System Core Architecture
        ========================================================================== */
-    const achievements = []; // Array for future achievements
+    const achievements = [
+      { id: 'FLAME_SLAYER', name: 'FLAME SLAYER', desc: 'Kill 50 Flame Knights as Archer', target: 50 }
+    ];
+    let flameKillsAsArcher = parseInt(localStorage.getItem('blade_deflector_archer_flame_kills') || '0');
     const unlockedAchievements = new Set(JSON.parse(localStorage.getItem('blade_deflector_achievements') || '[]'));
+
+    function checkFlameKillsAchievement() {
+      if (player.character === 'ARCHER' || player.character === 'FROZEN_ARCHER') {
+        flameKillsAsArcher++;
+        localStorage.setItem('blade_deflector_archer_flame_kills', flameKillsAsArcher);
+        if (flameKillsAsArcher >= 50 && !unlockedAchievements.has('FLAME_SLAYER')) {
+          unlockedAchievements.add('FLAME_SLAYER');
+          localStorage.setItem('blade_deflector_achievements', JSON.stringify([...unlockedAchievements]));
+          addFloatingText('🏆 UNLOCKED: FLAME SLAYER & FROZEN ARCHER!', player.x, player.y - 45, '#ffe600');
+        }
+      }
+    }
 
     function openAchievementsModal() {
       audio.init();
@@ -4903,12 +4931,49 @@
     }
 
     function updateAchievementsUI() {
+      const listContainer = document.getElementById('achievements-list');
       const countEl = document.getElementById('ach-unlocked-count');
       const bonusEl = document.getElementById('ach-active-bonuses');
       
-      if (countEl) countEl.textContent = `${unlockedAchievements.size} / ${achievements.length}`;
-      if (bonusEl) {
-        bonusEl.textContent = unlockedAchievements.size > 0 ? `+${unlockedAchievements.size * 5}% Stat Multipliers` : 'None Active';
+      const isUnlocked = unlockedAchievements.has('FLAME_SLAYER') || flameKillsAsArcher >= 50;
+      if (isUnlocked && !unlockedAchievements.has('FLAME_SLAYER')) {
+        unlockedAchievements.add('FLAME_SLAYER');
+        localStorage.setItem('blade_deflector_achievements', JSON.stringify([...unlockedAchievements]));
+      }
+
+      if (countEl) countEl.textContent = `${isUnlocked ? 1 : 0} / 1`;
+      if (bonusEl) bonusEl.textContent = isUnlocked ? '❄️ Frozen Archer Unlocked' : 'None Active';
+
+      if (listContainer) {
+        listContainer.innerHTML = `
+          <div class="shop-item-card" style="border-color: ${isUnlocked ? '#00f0ff' : 'rgba(255,255,255,0.15)'}; background: ${isUnlocked ? 'rgba(0, 240, 255, 0.08)' : 'rgba(0,0,0,0.4)'}; padding: 18px;">
+            <div style="display: flex; gap: 14px; align-items: center;">
+              <div style="font-size: 2.2rem;">${isUnlocked ? '🏹❄️' : '🔒'}</div>
+              <div style="flex: 1;">
+                <div style="font-size: 1.05rem; font-weight: 800; color: ${isUnlocked ? '#00f0ff' : '#ffffff'};">FLAME SLAYER</div>
+                <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">Kill 50 Flame Knights as the Archer class.</div>
+                <div style="font-size: 0.78rem; font-weight: 800; color: #ffe600; margin-top: 6px;">Progress: ${Math.min(50, flameKillsAsArcher)} / 50 Slain</div>
+              </div>
+            </div>
+            <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="font-size: 0.75rem; letter-spacing: 1px; color: var(--text-muted); font-weight: 800;">BONUS UNLOCK</div>
+                <div style="font-size: 0.9rem; font-weight: 800; color: #00f0ff;">❄️ Frozen Archer Side Class</div>
+              </div>
+              <button class="btn-primary" id="select-frozen-archer-btn" ${!isUnlocked ? 'disabled' : ''} style="padding: 10px 16px; font-size: 0.82rem; ${isUnlocked ? 'background: linear-gradient(135deg, #00f0ff, #0088ff); color: #000;' : ''}">
+                ${selectedCharacter === 'FROZEN_ARCHER' ? 'EQUIPPED ✔' : (isUnlocked ? 'EQUIP FROZEN ARCHER' : 'LOCKED 🔒')}
+              </button>
+            </div>
+          </div>
+        `;
+
+        const equipBtn = document.getElementById('select-frozen-archer-btn');
+        if (equipBtn && isUnlocked) {
+          equipBtn.addEventListener('click', () => {
+            setCharacter('FROZEN_ARCHER');
+            updateAchievementsUI();
+          });
+        }
       }
     }
 
@@ -4953,6 +5018,13 @@
       if (gameState === 'PLAYING') {
         gameState = 'PAUSED';
         resetInputFlags();
+
+        // Hide difficulty selector in TEST Mode
+        const diffContainer = document.getElementById('pause-diff-container');
+        if (diffContainer) {
+          diffContainer.style.display = gameDifficulty === 'TEST' ? 'none' : 'block';
+        }
+
         document.getElementById('pause-modal').classList.add('active');
         if (audio && typeof audio.init === 'function') audio.init();
       } else if (gameState === 'PAUSED') {
@@ -4961,6 +5033,17 @@
         document.getElementById('pause-modal').classList.remove('active');
       }
     }
+
+    function returnToMainMenu() {
+      gameState = 'START';
+      resetInputFlags();
+      document.getElementById('pause-modal').classList.remove('active');
+      document.getElementById('gameover-modal').classList.remove('active');
+      document.getElementById('start-modal').classList.add('active');
+    }
+
+    const pauseMenuBtn = document.getElementById('pause-mainmenu-btn');
+    if (pauseMenuBtn) pauseMenuBtn.addEventListener('click', returnToMainMenu);
 
     document.getElementById('pause-btn').addEventListener('click', () => {
       togglePause();
