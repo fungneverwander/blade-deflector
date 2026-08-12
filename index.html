@@ -1872,6 +1872,9 @@
     let minionPactTimer = 0;
 
     function handleEnemyKillEffects(ex, ey) {
+      // Track Archer & Sentinel Flame Kills Achievements
+      checkFlameKillsAchievement();
+
       // 1. Nova Burst: Shoot 8 projectiles in all directions!
       if (player.crescentBuffs.novaKill) {
         for (let a = 0; a < 8; a++) {
@@ -5171,6 +5174,9 @@
     }
 
     function updateAchievementsUI() {
+      flameKillsAsArcher = parseInt(localStorage.getItem('blade_deflector_archer_flame_kills') || '0');
+      flameRamKillsAsSentinel = parseInt(localStorage.getItem('blade_deflector_sentinel_flame_ram_kills') || '0');
+
       const listContainer = document.getElementById('achievements-list');
       const countEl = document.getElementById('ach-unlocked-count');
       const bonusEl = document.getElementById('ach-active-bonuses');
