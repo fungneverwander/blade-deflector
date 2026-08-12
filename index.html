@@ -901,7 +901,7 @@
               </div>
               <div class="diff-card char-card" data-char="SENTINEL" onclick="setCharacter('SENTINEL')">
                 <div class="diff-title" style="color: var(--accent-yellow);">🛡️ SENTINEL</div>
-                <div class="diff-desc">Shield & Ram</div>
+                <div class="diff-desc">Passive Shield & Dash</div>
               </div>
               <div class="diff-card char-card" data-char="SHOTGUN" onclick="setCharacter('SHOTGUN')">
                 <div class="diff-title" style="color: #ff5500;">💥 SHOTGUN</div>
@@ -1572,6 +1572,11 @@
     window.addEventListener('keydown', (e) => {
       if (e.code === 'Digit1' || e.code === 'Numpad1' || e.key === '1') {
         iceWaveRequested = true;
+      }
+      if (e.code === 'ShiftLeft' || e.code === 'ShiftRight' || e.code === 'KeyE') {
+        if (gameState === 'PLAYING') {
+          spaceWasTapped = true; // Trigger Sentinel Dash / Abilities on Shift / E
+        }
       }
       if (e.code === 'Space') {
         e.preventDefault(); // Prevent browser from triggering focused buttons (Start/Restart) or scrolling
@@ -2642,9 +2647,9 @@
       if (player.character === 'FROZEN_ARCHER') {
         addFloatingText('💡 TIP: PRESS [1] FOR 360° ICE WAVE (300PX)!', width / 2, height / 2 - 60, '#00f0ff');
       } else if (player.character === 'BURNING_SENTINEL') {
-        addFloatingText('💡 TIP: PRESS [SHIFT / E] FOR 10s FIRE DASH TRAIL!', width / 2, height / 2 - 60, '#ff3300');
+        addFloatingText('💡 TIP: TAP [SPACE / SHIFT] FOR 10s FIRE DASH TRAIL!', width / 2, height / 2 - 60, '#ff3300');
       } else if (player.character === 'SENTINEL') {
-        addFloatingText('💡 TIP: PRESS [SHIFT / E] FOR RAMMING DASH!', width / 2, height / 2 - 60, '#ffe600');
+        addFloatingText('💡 TIP: TAP [SPACE / SHIFT] FOR RAMMING DASH!', width / 2, height / 2 - 60, '#ffe600');
       } else if (player.character === 'SHOTGUN') {
         addFloatingText('💡 TIP: PRESS [E / R-CLICK] FOR HEAVY SLUG BOMB!', width / 2, height / 2 - 60, '#ff5500');
       } else if (player.character === 'ARCHER') {
@@ -5804,12 +5809,12 @@
         if (card) {
           card.innerHTML = `
             <div class="control-item"><span class="key-cap">WASD</span> Move</div>
-            <div class="control-item"><span class="key-cap">Hold SPACE</span> 180° Magma Shield</div>
-            <div class="control-item"><span class="key-cap">SHIFT / E</span> 10s Fire Trail Dash</div>
+            <div class="control-item"><span class="key-cap">Shield</span> Passive 180° Magma Barrier</div>
+            <div class="control-item"><span class="key-cap">SPACE / SHIFT</span> 10s Fire Trail Dash</div>
           `;
         }
-        if (titleEl) { titleEl.textContent = '🛡️🔥 EQUIPPED CLASS: BURNING SENTINEL'; titleEl.style.color = '#ff3300'; }
-        if (descEl) descEl.innerHTML = `• Hold <span class="key-cap">SPACE</span>: 180° Magma Shield | • Press <span class="key-cap">SHIFT / E</span>: 10s Fire Dash Trail`;
+        if (titleEl) { titleEl.textContent = '🛡️🔥 EQUIPPED: BURNING SENTINEL'; titleEl.style.color = '#ff3300'; }
+        if (descEl) descEl.innerHTML = `• Passive: 180° Magma Barrier (Always Active) | • Tap <span class="key-cap">SPACE / SHIFT</span>: 10s Fire Dash Trail`;
         if (tagEl) { tagEl.textContent = '🔥 10s FIRE TRAILS'; tagEl.style.borderColor = '#ff3300'; tagEl.style.color = '#ff3300'; tagEl.style.background = 'rgba(255, 51, 0, 0.15)'; }
       } else if (charType === 'FROZEN_ARCHER') {
         if (card) {
@@ -5819,20 +5824,20 @@
             <div class="control-item"><span class="key-cap">Key 1</span> 360° Ice Wave</div>
           `;
         }
-        if (titleEl) { titleEl.textContent = '🏹❄️ EQUIPPED CLASS: FROZEN ARCHER'; titleEl.style.color = '#00f0ff'; }
+        if (titleEl) { titleEl.textContent = '🏹❄️ EQUIPPED: FROZEN ARCHER'; titleEl.style.color = '#00f0ff'; }
         if (descEl) descEl.innerHTML = `• Passive: 300px 25% Frost Slow Aura | • Press <span class="key-cap">1</span>: 360° Ice Wave Blast (300px)`;
         if (tagEl) { tagEl.textContent = '❄️ 360° ICE WAVE [1]'; tagEl.style.borderColor = '#00f0ff'; tagEl.style.color = '#00f0ff'; tagEl.style.background = 'rgba(0, 240, 255, 0.15)'; }
       } else if (charType === 'SENTINEL') {
         if (card) {
           card.innerHTML = `
             <div class="control-item"><span class="key-cap">WASD</span> Move</div>
-            <div class="control-item"><span class="key-cap">Hold SPACE</span> 180° Shield</div>
-            <div class="control-item"><span class="key-cap">SHIFT / E</span> Ramming Dash</div>
+            <div class="control-item"><span class="key-cap">Shield</span> Passive 180° Barrier</div>
+            <div class="control-item"><span class="key-cap">SPACE / SHIFT</span> Ramming Dash</div>
           `;
         }
-        if (titleEl) { titleEl.textContent = '🛡️ EQUIPPED CLASS: SHIELD SENTINEL'; titleEl.style.color = '#ffe600'; }
-        if (descEl) descEl.innerHTML = `• Hold <span class="key-cap">SPACE / R-Click</span>: 180° Shield | • Press <span class="key-cap">SHIFT / E</span>: Ramming Dash Crush`;
-        if (tagEl) { tagEl.textContent = '🛡️ RAMMING DASH [SHIFT]'; tagEl.style.borderColor = '#ffe600'; tagEl.style.color = '#ffe600'; tagEl.style.background = 'rgba(255, 230, 0, 0.15)'; }
+        if (titleEl) { titleEl.textContent = '🛡️ EQUIPPED: SHIELD SENTINEL'; titleEl.style.color = '#ffe600'; }
+        if (descEl) descEl.innerHTML = `• Passive: 180° Shield Barrier (Always Active) | • Tap <span class="key-cap">SPACE / SHIFT</span>: Ramming Dash Crush`;
+        if (tagEl) { tagEl.textContent = '🛡️ RAMMING DASH'; tagEl.style.borderColor = '#ffe600'; tagEl.style.color = '#ffe600'; tagEl.style.background = 'rgba(255, 230, 0, 0.15)'; }
       } else if (charType === 'SHOTGUN') {
         if (card) {
           card.innerHTML = `
