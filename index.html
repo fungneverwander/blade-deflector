@@ -2730,16 +2730,20 @@
         if (player.archerBombCooldown > 0) player.archerBombCooldown--;
         if (player.frozenWaveCooldown > 0) player.frozenWaveCooldown--;
 
-        // Passive 300px Frost Aura Slow for Frozen Archer
+        // Passive 300px Frost Aura Slow for Frozen Archer (Balanced 25% Slow)
         if (player.character === 'FROZEN_ARCHER') {
           enemies.forEach(e => {
             const edx = e.x - player.x;
             const edy = e.y - player.y;
             const edist = Math.sqrt(edx * edx + edy * edy);
             if (edist <= 300) {
-              e.speed *= 0.5; // Passive 50% Frost Aura Slow!
+              e.slowAuraFactor = 0.75; // 25% balanced slow (no compounding frame freezes!)
+            } else {
+              e.slowAuraFactor = 1.0;
             }
           });
+        } else {
+          enemies.forEach(e => e.slowAuraFactor = 1.0);
         }
 
         // Active Ability: Press [1] for 360° Ice Wave (300px)
@@ -3421,8 +3425,9 @@
 
         // Move towards player
         const angle = Math.atan2(player.y - e.y, player.x - e.x);
-        e.x += Math.cos(angle) * e.speed;
-        e.y += Math.sin(angle) * e.speed;
+        const effectiveSpeed = e.speed * (e.slowAuraFactor || 1.0);
+        e.x += Math.cos(angle) * effectiveSpeed;
+        e.y += Math.sin(angle) * effectiveSpeed;
 
         // Shooter AI
         if (e.type === 'SHOOTER') {
@@ -3437,8 +3442,9 @@
         if (e.type === 'CRESCENT_BOSS') {
           // Face player & move slowly
           e.angle = Math.atan2(player.y - e.y, player.x - e.x);
-          e.x += Math.cos(e.angle) * e.speed;
-          e.y += Math.sin(e.angle) * e.speed;
+          const bossEffectiveSpeed = e.speed * (e.slowAuraFactor || 1.0);
+          e.x += Math.cos(e.angle) * bossEffectiveSpeed;
+          e.y += Math.sin(e.angle) * bossEffectiveSpeed;
 
           // Spin Crescent Blade Hands
           e.bladeAngle += e.slashActive ? 0.35 : 0.08;
@@ -3541,8 +3547,9 @@
             }
           } else {
             // Move toward player
-            e.x += Math.cos(angleToPlayer) * e.speed;
-            e.y += Math.sin(angleToPlayer) * e.speed;
+            const basherEffectiveSpeed = e.speed * (e.slowAuraFactor || 1.0);
+            e.x += Math.cos(angleToPlayer) * basherEffectiveSpeed;
+            e.y += Math.sin(angleToPlayer) * basherEffectiveSpeed;
 
             if (e.bashTimer > 0) e.bashTimer--;
 
