@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, user-scalable=no, shrink-to-fit=no, viewport-fit=cover">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>BLADE DEFLECTOR - Top-Down Shield Slash Arena</title>
   <meta name="description" content="Defend against green biting squares and deflect incoming projectiles in this fast-paced square knight action game!">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -31,22 +31,12 @@
       padding: 0;
       user-select: none;
       -webkit-user-select: none;
-      -webkit-text-size-adjust: none !important;
-      -moz-text-size-adjust: none !important;
-      text-size-adjust: none !important;
-      touch-action: manipulation;
     }
 
     body, html {
       width: 100%;
       height: 100%;
       overflow: hidden;
-      overscroll-behavior: none !important;
-      overscroll-behavior-y: none !important;
-      touch-action: none !important;
-      position: fixed;
-      top: 0;
-      left: 0;
       background-color: var(--bg-dark);
       font-family: var(--font-ui);
       color: var(--text-main);
@@ -212,7 +202,7 @@
 
     /* Modal Overlay Screens (Start, Game Over, Pause) */
     .modal-overlay {
-      position: fixed;
+      position: absolute;
       top: 0;
       left: 0;
       width: 100%;
@@ -227,8 +217,6 @@
       opacity: 0;
       pointer-events: none;
       transition: opacity 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-      touch-action: pan-y !important;
-      -webkit-overflow-scrolling: touch !important;
     }
 
     .modal-overlay.active {
@@ -247,9 +235,6 @@
       box-shadow: 0 20px 60px rgba(0, 0, 0, 0.85), 0 0 40px rgba(255, 120, 0, 0.2);
       transform: translateY(20px) scale(0.95);
       transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-      touch-action: pan-y !important;
-      -webkit-overflow-scrolling: touch !important;
-      overflow-y: auto !important;
     }
 
     .modal-overlay.active .modal-card {
@@ -598,7 +583,15 @@
     }
 
     .touch-btn {
+      position: absolute;
+      bottom: 28px;
+      right: 24px;
+      width: 96px;
+      height: 96px;
       border-radius: 50%;
+      background: radial-gradient(circle, rgba(0, 240, 255, 0.3) 0%, rgba(0, 240, 255, 0.1) 100%);
+      border: 2px solid var(--accent-cyan);
+      box-shadow: 0 0 20px rgba(0, 240, 255, 0.4);
       color: #ffffff;
       font-weight: 800;
       font-size: 0.8rem;
@@ -615,39 +608,15 @@
 
     .touch-btn:active {
       transform: scale(0.92);
-      background: rgba(0, 240, 255, 0.5) !important;
-    }
-
-    #mobile-attack-cluster {
-      position: absolute;
-      bottom: 16px;
-      right: 16px;
-      display: flex;
-      gap: 12px;
-      align-items: flex-end;
-      pointer-events: auto;
-      touch-action: none;
-    }
-
-    .touch-btn-primary-attack {
-      width: 82px !important;
-      height: 82px !important;
-      background: radial-gradient(circle, rgba(0, 240, 255, 0.4) 0%, rgba(0, 240, 255, 0.15) 100%) !important;
-      border: 2px solid var(--accent-cyan) !important;
-      box-shadow: 0 0 16px rgba(0, 240, 255, 0.5) !important;
-    }
-
-    .touch-btn-secondary-shield {
-      width: 72px !important;
-      height: 72px !important;
-      background: radial-gradient(circle, rgba(255, 230, 0, 0.35) 0%, rgba(255, 230, 0, 0.1) 100%) !important;
-      border: 2px solid var(--accent-yellow) !important;
-      box-shadow: 0 0 14px rgba(255, 230, 0, 0.4) !important;
+      background: rgba(0, 240, 255, 0.5);
     }
 
     .touch-btn-shop {
-      width: 52px !important;
-      height: 52px !important;
+      position: absolute;
+      bottom: 140px;
+      right: 28px;
+      width: 56px;
+      height: 56px;
       border-radius: 50%;
       background: rgba(255, 230, 0, 0.15);
       border: 2px solid var(--accent-yellow);
@@ -664,166 +633,51 @@
       cursor: pointer;
     }
 
-    .start-modal-card {
-      max-width: 860px;
-      width: 90vw;
-      max-height: 80vh;
-      padding: 20px 24px;
-      overflow-y: scroll !important;
-      scrollbar-width: auto;
-      scrollbar-color: var(--accent-cyan) rgba(255, 140, 0, 0.2);
-    }
-
-    /* Custom Glowing Neon Scrollbars for Modal Cards (Always Visible) */
-    .modal-card::-webkit-scrollbar,
-    .start-modal-card::-webkit-scrollbar,
-    ::-webkit-scrollbar {
-      width: 10px !important;
-      height: 10px !important;
-      display: block !important;
-    }
-
-    .modal-card::-webkit-scrollbar-track,
-    .start-modal-card::-webkit-scrollbar-track,
-    ::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.6) !important;
-      border: 1px solid rgba(0, 240, 255, 0.2) !important;
-      border-radius: 6px !important;
-    }
-
-    .modal-card::-webkit-scrollbar-thumb,
-    .start-modal-card::-webkit-scrollbar-thumb,
-    ::-webkit-scrollbar-thumb {
-      background: linear-gradient(180deg, #00f0ff 0%, #ff9900 100%) !important;
-      border-radius: 6px !important;
-      border: 1px solid #00f0ff !important;
-      box-shadow: 0 0 12px rgba(0, 240, 255, 0.8) !important;
-    }
-
-    .modal-card::-webkit-scrollbar-thumb:hover,
-    .start-modal-card::-webkit-scrollbar-thumb:hover,
-    ::-webkit-scrollbar-thumb:hover {
-      background: #ffe600 !important;
-      box-shadow: 0 0 18px #ffe600 !important;
-    }
-
-    .start-selectors-container {
-      display: flex;
-      flex-direction: row;
-      gap: 14px;
-      margin-bottom: 12px;
-    }
-
-    .selector-section {
-      flex: 1;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .section-title {
-      text-align: center;
-      margin-bottom: 6px;
-      font-size: 0.75rem;
-      letter-spacing: 1.5px;
-    }
-
-    .char-grid {
-      display: grid;
-      grid-template-columns: repeat(4, 1fr);
-      gap: 6px;
-    }
-
-    .diff-grid-5 {
-      display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 6px;
-    }
-
-    .diff-card {
-      padding: 8px 6px;
-      text-align: center;
-    }
-
-    .diff-title {
-      font-weight: 800;
-      font-size: 0.82rem;
-      margin-bottom: 2px;
-    }
-
-    .diff-desc {
-      font-size: 0.68rem;
-      color: var(--text-muted);
-      line-height: 1.2;
-    }
-
     /* Mobile Phone & Tablet Modal Responsive Styles */
-    @media (pointer: coarse) and (max-width: 768px), (max-height: 500px) {
-      .guide-box, .subtitle, #start-guide-box, #start-subtitle {
-        display: none !important; /* Hide explanation box on touch mobile devices */
-      }
-    }
-
-    @media (max-width: 768px), (max-height: 500px) {
-      .start-selectors-container {
-        flex-direction: column !important;
-        gap: 8px !important;
-      }
-      .char-grid {
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 5px !important;
-      }
-      .diff-grid-5 {
-        grid-template-columns: repeat(2, 1fr) !important;
-        gap: 5px !important;
-      }
-      .diff-title {
-        font-size: 0.78rem !important;
-      }
-      .diff-desc {
-        font-size: 0.64rem !important;
-      }
-      .diff-card {
-        padding: 6px 4px !important;
-      }
-      .start-modal-card {
-        padding: 10px 14px !important;
+    @media (max-width: 768px) {
+      .modal-card {
+        padding: 14px !important;
         max-width: 95vw !important;
         max-height: 92vh !important;
+        overflow-y: auto !important;
       }
       .game-title {
-        font-size: 1.35rem !important;
-        letter-spacing: 1.5px !important;
-        margin-bottom: 6px !important;
+        font-size: 1.7rem !important;
+        letter-spacing: 2px !important;
+      }
+      .diff-grid {
+        grid-template-columns: repeat(2, 1fr) !important;
+        gap: 6px !important;
       }
       .hud-top {
         gap: 4px !important;
-        padding: 4px 8px !important;
+        padding: 6px 10px !important;
       }
       .hud-card {
-        padding: 3px 6px !important;
+        padding: 4px 8px !important;
       }
       .score-value {
-        font-size: 0.9rem !important;
+        font-size: 0.95rem !important;
       }
       .v-joystick-base {
+        width: 90px;
+        height: 90px;
+        bottom: 16px;
+      }
+      #v-joystick-move { left: 16px; }
+      #v-joystick-aim { right: 116px; }
+      .touch-btn {
         width: 80px;
         height: 80px;
-        bottom: 12px;
-      }
-      #v-joystick-move { left: 12px; }
-      #v-joystick-aim { right: 106px; }
-      .touch-btn {
-        width: 74px;
-        height: 74px;
-        bottom: 12px;
-        right: 12px;
-        font-size: 0.65rem;
+        bottom: 16px;
+        right: 16px;
+        font-size: 0.7rem;
       }
       .touch-btn-shop {
-        bottom: 96px;
-        right: 16px;
-        width: 42px;
-        height: 42px;
+        bottom: 110px;
+        right: 20px;
+        width: 48px;
+        height: 48px;
       }
     }
   </style>
@@ -917,88 +771,106 @@
       <div class="v-joystick-stick" id="v-stick-aim"></div>
     </div>
 
-    <!-- Dedicated Mobile Attack & Action Buttons Cluster -->
-    <div id="mobile-attack-cluster">
-      <!-- Primary Weapon Attack Button -->
-      <button class="touch-btn touch-btn-primary-attack" id="touch-btn-attack">
-        <span id="touch-attack-icon" style="font-size: 1.4rem;">⚔️</span>
-        <span id="touch-attack-label" style="font-size: 0.65rem; font-weight: 800;">ATTACK</span>
-      </button>
+    <!-- Main Touch Action Button (Spacebar Emulation) -->
+    <button class="touch-btn" id="touch-btn-action">
+      <span id="touch-action-icon" style="font-size: 1.4rem;">⚔️</span>
+      <span id="touch-action-label">ATTACK</span>
+    </button>
 
-      <!-- Shield / Block Button -->
-      <button class="touch-btn touch-btn-secondary-shield" id="touch-btn-shield">
-        <span id="touch-shield-icon" style="font-size: 1.3rem;">🛡️</span>
-        <span id="touch-shield-label" style="font-size: 0.65rem; font-weight: 800;">SHIELD</span>
-      </button>
-
-      <!-- Shop Buy Touch Button -->
-      <button class="touch-btn-shop" id="touch-btn-shop" title="Buy at Shop Pedestal">
-        🛒
-      </button>
-    </div>
+    <!-- Shop Buy Touch Button (TAB Emulation) -->
+    <button class="touch-btn-shop" id="touch-btn-shop" title="Buy at Shop Pedestal">
+      🛒
+    </button>
   </div>
 
   <!-- Start / Controls Modal -->
   <div class="modal-overlay active" id="start-modal">
-    <div class="modal-card start-modal-card">
+    <div class="modal-card" style="max-width: 960px;">
       <h1 class="game-title">BLADE DEFLECTOR</h1>
+      <p class="subtitle">Equip your energy blade. Slash swarming biting squares and deflect incoming projectiles!</p>
+      
+      <div class="guide-box">
+        <div class="guide-row">
+          <div class="guide-badge gb-green">🟩</div>
+          <div class="guide-desc"><strong>Green Biting Squares:</strong> Swarm and bite you! Lose 1 heart per bite. Slash them before they reach you.</div>
+        </div>
+        <div class="guide-row">
+          <div class="guide-badge gb-yellow">⚡</div>
+          <div class="guide-desc"><strong>Square Knight:</strong> Tap <span class="key-cap">SPACEBAR</span> to slash & deflect! Hold to Block.</div>
+        </div>
+        <div class="guide-row">
+          <div class="guide-badge gb-cyan">🛡️</div>
+          <div class="guide-desc"><strong>Shield Sentinel:</strong> Always-Active Shield! Tap <span class="key-cap">SPACEBAR</span> for Ramming Dash!</div>
+        </div>
+        <div class="guide-row">
+          <div class="guide-badge" style="background: rgba(255, 153, 0, 0.2); border-color: #ff9900; color: #ff9900;">💥</div>
+          <div class="guide-desc"><strong>Shield Basher (Wave 7+):</strong> Heavy enemy with frontal shield that bashes you, breaking both shields for 1 sec!</div>
+        </div>
+      </div>
 
-      <!-- Selectors Container -->
-      <div class="start-selectors-container">
-        <!-- Character Class Selection Section -->
-        <div class="selector-section">
-          <div class="score-label section-title">SELECT CHARACTER CLASS</div>
-          <div class="char-grid">
-            <div class="diff-card char-card active" data-char="KNIGHT" onclick="setCharacter('KNIGHT')">
-              <div class="diff-title" style="color: var(--accent-cyan);">🗡️ KNIGHT</div>
-              <div class="diff-desc">Sword & Shield</div>
-            </div>
-            <div class="diff-card char-card" data-char="SENTINEL" onclick="setCharacter('SENTINEL')">
-              <div class="diff-title" style="color: var(--accent-yellow);">🛡️ SENTINEL</div>
-              <div class="diff-desc">Shield & Ram</div>
-            </div>
-            <div class="diff-card char-card" data-char="SHOTGUN" onclick="setCharacter('SHOTGUN')">
-              <div class="diff-title" style="color: #ff5500;">💥 SHOTGUN</div>
-              <div class="diff-desc">Buckshot & Shield</div>
-            </div>
-            <div class="diff-card char-card" data-char="ARCHER" onclick="setCharacter('ARCHER')">
-              <div class="diff-title" style="color: #00ff66;">🏹 ARCHER</div>
-              <div class="diff-desc">Arrows & Bomb</div>
+      <!-- Character Class Selector & Difficulty Selector Side-by-Side Container -->
+      <div style="margin-bottom: 18px;">
+        <!-- Top Row: Selectors Title Headers -->
+        <div style="display: flex; gap: 16px; margin-bottom: 8px;">
+          <div class="score-label" style="flex: 1.1; text-align: center;">SELECT CHARACTER CLASS</div>
+          <div class="score-label" style="flex: 1; text-align: center;">SELECT DIFFICULTY</div>
+        </div>
+
+        <!-- Cards Row: 4 Character Cards on Left + 5 Difficulty Cards on Right -->
+        <div style="display: flex; gap: 16px; align-items: stretch;">
+          <!-- Left: 4 Character Cards -->
+          <div style="flex: 1.1;">
+            <div class="diff-grid" style="grid-template-columns: repeat(4, 1fr); gap: 6px;">
+              <div class="diff-card char-card active" data-char="KNIGHT" onclick="setCharacter('KNIGHT')">
+                <div class="diff-title" style="color: var(--accent-cyan);">🗡️ KNIGHT</div>
+                <div class="diff-desc">Sword & Shield</div>
+              </div>
+              <div class="diff-card char-card" data-char="SENTINEL" onclick="setCharacter('SENTINEL')">
+                <div class="diff-title" style="color: var(--accent-yellow);">🛡️ SENTINEL</div>
+                <div class="diff-desc">Shield & Ram</div>
+              </div>
+              <div class="diff-card char-card" data-char="SHOTGUN" onclick="setCharacter('SHOTGUN')">
+                <div class="diff-title" style="color: #ff5500;">💥 SHOTGUN</div>
+                <div class="diff-desc">Buckshot & Shield</div>
+              </div>
+              <div class="diff-card char-card" data-char="ARCHER" onclick="setCharacter('ARCHER')">
+                <div class="diff-title" style="color: #00ff66;">🏹 ARCHER</div>
+                <div class="diff-desc">Arrows & Bomb</div>
+              </div>
             </div>
           </div>
 
-          <!-- Start Button Placed Right Under Players -->
-          <button class="btn-primary" id="start-btn" style="width: 100% !important; margin-top: 10px; padding: 14px; font-size: 1.05rem; letter-spacing: 1px;">
-            ENTER ARENA ▶
-          </button>
-        </div>
-
-        <!-- Difficulty Selection Section -->
-        <div class="selector-section">
-          <div class="score-label section-title">SELECT DIFFICULTY</div>
-          <div class="diff-grid-5">
-            <div class="diff-card" data-diff="TEST" onclick="setDifficulty('TEST')">
-              <div class="diff-title" style="color: #00f0ff;">🛠️ TEST</div>
-              <div class="diff-desc">Immortal Practice</div>
-            </div>
-            <div class="diff-card" data-diff="EASY" onclick="setDifficulty('EASY')">
-              <div class="diff-title" style="color: var(--accent-cyan);">🟢 EASY</div>
-              <div class="diff-desc">7 Hearts • 360° Shield</div>
-            </div>
-            <div class="diff-card active" data-diff="NORMAL" onclick="setDifficulty('NORMAL')">
-              <div class="diff-title" style="color: var(--accent-yellow);">🟡 NORMAL</div>
-              <div class="diff-desc">6 Hearts • 180° Shield</div>
-            </div>
-            <div class="diff-card" data-diff="HARD" onclick="setDifficulty('HARD')">
-              <div class="diff-title" style="color: var(--accent-pink);">🔴 HARD</div>
-              <div class="diff-desc">4 Hearts • 180° Shield</div>
-            </div>
-            <div class="diff-card" data-diff="IMPOSSIBLE" onclick="setDifficulty('IMPOSSIBLE')">
-              <div class="diff-title" style="color: #ff0055;">💀 HARDCORE</div>
-              <div class="diff-desc">1 Heart • 60° Precision</div>
+          <!-- Right (Directly to the right of Archer card): 5 Difficulty Cards -->
+          <div style="flex: 1;">
+            <div class="diff-grid" style="grid-template-columns: repeat(5, 1fr); gap: 6px;">
+              <div class="diff-card" data-diff="TEST" onclick="setDifficulty('TEST')">
+                <div class="diff-title" style="color: #00f0ff;">🛠️ TEST</div>
+                <div class="diff-desc">Immortal</div>
+              </div>
+              <div class="diff-card" data-diff="EASY" onclick="setDifficulty('EASY')">
+                <div class="diff-title" style="color: var(--accent-cyan);">🟢 EASY</div>
+                <div class="diff-desc">7 Hearts</div>
+              </div>
+              <div class="diff-card active" data-diff="NORMAL" onclick="setDifficulty('NORMAL')">
+                <div class="diff-title" style="color: var(--accent-yellow);">🟡 NORMAL</div>
+                <div class="diff-desc">5H | 1.5X</div>
+              </div>
+              <div class="diff-card" data-diff="HARD" onclick="setDifficulty('HARD')">
+                <div class="diff-title" style="color: var(--accent-pink);">🔴 HARD</div>
+                <div class="diff-desc">3H | 2.5X</div>
+              </div>
+              <div class="diff-card" data-diff="IMPOSSIBLE" onclick="setDifficulty('IMPOSSIBLE')">
+                <div class="diff-title" style="color: #ff0055; text-shadow: 0 0 8px #ff0055;">💀 IMPOSSIBLE</div>
+                <div class="diff-desc">1H | 5.0X</div>
+              </div>
             </div>
           </div>
         </div>
+      </div>
+
+      <!-- Start Button Row -->
+      <div style="display: flex; justify-content: flex-end; width: 100%; margin-top: 10px;">
+        <button class="btn-primary" id="start-btn" style="width: 100% !important; padding: 16px; font-size: 1.1rem; letter-spacing: 1px;">ENTER ARENA ▶</button>
       </div>
     </div>
   </div>
@@ -1493,15 +1365,6 @@
       height = window.innerHeight;
       canvas.width = width * dpr;
       canvas.height = height * dpr;
-      canvas.style.width = width + 'px';
-      canvas.style.height = height + 'px';
-
-      document.documentElement.style.width = width + 'px';
-      document.documentElement.style.height = height + 'px';
-      document.body.style.width = width + 'px';
-      document.body.style.height = height + 'px';
-
-      ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transformation matrix before scaling!
       ctx.scale(dpr, dpr);
     }
     window.addEventListener('resize', resizeCanvas);
@@ -1695,78 +1558,29 @@
       touchAimActive = true;
     }
 
-    // Mobile Auto-Aim Assistant for Touch Attacks
-    function getMobileAutoAimTarget() {
-      let nearest = null;
-      let minDst = 240;
-      enemies.forEach(e => {
-        const dst = Math.sqrt((e.x - player.x) ** 2 + (e.y - player.y) ** 2);
-        if (dst < minDst) {
-          minDst = dst;
-          nearest = e;
-        }
-      });
-      return nearest;
-    }
-
-    // Touch Attack Button Handler (Primary Weapon Strike)
-    const touchBtnAttack = document.getElementById('touch-btn-attack');
-    if (touchBtnAttack) {
-      touchBtnAttack.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        if (gameState === 'PLAYING') {
-          // Auto-aim at nearest enemy if available
-          const target = getMobileAutoAimTarget();
-          if (target) {
-            const aimAngle = Math.atan2(target.y - player.y, target.x - player.x);
-            player.angle = aimAngle;
-            mouse.x = player.x + Math.cos(aimAngle) * 100;
-            mouse.y = player.y + Math.sin(aimAngle) * 100;
-          }
-          spaceWasTapped = true;
-          createSparks(player.x, player.y, 10, '#00f0ff', 4);
-        }
-      }, { passive: false });
-    }
-
-    // Touch Shield Button Handler (Hold to Block & Drop Bomb)
-    const touchBtnShield = document.getElementById('touch-btn-shield');
-    if (touchBtnShield) {
-      touchBtnShield.addEventListener('touchstart', (e) => {
+    // Touch Action Button Handlers (Spacebar Emulation)
+    const touchBtnAction = document.getElementById('touch-btn-action');
+    if (touchBtnAction) {
+      touchBtnAction.addEventListener('touchstart', (e) => {
         e.preventDefault();
         if (gameState === 'PLAYING') {
           keys['Space'] = true;
           spaceDownTime = performance.now();
+          spaceWasTapped = true;
           spaceIsHeld = true;
         }
       }, { passive: false });
 
-      const endTouchShield = (e) => {
+      const endTouchAction = (e) => {
         e.preventDefault();
         keys['Space'] = false;
         spaceIsHeld = false;
         spaceDownTime = 0;
       };
 
-      touchBtnShield.addEventListener('touchend', endTouchShield, { passive: false });
-      touchBtnShield.addEventListener('touchcancel', endTouchShield, { passive: false });
+      touchBtnAction.addEventListener('touchend', endTouchAction, { passive: false });
+      touchBtnAction.addEventListener('touchcancel', endTouchAction, { passive: false });
     }
-
-    // Canvas Tap-To-Attack Gesture System
-    canvas.addEventListener('touchstart', (e) => {
-      if (gameState === 'PLAYING' && e.touches.length === 1) {
-        const t = e.touches[0];
-        // If not tapping controls, trigger weapon attack to touch point!
-        const isControlTouch = e.target.closest('#mobile-controls') || e.target.closest('#hud-layer');
-        if (!isControlTouch) {
-          mouse.x = t.clientX;
-          mouse.y = t.clientY;
-          player.angle = Math.atan2(mouse.y - player.y, mouse.x - player.x);
-          spaceWasTapped = true;
-          createSparks(t.clientX, t.clientY, 8, '#00ff66', 5);
-        }
-      }
-    }, { passive: false });
 
     // Touch Shop Buy Button Handlers (TAB Emulation)
     const touchBtnShop = document.getElementById('touch-btn-shop');
@@ -1779,55 +1593,13 @@
       }, { passive: false });
     }
 
-    // Global Touch Support & Mobile Menu Touch Scroll Handling
+    // Touch Support for mobile / cursor alignment
     window.addEventListener('touchmove', (e) => {
-      // Allow finger scrolling inside modal menus on mobile!
-      const isInsideModal = e.target.closest && (e.target.closest('.modal-card') || e.target.closest('.modal-overlay'));
-      if (isInsideModal && gameState !== 'PLAYING') {
-        return; // Allow native mobile touch scrolling down the menu!
-      }
-
-      if (e.cancelable) e.preventDefault();
       if (e.touches.length > 0 && !touchAimActive) {
         mouse.x = e.touches[0].clientX;
         mouse.y = e.touches[0].clientY;
       }
-    }, { passive: false });
-
-    // Global Mobile & Touch Check to hide Start Menu Explanation Box on Mobile
-    function checkMobileGuideBox() {
-      const isMobile = (('ontouchstart' in window) || (navigator.maxTouchPoints > 0)) && (window.innerWidth <= 768 || window.innerHeight <= 500);
-      if (isMobile) {
-        const gb = document.getElementById('start-guide-box');
-        const st = document.getElementById('start-subtitle');
-        if (gb) gb.style.setProperty('display', 'none', 'important');
-        if (st) st.style.setProperty('display', 'none', 'important');
-      }
-    }
-    window.addEventListener('DOMContentLoaded', checkMobileGuideBox);
-    window.addEventListener('load', checkMobileGuideBox);
-    window.addEventListener('resize', checkMobileGuideBox);
-    checkMobileGuideBox();
-
-    // Block iOS Safari & Mobile Gesture / Double-Tap / Pinch Zooming
-    document.addEventListener('gesturestart', (e) => { if (e.cancelable) e.preventDefault(); }, { passive: false });
-    document.addEventListener('gesturechange', (e) => { if (e.cancelable) e.preventDefault(); }, { passive: false });
-    document.addEventListener('gestureend', (e) => { if (e.cancelable) e.preventDefault(); }, { passive: false });
-
-    let lastTouchTime = 0;
-    document.addEventListener('touchend', (e) => {
-      const now = performance.now();
-      if (now - lastTouchTime <= 300) {
-        if (e.cancelable) e.preventDefault();
-      }
-      lastTouchTime = now;
-    }, { passive: false });
-
-    document.addEventListener('touchstart', (e) => {
-      if (e.touches.length > 1 && e.cancelable) {
-        e.preventDefault(); // Block multi-touch pinch zoom
-      }
-    }, { passive: false });
+    });
 
     /* ==========================================================================
        Game Entities & Systems
