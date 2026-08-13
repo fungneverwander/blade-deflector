@@ -3005,11 +3005,11 @@
           }
         }
 
-        // 2. Burst Rifle Passive: Shoots 3 energy balls every 3 seconds (180 frames)
+        // 2. Burst Rifle Passive: Shoots 3 energy balls every 3 seconds ONLY while holding shield!
         if (!player.burstRifleCooldown) player.burstRifleCooldown = 0;
         if (player.burstRifleCooldown > 0) player.burstRifleCooldown--;
 
-        if (player.burstRifleCooldown <= 0) {
+        if (player.isBlocking && player.burstRifleCooldown <= 0) {
           player.burstRifleCooldown = 180; // 3 second cooldown
           triggerBurstRifleVolley();
         }
