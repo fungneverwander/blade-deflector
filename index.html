@@ -2950,7 +2950,62 @@
         }
       } else if (player.character === 'SIDE_ARM_SHOTGUNNER') {
         // SIDE ARM SHOTGUNNER:
-        // 1. Burst Rifle Passive: Shoots 3 energy balls every 3 seconds (180 frames)
+        // 1. Shotgun Main Attack (Spacebar / L-Click Buckshot)
+        if (player.shotgunCooldown > 0) player.shotgunCooldown--;
+
+        if (spaceWasTapped) {
+          spaceWasTapped = false;
+          if (player.shotgunCooldown <= 0 && !player.isBlocking) {
+            player.shotgunCooldown = player.maxShotgunCooldown || 22;
+            const aimAngle = Math.atan2(mouse.y - player.y, mouse.x - player.x);
+
+            // Recoil kickback
+            player.x -= Math.cos(aimAngle) * 5;
+            player.y -= Math.sin(aimAngle) * 5;
+
+            audio.playSlash();
+            screenShake = 10;
+            createSparks(player.x, player.y, 18, '#ff6600', 7);
+            addFloatingText('💥 BUCKSHOT!', player.x, player.y - 30, '#ff6600');
+
+            const numPellets = player.buffs.slash360 ? 12 : 5;
+            const spreadAngle = player.buffs.slash360 ? Math.PI * 2 : (Math.PI / 4 * (player.buffs.range ? 1.4 : 1.0));
+            const pelletSpeed = 12.5 * (player.buffs.range ? 1.35 : 1.0) * (player.permBuffs.permRange ? 1.45 : 1.0);
+
+            for (let k = 0; k < numPellets; k++) {
+              let angleOffset = (k / (numPellets - 1) - 0.5) * spreadAngle;
+              if (player.buffs.slash360) {
+                angleOffset = (k / numPellets) * Math.PI * 2;
+              }
+              const pAngle = aimAngle + angleOffset;
+
+              projectiles.push({
+                x: player.x + Math.cos(pAngle) * 22,
+                y: player.y + Math.sin(pAngle) * 22,
+                vx: Math.cos(pAngle) * pelletSpeed,
+                vy: Math.sin(pAngle) * pelletSpeed,
+                radius: 6,
+                color: '#ff6600',
+                deflected: true
+              });
+            }
+
+            if (player.permBuffs.projectileSlash) {
+              projectiles.push({
+                x: player.x + Math.cos(aimAngle) * 28,
+                y: player.y + Math.sin(aimAngle) * 28,
+                vx: Math.cos(aimAngle) * (pelletSpeed * 1.3),
+                vy: Math.sin(aimAngle) * (pelletSpeed * 1.3),
+                radius: 12,
+                color: '#ffe600',
+                deflected: true,
+                isHeavySlug: true
+              });
+            }
+          }
+        }
+
+        // 2. Burst Rifle Passive: Shoots 3 energy balls every 3 seconds (180 frames)
         if (!player.burstRifleCooldown) player.burstRifleCooldown = 0;
         if (player.burstRifleCooldown > 0) player.burstRifleCooldown--;
 
@@ -2959,7 +3014,7 @@
           triggerBurstRifleVolley();
         }
 
-        // 2. Anti-Deflect RPG Round on Shield Drop!
+        // 3. Anti-Deflect RPG Round on Shield Drop!
         if (shieldJustDropped) {
           triggerAntiDeflectRPG(mouse.x, mouse.y);
         }
@@ -6183,7 +6238,19 @@
       const descEl = document.getElementById('ach-preview-desc');
       const tagEl = document.getElementById('ach-preview-tag');
 
-      if (charType === 'BURNING_SENTINEL') {
+      if (charType === 'SIDE_ARM_SHOTGUNNER') {
+        if (card) {
+          card.innerHTML = `
+            <div class="control-item"><span class="key-cap">WASD</span> Move</div>
+            <div class="control-item"><span class="key-cap">SPACE / L-Click</span> Shotgun Buckshot</div>
+            <div class="control-item"><span class="key-cap">Passive (3s)</span> 3-Round Burst Volley</div>
+            <div class="control-item"><span class="key-cap">Release Shield</span> Anti-Deflect RPG</div>
+          `;
+        }
+        if (titleEl) { titleEl.textContent = '💥🚀 EQUIPPED: SIDE ARM SHOTGUNNER'; titleEl.style.color = '#ff6600'; }
+        if (descEl) descEl.innerHTML = `• Press <span class="key-cap">SPACE / L-Click</span>: Shotgun Buckshot | • Passive 3s: Burst Volley | • Release Shield: Anti-Deflect RPG`;
+        if (tagEl) { tagEl.textContent = '🚀 ANTI-DEFLECT RPG'; tagEl.style.borderColor = '#ff6600'; tagEl.style.color = '#ff6600'; tagEl.style.background = 'rgba(255, 102, 0, 0.15)'; }
+      } else if (charType === 'BURNING_SENTINEL') {
         if (card) {
           card.innerHTML = `
             <div class="control-item"><span class="key-cap">WASD</span> Move</div>
