@@ -1959,16 +1959,19 @@
     let minionPactTimer = 0;
 
     function handleEnemyKillEffects(ex, ey, enemyType = '') {
-      // 1. Track Archer Flame Kills Achievement (ONLY FOR FLAME KNIGHTS!)
-      if ((enemyType === 'SWORD_DEFLECTOR' || enemyType === 'FLAME_KNIGHT') && (player.character === 'ARCHER' || player.character === 'FROZEN_ARCHER')) {
-        checkFlameKillsAchievement();
-      }
+      // Block achievement progress in TEST mode!
+      if (typeof gameDifficulty === 'undefined' || gameDifficulty !== 'TEST') {
+        // 1. Track Archer Flame Kills Achievement (ONLY FOR FLAME KNIGHTS!)
+        if ((enemyType === 'SWORD_DEFLECTOR' || enemyType === 'FLAME_KNIGHT') && (player.character === 'ARCHER' || player.character === 'FROZEN_ARCHER')) {
+          checkFlameKillsAchievement();
+        }
 
-      // 2. Track Shotgun Enforcer Kills Achievement (All enemy kills while Shotgun / Side Arm Shotgunner equipped!)
-      if (player.character === 'SHOTGUN' || player.character === 'SIDE_ARM_SHOTGUNNER') {
-        shotgunKills++;
-        localStorage.setItem('blade_deflector_shotgun_kills', shotgunKills);
-        checkSideArmShotgunnerAchievement();
+        // 2. Track Shotgun Enforcer Kills Achievement (All enemy kills while Shotgun / Side Arm Shotgunner equipped!)
+        if (player.character === 'SHOTGUN' || player.character === 'SIDE_ARM_SHOTGUNNER') {
+          shotgunKills++;
+          localStorage.setItem('blade_deflector_shotgun_kills', shotgunKills);
+          checkSideArmShotgunnerAchievement();
+        }
       }
 
       // 1. Nova Burst: Shoot 8 projectiles in all directions!
@@ -6251,8 +6254,8 @@
     }
 
     window.setCharacter = function(charType) {
-      // Track switching from Shotgun to another class 20 times for Side Arm Shotgunner Achievement!
-      if (selectedCharacter === 'SHOTGUN' && charType !== 'SHOTGUN' && charType !== 'SIDE_ARM_SHOTGUNNER') {
+      // Track switching from Shotgun to another class 20 times for Side Arm Shotgunner Achievement! (NO ACHIEVEMENTS IN TEST MODE!)
+      if ((typeof gameDifficulty === 'undefined' || gameDifficulty !== 'TEST') && selectedCharacter === 'SHOTGUN' && charType !== 'SHOTGUN' && charType !== 'SIDE_ARM_SHOTGUNNER') {
         shotgunSwitches++;
         localStorage.setItem('blade_deflector_shotgun_switches', shotgunSwitches);
         checkSideArmShotgunnerAchievement();
