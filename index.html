@@ -5345,6 +5345,61 @@
             ctx.fillRect(-20, player.size / 2 + 11, 40 * cdPct, 4);
             ctx.restore();
           } else if (player.character === 'SIDE_ARM_SHOTGUNNER') {
+            // Detailed Side Arm Shotgunner Weapon Displays:
+            // 1. Dual Heavy Shotgun Barrels (Front Center)
+            // 2. Shoulder-Mounted RPG Rocket Launcher Tube (Left Shoulder) with Red Warhead
+            // 3. Aux Burst Rifle Laser Barrel (Right Shoulder) with Glowing Laser Sight
+            ctx.save();
+            ctx.rotate(player.angle);
+
+            // A. Left Shoulder RPG Rocket Launcher Tube & Loaded Rocket Warhead
+            ctx.fillStyle = '#333333';
+            ctx.strokeStyle = '#ff3300';
+            ctx.lineWidth = 1.5;
+            ctx.shadowColor = '#ff3300';
+            ctx.shadowBlur = player.rpgCooldown <= 0 ? 10 : 0;
+            // RPG Launcher Barrel Tube
+            ctx.fillRect(player.size / 2 - 6, -16, 26, 6);
+            ctx.strokeRect(player.size / 2 - 6, -16, 26, 6);
+
+            // RPG Rocket Warhead Tip (Visible when RPG is ready!)
+            if (!player.rpgCooldown || player.rpgCooldown <= 0) {
+              ctx.fillStyle = '#ff3300';
+              ctx.beginPath();
+              ctx.moveTo(player.size / 2 + 20, -16);
+              ctx.lineTo(player.size / 2 + 28, -13);
+              ctx.lineTo(player.size / 2 + 20, -10);
+              ctx.closePath();
+              ctx.fill();
+            }
+
+            // B. Right Shoulder Burst Rifle Laser Barrel
+            ctx.fillStyle = '#ff6600';
+            ctx.shadowColor = '#ff6600';
+            ctx.shadowBlur = 12;
+            ctx.fillRect(player.size / 2 - 2, 10, 22, 5);
+
+            // Burst Rifle Laser Sight Tip Indicator
+            ctx.fillStyle = '#ffe600';
+            ctx.shadowColor = '#ffe600';
+            ctx.shadowBlur = 14;
+            ctx.beginPath();
+            ctx.arc(player.size / 2 + 20, 12.5, 3, 0, Math.PI * 2);
+            ctx.fill();
+
+            // C. Center Dual Shotgun Barrels
+            ctx.fillStyle = '#ff5500';
+            ctx.shadowColor = '#ff5500';
+            ctx.shadowBlur = 14;
+            ctx.fillRect(player.size / 2 - 2, -6, 26, 5);
+            ctx.fillRect(player.size / 2 - 2, 1, 26, 5);
+
+            // Shotgun Muzzle Flash Guard
+            ctx.fillStyle = '#ffe600';
+            ctx.fillRect(player.size / 2 + 20, -7, 5, 14);
+
+            ctx.restore();
+
             // Draw RPG Cooldown Bar below player for Side Arm Shotgunner
             ctx.save();
             ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
