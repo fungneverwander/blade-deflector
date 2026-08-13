@@ -5320,8 +5320,8 @@
        Achievement System Core Architecture
        ========================================================================== */
     const achievements = [
-      { id: 'FLAME_SLAYER', name: 'FLAME SLAYER', desc: 'Kill 50 Flame Knights as Archer', target: 50 },
-      { id: 'RAM_SLAYER', name: 'RAM SLAYER', desc: 'Kill 70 Flame Knights by Ramming as Sentinel', target: 70 }
+      { id: 'FLAME_SLAYER', name: 'FLAME SLAYER', desc: 'Kill 200 Flame Knights as Archer', target: 200 },
+      { id: 'RAM_SLAYER', name: 'RAM SLAYER', desc: 'Kill 200 Flame Knights by Ramming as Sentinel', target: 200 }
     ];
     let flameKillsAsArcher = parseInt(localStorage.getItem('blade_deflector_archer_flame_kills') || '0');
     let flameRamKillsAsSentinel = parseInt(localStorage.getItem('blade_deflector_sentinel_flame_ram_kills') || '0');
@@ -5407,7 +5407,7 @@
       if (player.character === 'ARCHER' || player.character === 'FROZEN_ARCHER') {
         flameKillsAsArcher++;
         localStorage.setItem('blade_deflector_archer_flame_kills', flameKillsAsArcher);
-        if (flameKillsAsArcher >= 50 && !unlockedAchievements.has('FLAME_SLAYER')) {
+        if (flameKillsAsArcher >= 200 && !unlockedAchievements.has('FLAME_SLAYER')) {
           unlockedAchievements.add('FLAME_SLAYER');
           localStorage.setItem('blade_deflector_achievements', JSON.stringify([...unlockedAchievements]));
           addFloatingText('🏆 UNLOCKED: FLAME SLAYER & FROZEN ARCHER!', player.x, player.y - 45, '#ffe600');
@@ -5420,7 +5420,7 @@
       if (player.character === 'SENTINEL' || player.character === 'BURNING_SENTINEL') {
         flameRamKillsAsSentinel++;
         localStorage.setItem('blade_deflector_sentinel_flame_ram_kills', flameRamKillsAsSentinel);
-        if (flameRamKillsAsSentinel >= 70 && !unlockedAchievements.has('RAM_SLAYER')) {
+        if (flameRamKillsAsSentinel >= 200 && !unlockedAchievements.has('RAM_SLAYER')) {
           unlockedAchievements.add('RAM_SLAYER');
           localStorage.setItem('blade_deflector_achievements', JSON.stringify([...unlockedAchievements]));
           addFloatingText('🏆 UNLOCKED: RAM SLAYER & BURNING SENTINEL!', player.x, player.y - 45, '#ff3300');
@@ -5797,13 +5797,13 @@
       const countEl = document.getElementById('ach-unlocked-count');
       const bonusEl = document.getElementById('ach-active-bonuses');
       
-      const isFlameUnlocked = unlockedAchievements.has('FLAME_SLAYER') || flameKillsAsArcher >= 50;
+      const isFlameUnlocked = unlockedAchievements.has('FLAME_SLAYER') || flameKillsAsArcher >= 200;
       if (isFlameUnlocked && !unlockedAchievements.has('FLAME_SLAYER')) {
         unlockedAchievements.add('FLAME_SLAYER');
         localStorage.setItem('blade_deflector_achievements', JSON.stringify([...unlockedAchievements]));
       }
 
-      const isRamUnlocked = unlockedAchievements.has('RAM_SLAYER') || flameRamKillsAsSentinel >= 70;
+      const isRamUnlocked = unlockedAchievements.has('RAM_SLAYER') || flameRamKillsAsSentinel >= 200;
       if (isRamUnlocked && !unlockedAchievements.has('RAM_SLAYER')) {
         unlockedAchievements.add('RAM_SLAYER');
         localStorage.setItem('blade_deflector_achievements', JSON.stringify([...unlockedAchievements]));
@@ -5830,8 +5830,8 @@
               <div style="font-size: 2.2rem;">${isFlameUnlocked ? '🏹❄️' : '🔒'}</div>
               <div style="flex: 1;">
                 <div style="font-size: 1.05rem; font-weight: 800; color: ${isFlameUnlocked ? '#00f0ff' : '#ffffff'};">FLAME SLAYER</div>
-                <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">Kill 50 Flame Knights as the Archer class.</div>
-                <div style="font-size: 0.78rem; font-weight: 800; color: #ffe600; margin-top: 6px;">Progress: ${Math.min(50, flameKillsAsArcher)} / 50 Slain</div>
+                <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">Kill 200 Flame Knights as the Archer class.</div>
+                <div style="font-size: 0.78rem; font-weight: 800; color: #ffe600; margin-top: 6px;">Progress: ${Math.min(200, flameKillsAsArcher)} / 200 Slain</div>
               </div>
             </div>
             <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;">
@@ -5851,8 +5851,8 @@
               <div style="font-size: 2.2rem;">${isRamUnlocked ? '🛡️🔥' : '🔒'}</div>
               <div style="flex: 1;">
                 <div style="font-size: 1.05rem; font-weight: 800; color: ${isRamUnlocked ? '#ff3300' : '#ffffff'};">RAM SLAYER</div>
-                <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">Kill 70 Flame Knights by Ramming as the Sentinel class.</div>
-                <div style="font-size: 0.78rem; font-weight: 800; color: #ffe600; margin-top: 6px;">Progress: ${Math.min(70, flameRamKillsAsSentinel)} / 70 Rammed</div>
+                <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">Kill 200 Flame Knights by Ramming as the Sentinel class.</div>
+                <div style="font-size: 0.78rem; font-weight: 800; color: #ffe600; margin-top: 6px;">Progress: ${Math.min(200, flameRamKillsAsSentinel)} / 200 Rammed</div>
               </div>
             </div>
             <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;">
