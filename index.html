@@ -2058,9 +2058,9 @@
             createSparks(target.x, target.y, 20, '#ff5500', 7);
             audio.playEnemyKill();
             score += Math.round(150 * getScoreMult());
-            const ex = target.x, ey = target.y;
+            const ex = target.x, ey = target.y, etype = target.type;
             enemies.splice(k, 1);
-            handleEnemyKillEffects(ex, ey);
+            handleEnemyKillEffects(ex, ey, etype);
           }
         }
       }
@@ -2125,9 +2125,9 @@
             createSparks(target.x, target.y, 22, sparkColor, 7);
             audio.playEnemyKill();
             score += Math.round(150 * getScoreMult());
-            const ex = target.x, ey = target.y;
+            const ex = target.x, ey = target.y, etype = target.type;
             enemies.splice(k, 1);
-            handleEnemyKillEffects(ex, ey);
+            handleEnemyKillEffects(ex, ey, etype);
           }
         }
       }
@@ -3993,9 +3993,9 @@
                 createSparks(e.x, e.y, 35, '#bf00ff', 9);
                 audio.playDeflect();
                 score += Math.round(600 * getScoreMult());
-                const ex = e.x, ey = e.y;
+                const ex = e.x, ey = e.y, etype = e.type;
                 enemies.splice(i, 1);
-                handleEnemyKillEffects(ex, ey);
+                handleEnemyKillEffects(ex, ey, etype);
                 continue;
               }
             } else if (e.type === 'MINI_CRESCENT') {
@@ -4010,9 +4010,9 @@
                 createSparks(e.x, e.y, 35, '#00ffaa', 9);
                 audio.playDeflect();
                 score += Math.round(750 * getScoreMult());
-                const ex = e.x, ey = e.y;
+                const ex = e.x, ey = e.y, etype = e.type;
                 enemies.splice(i, 1);
-                handleEnemyKillEffects(ex, ey);
+                handleEnemyKillEffects(ex, ey, etype);
                 continue;
               }
             } else if (e.type === 'MINI_TRIANGLE') {
@@ -4027,9 +4027,9 @@
                 createSparks(e.x, e.y, 35, '#ff3300', 9);
                 audio.playDeflect();
                 score += Math.round(850 * getScoreMult());
-                const ex = e.x, ey = e.y;
+                const ex = e.x, ey = e.y, etype = e.type;
                 enemies.splice(i, 1);
-                handleEnemyKillEffects(ex, ey);
+                handleEnemyKillEffects(ex, ey, etype);
                 continue;
               }
             } else if (e.type === 'SHIELD_BASHER') {
@@ -4064,9 +4064,9 @@
                 createSparks(e.x, e.y, 30, '#ff9900', 9);
                 audio.playDeflect();
                 score += Math.round(300 * getScoreMult());
-                const ex = e.x, ey = e.y;
+                const ex = e.x, ey = e.y, etype = e.type;
                 enemies.splice(i, 1);
-                handleEnemyKillEffects(ex, ey);
+                handleEnemyKillEffects(ex, ey, etype);
                 continue;
               }
             } else {
@@ -4074,10 +4074,10 @@
               createSparks(e.x, e.y, 16, e.color, 5);
               audio.playEnemyKill();
               score += Math.round(100 * getScoreMult());
-              const ex = e.x, ey = e.y;
+              const ex = e.x, ey = e.y, etype = e.type;
               enemies.splice(i, 1);
               screenShake = 6;
-              handleEnemyKillEffects(ex, ey);
+              handleEnemyKillEffects(ex, ey, etype);
               continue;
             }
           }
@@ -4276,9 +4276,9 @@
                   createSparks(e.x, e.y, 30, '#ff9900', 9);
                   audio.playDeflect();
                   score += Math.round(300 * getScoreMult());
-                  const ex = e.x, ey = e.y;
+                  const ex = e.x, ey = e.y, etype = e.type;
                   enemies.splice(j, 1);
-                  handleEnemyKillEffects(ex, ey);
+                  handleEnemyKillEffects(ex, ey, etype);
                 }
                 break;
               } else {
@@ -4287,10 +4287,10 @@
                 audio.playEnemyKill();
                 addFloatingText(`+${Math.round(500 * getScoreMult())} DEFLECT KILL!`, e.x, e.y - 20, '#ffe600');
                 score += Math.round(500 * getScoreMult());
-                const ex = e.x, ey = e.y;
+                const ex = e.x, ey = e.y, etype = e.type;
                 enemies.splice(j, 1);
                 projectiles.splice(i, 1);
-                handleEnemyKillEffects(ex, ey);
+                handleEnemyKillEffects(ex, ey, etype);
                 break;
               }
             }
@@ -5385,9 +5385,9 @@
             createSparks(target.x, target.y, 25, '#ff3300', 8);
             audio.playEnemyKill();
             score += Math.round(150 * getScoreMult());
-            const ex = target.x, ey = target.y;
+            const ex = target.x, ey = target.y, etype = target.type;
             enemies.splice(k, 1);
-            handleEnemyKillEffects(ex, ey);
+            handleEnemyKillEffects(ex, ey, etype);
           }
         }
       }
