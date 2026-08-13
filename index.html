@@ -1959,12 +1959,12 @@
     let minionPactTimer = 0;
 
     function handleEnemyKillEffects(ex, ey, enemyType = '') {
-      // 1. Track Archer Kills Achievement (All kills as Archer / Frozen Archer!)
-      if (player.character === 'ARCHER' || player.character === 'FROZEN_ARCHER') {
+      // 1. Track Archer Flame Kills Achievement (ONLY FOR FLAME KNIGHTS!)
+      if ((enemyType === 'SWORD_DEFLECTOR' || enemyType === 'FLAME_KNIGHT') && (player.character === 'ARCHER' || player.character === 'FROZEN_ARCHER')) {
         checkFlameKillsAchievement();
       }
 
-      // 2. Track Shotgun Enforcer Kills Achievement (All kills as Shotgun / Side Arm Shotgunner!)
+      // 2. Track Shotgun Enforcer Kills Achievement (All enemy kills while Shotgun / Side Arm Shotgunner equipped!)
       if (player.character === 'SHOTGUN' || player.character === 'SIDE_ARM_SHOTGUNNER') {
         shotgunKills++;
         localStorage.setItem('blade_deflector_shotgun_kills', shotgunKills);
@@ -5417,6 +5417,7 @@
 
     function checkFlameRamKillsAchievement(enemyType = '') {
       if (typeof gameDifficulty !== 'undefined' && gameDifficulty === 'TEST') return; // NO ACHIEVEMENTS IN TEST MODE!
+      if (enemyType !== 'SWORD_DEFLECTOR' && enemyType !== 'FLAME_KNIGHT') return; // MUST BE A FLAME KNIGHT!
       if (player.character === 'SENTINEL' || player.character === 'BURNING_SENTINEL') {
         flameRamKillsAsSentinel++;
         localStorage.setItem('blade_deflector_sentinel_flame_ram_kills', flameRamKillsAsSentinel);
