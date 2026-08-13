@@ -3014,9 +3014,20 @@
           triggerBurstRifleVolley();
         }
 
-        // 3. Anti-Deflect RPG Round on Shield Drop!
+        // 3. Anti-Deflect RPG Round on Shield Drop (5-Second Cooldown)!
+        if (!player.rpgCooldown) player.rpgCooldown = 0;
+        player.maxRPGCooldown = 300; // 5 second RPG cooldown
+        if (player.rpgCooldown > 0) player.rpgCooldown--;
+
         if (shieldJustDropped) {
-          triggerAntiDeflectRPG(mouse.x, mouse.y);
+          if (player.rpgCooldown <= 0) {
+            player.rpgCooldown = player.maxRPGCooldown;
+            triggerAntiDeflectRPG(mouse.x, mouse.y);
+          } else {
+            const secLeft = Math.ceil(player.rpgCooldown / 60);
+            addFloatingText(`🚀 RPG RECHARGING (${secLeft}s)!`, player.x, player.y - 40, '#ff9900');
+            audio.playBlock();
+          }
         }
       } else if (player.character === 'SENTINEL' || player.character === 'BURNING_SENTINEL') {
         // Shield Sentinel has ALWAYS-ACTIVE passive shield (unless currently dashing!)
@@ -5330,6 +5341,17 @@
             const cdPct = player.shotgunCooldown > 0 ? (1 - player.shotgunCooldown / player.maxShotgunCooldown) : 1;
             ctx.fillStyle = cdPct >= 1 ? '#ff5500' : '#ff9900';
             ctx.shadowColor = '#ff5500';
+            ctx.shadowBlur = cdPct >= 1 ? 10 : 0;
+            ctx.fillRect(-20, player.size / 2 + 11, 40 * cdPct, 4);
+            ctx.restore();
+          } else if (player.character === 'SIDE_ARM_SHOTGUNNER') {
+            // Draw RPG Cooldown Bar below player for Side Arm Shotgunner
+            ctx.save();
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+            ctx.fillRect(-22, player.size / 2 + 10, 44, 6);
+            const cdPct = player.rpgCooldown > 0 ? (1 - player.rpgCooldown / (player.maxRPGCooldown || 300)) : 1;
+            ctx.fillStyle = cdPct >= 1 ? '#ff6600' : '#ff9900';
+            ctx.shadowColor = '#ff6600';
             ctx.shadowBlur = cdPct >= 1 ? 10 : 0;
             ctx.fillRect(-20, player.size / 2 + 11, 40 * cdPct, 4);
             ctx.restore();
