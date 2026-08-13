@@ -937,14 +937,17 @@
         </div>
       </div>
 
-      <!-- Start Button, Achievements & Save Progress Buttons Row -->
-      <div style="display: flex; gap: 10px; width: 100%; margin-top: 12px;">
-        <button class="btn-primary" id="start-btn" style="flex: 2; padding: 16px; font-size: 1.1rem; letter-spacing: 1px;">ENTER ARENA ▶</button>
-        <button id="start-achievements-btn" style="flex: 1; padding: 16px; font-size: 0.92rem; font-weight: 800; background: rgba(255, 230, 0, 0.12); border: 2px solid var(--accent-yellow); color: var(--accent-yellow); border-radius: 14px; cursor: pointer; transition: all 0.2s ease;">
+      <!-- Start Button, Achievements, Save & Saves Manager Buttons Row -->
+      <div style="display: flex; gap: 8px; width: 100%; margin-top: 12px;">
+        <button class="btn-primary" id="start-btn" style="flex: 2; padding: 14px; font-size: 1.05rem; letter-spacing: 1px;">ENTER ARENA ▶</button>
+        <button id="start-achievements-btn" style="flex: 1; padding: 14px; font-size: 0.88rem; font-weight: 800; background: rgba(255, 230, 0, 0.12); border: 2px solid var(--accent-yellow); color: var(--accent-yellow); border-radius: 12px; cursor: pointer; transition: all 0.2s ease;">
           🏆 ACHIEVEMENTS
         </button>
-        <button id="start-save-btn" onclick="saveGameProgress(true)" style="flex: 1; padding: 16px; font-size: 0.92rem; font-weight: 800; background: rgba(57, 255, 20, 0.12); border: 2px solid #39ff14; color: #39ff14; border-radius: 14px; cursor: pointer; transition: all 0.2s ease;">
-          💾 SAVE PROGRESS
+        <button onclick="saveGameProgress(false)" style="flex: 0.9; padding: 14px; font-size: 0.88rem; font-weight: 800; background: rgba(57, 255, 20, 0.12); border: 2px solid #39ff14; color: #39ff14; border-radius: 12px; cursor: pointer; transition: all 0.2s ease;">
+          💾 SAVE
+        </button>
+        <button onclick="openSavesModal()" style="flex: 0.9; padding: 14px; font-size: 0.88rem; font-weight: 800; background: rgba(0, 240, 255, 0.12); border: 2px solid #00f0ff; color: #00f0ff; border-radius: 12px; cursor: pointer; transition: all 0.2s ease;">
+          📂 SAVES
         </button>
       </div>
     </div>
@@ -963,8 +966,12 @@
           ◀ BACK TO MENU
         </button>
         <!-- Save Progress Button directly to its right -->
-        <button class="btn-primary" onclick="saveGameProgress(true)" style="flex: 0.75; padding: 10px 14px; font-size: 0.88rem; font-weight: 800; background: linear-gradient(135deg, #39ff14, #00b344); color: #000; border-radius: 12px; margin: 0; display: flex; align-items: center; justify-content: center; white-space: nowrap; cursor: pointer;">
+        <button class="btn-primary" onclick="saveGameProgress(false)" style="flex: 0.75; padding: 10px 14px; font-size: 0.88rem; font-weight: 800; background: linear-gradient(135deg, #39ff14, #00b344); color: #000; border-radius: 12px; margin: 0; display: flex; align-items: center; justify-content: center; white-space: nowrap; cursor: pointer;">
           💾 SAVE
+        </button>
+        <!-- Saves Manager Button -->
+        <button class="btn-primary" onclick="openSavesModal()" style="flex: 0.75; padding: 10px 14px; font-size: 0.88rem; font-weight: 800; background: linear-gradient(135deg, #00f0ff, #0088ff); color: #000; border-radius: 12px; margin: 0; display: flex; align-items: center; justify-content: center; white-space: nowrap; cursor: pointer;">
+          📂 SAVES
         </button>
         <div class="summary-item" style="flex: 0.7;">
           <span class="summary-label">UNLOCKED</span>
@@ -994,6 +1001,39 @@
           <div style="font-size: 0.88rem; color: var(--text-muted); max-width: 440px; margin: 8px auto 0 auto; line-height: 1.45;">
             The achievement engine is initialized. Unlockable achievements, milestones, and stat bonus rewards will appear here!
           </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Saves Manager Modal -->
+  <div class="modal-overlay" id="saves-modal">
+    <div class="modal-card" style="max-width: 860px; width: 94%;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px;">
+        <div>
+          <h1 class="game-title" style="background: linear-gradient(135deg, #39ff14, #00f0ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 1.8rem; margin: 0;">📂 SAVE MANAGER & SLOTS</h1>
+          <p class="subtitle" style="margin: 4px 0 0 0; text-align: left;">View, load, or manage your saved runs. Latest save is featured on the right.</p>
+        </div>
+        <button class="btn-primary" onclick="closeSavesModal()" style="padding: 10px 18px; font-size: 0.88rem; background: linear-gradient(135deg, var(--accent-yellow), var(--accent-orange)); color: #000; font-weight: 800; cursor: pointer;">
+          ◀ BACK
+        </button>
+      </div>
+
+      <div style="display: flex; gap: 20px; align-items: stretch; margin-top: 10px;">
+        <!-- Left Side: Previous Saves Scrollable Container -->
+        <div style="flex: 1.1; display: flex; flex-direction: column; background: rgba(0, 0, 0, 0.4); border: 1.5px solid rgba(255, 255, 255, 0.12); border-radius: 14px; padding: 16px; min-height: 340px;">
+          <div style="font-weight: 800; font-size: 0.95rem; color: #ffe600; margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
+            <span>📜 PREVIOUS SAVES</span>
+            <span id="previous-saves-count" style="font-size: 0.78rem; color: var(--text-muted);">(0 Saves)</span>
+          </div>
+          <div id="previous-saves-scroll" style="flex: 1; overflow-y: auto; max-height: 280px; display: flex; flex-direction: column; gap: 10px; padding-right: 6px;">
+            <!-- Rendered dynamically -->
+          </div>
+        </div>
+
+        <!-- Right Side: Latest Save Featured Card -->
+        <div style="flex: 1; background: rgba(57, 255, 20, 0.08); border: 2px solid #39ff14; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; justify-content: space-between;" id="latest-save-container">
+          <!-- Rendered dynamically -->
         </div>
       </div>
     </div>
@@ -1211,7 +1251,8 @@
           <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px;">
             <button class="btn-primary" id="resume-btn" style="width: 100%;">RESUME GAME [ESC / P]</button>
             <button class="btn-primary" onclick="openAchievementsModal()" style="width: 100%; background: linear-gradient(135deg, #ffe600, #ff9900); color: #040814; font-weight: 800;">🏆 ACHIEVEMENTS & BONUSES</button>
-            <button class="btn-primary" id="pause-save-btn" onclick="saveGameProgress(true)" style="width: 100%; background: linear-gradient(135deg, #00ff66, #00b344); color: #040814; font-weight: 800;">💾 SAVE PROGRESS TO DEVICE</button>
+            <button class="btn-primary" onclick="openSavesModal()" style="width: 100%; background: linear-gradient(135deg, #00f0ff, #0088ff); color: #040814; font-weight: 800;">📂 SAVE MANAGER & SLOTS</button>
+            <button class="btn-primary" id="pause-save-btn" onclick="saveGameProgress(false)" style="width: 100%; background: linear-gradient(135deg, #00ff66, #00b344); color: #040814; font-weight: 800;">💾 SAVE PROGRESS NOW</button>
             <button class="btn-primary" id="pause-restart-btn" style="width: 100%; background: linear-gradient(135deg, #ff0055, #ff6b00);">RESTART RUN</button>
             <button class="btn-primary" id="pause-mainmenu-btn" style="width: 100%; background: linear-gradient(135deg, var(--accent-yellow), var(--accent-orange)); color: #040814;">🏠 RETURN TO MAIN MENU</button>
           </div>
@@ -5429,9 +5470,17 @@
     }
 
     /* ==========================================================================
-       Save Game Progress Engine
+       Save Game Progress Engine & Saves Manager
        ========================================================================== */
-    function saveGameProgress(downloadFile = true) {
+    function getSavedRuns() {
+      try {
+        return JSON.parse(localStorage.getItem('blade_deflector_all_saves') || '[]');
+      } catch(e) {
+        return [];
+      }
+    }
+
+    function saveGameProgress(downloadFile = false) {
       if (typeof audio !== 'undefined' && audio.init) audio.init();
 
       flameKillsAsArcher = parseInt(localStorage.getItem('blade_deflector_archer_flame_kills') || '0');
@@ -5439,10 +5488,9 @@
       shotgunKills = parseInt(localStorage.getItem('blade_deflector_shotgun_kills') || '0');
       shotgunSwitches = parseInt(localStorage.getItem('blade_deflector_shotgun_switches') || '0');
 
-      const saveData = {
-        game: 'Blade Deflector',
-        version: '1.0',
-        timestamp: new Date().toISOString(),
+      const newSave = {
+        id: 'save_' + Date.now(),
+        timestamp: new Date().toLocaleString(),
         highScore: highScore || 0,
         selectedCharacter: selectedCharacter || 'KNIGHT',
         flameKillsAsArcher: flameKillsAsArcher || 0,
@@ -5454,38 +5502,198 @@
         currentScore: (typeof gameState !== 'undefined' && gameState === 'PLAYING') ? score : 0
       };
 
-      // 1. Save to Device Local Storage
-      localStorage.setItem('blade_deflector_hi', saveData.highScore);
-      localStorage.setItem('blade_deflector_character', saveData.selectedCharacter);
-      localStorage.setItem('blade_deflector_archer_flame_kills', saveData.flameKillsAsArcher);
-      localStorage.setItem('blade_deflector_sentinel_flame_ram_kills', saveData.flameRamKillsAsSentinel);
-      localStorage.setItem('blade_deflector_shotgun_kills', saveData.shotgunKills);
-      localStorage.setItem('blade_deflector_shotgun_switches', saveData.shotgunSwitches);
-      localStorage.setItem('blade_deflector_achievements', JSON.stringify(saveData.unlockedAchievements));
-      localStorage.setItem('blade_deflector_full_save', JSON.stringify(saveData));
+      let saves = getSavedRuns();
+      saves.unshift(newSave); // Add to beginning (latest first!)
+      if (saves.length > 25) saves = saves.slice(0, 25); // Cap at 25 saves max
 
-      // 2. Download JSON Backup File to Device if requested
+      localStorage.setItem('blade_deflector_all_saves', JSON.stringify(saves));
+      localStorage.setItem('blade_deflector_hi', newSave.highScore);
+      localStorage.setItem('blade_deflector_character', newSave.selectedCharacter);
+      localStorage.setItem('blade_deflector_archer_flame_kills', newSave.flameKillsAsArcher);
+      localStorage.setItem('blade_deflector_sentinel_flame_ram_kills', newSave.flameRamKillsAsSentinel);
+      localStorage.setItem('blade_deflector_shotgun_kills', newSave.shotgunKills);
+      localStorage.setItem('blade_deflector_shotgun_switches', newSave.shotgunSwitches);
+      localStorage.setItem('blade_deflector_achievements', JSON.stringify(newSave.unlockedAchievements));
+      localStorage.setItem('blade_deflector_full_save', JSON.stringify(newSave));
+
       if (downloadFile) {
         try {
-          const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(saveData, null, 2));
+          const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(newSave, null, 2));
           const downloadAnchor = document.createElement('a');
           downloadAnchor.setAttribute("href", dataStr);
           downloadAnchor.setAttribute("download", `blade_deflector_save_${Date.now()}.json`);
           document.body.appendChild(downloadAnchor);
           downloadAnchor.click();
           downloadAnchor.remove();
-        } catch(e) {
-          console.log('Download anchor error:', e);
-        }
+        } catch(e) {}
       }
 
-      // 3. In-Game Toast & Audio Callout
       if (typeof player !== 'undefined' && player && typeof addFloatingText === 'function') {
-        addFloatingText('💾 PROGRESS SAVED TO DEVICE!', player.x, player.y - 45, '#39ff14');
+        addFloatingText('💾 GAME PROGRESS SAVED!', player.x, player.y - 45, '#39ff14');
       }
       if (typeof audio !== 'undefined' && audio.playDeflect) audio.playDeflect();
 
-      alert(`💾 Progress successfully saved to your device!\n\n• High Score: ${saveData.highScore}\n• Character: ${saveData.selectedCharacter}\n• Unlocked Achievements: ${saveData.unlockedAchievements.length} / 3\n• Backup file downloaded to device downloads folder.`);
+      const savesModal = document.getElementById('saves-modal');
+      if (savesModal && savesModal.classList.contains('active')) {
+        renderSavesModalUI();
+      }
+    }
+
+    function openSavesModal() {
+      if (typeof audio !== 'undefined' && audio.init) audio.init();
+
+      const allModals = ['start-modal', 'pause-modal', 'achievements-modal', 'gameover-modal', 'shop-modal', 'reward-modal', 'crescent-reward-modal', 'triangle-reward-modal'];
+      previousActiveModalId = null;
+      for (const id of allModals) {
+        const m = document.getElementById(id);
+        if (m && m.classList.contains('active')) {
+          previousActiveModalId = id;
+          m.classList.remove('active');
+          break;
+        }
+      }
+
+      renderSavesModalUI();
+      const modal = document.getElementById('saves-modal');
+      if (modal) modal.classList.add('active');
+    }
+
+    function closeSavesModal() {
+      const modal = document.getElementById('saves-modal');
+      if (modal) modal.classList.remove('active');
+
+      if (previousActiveModalId) {
+        const prevModal = document.getElementById(previousActiveModalId);
+        if (prevModal) prevModal.classList.add('active');
+        previousActiveModalId = null;
+      }
+    }
+
+    function renderSavesModalUI() {
+      const saves = getSavedRuns();
+      const previousScroll = document.getElementById('previous-saves-scroll');
+      const previousCount = document.getElementById('previous-saves-count');
+      const latestContainer = document.getElementById('latest-save-container');
+
+      if (!saves || saves.length === 0) {
+        if (latestContainer) {
+          latestContainer.innerHTML = `
+            <div style="text-align: center; margin: auto;">
+              <div style="font-size: 3rem; margin-bottom: 10px;">💾</div>
+              <div style="font-weight: 800; font-size: 1.1rem; color: #ffffff;">NO SAVED RUNS FOUND</div>
+              <div style="font-size: 0.85rem; color: var(--text-muted); margin-top: 6px;">Click "SAVE" anytime during or after a run to store a save slot!</div>
+            </div>
+          `;
+        }
+        if (previousScroll) {
+          previousScroll.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 40px 0;">No older saves in history.</div>`;
+        }
+        if (previousCount) previousCount.textContent = '(0 Saves)';
+        return;
+      }
+
+      // 1. Right Side: Latest Save Featured Card
+      const latest = saves[0];
+      if (latestContainer) {
+        latestContainer.innerHTML = `
+          <div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+              <span style="background: #39ff14; color: #000; font-weight: 900; font-size: 0.75rem; padding: 4px 10px; border-radius: 6px; letter-spacing: 0.5px;">⭐ LATEST SAVE</span>
+              <span style="font-size: 0.78rem; color: var(--text-muted); font-weight: 800;">${latest.timestamp || ''}</span>
+            </div>
+            <div style="font-size: 1.25rem; font-weight: 900; color: #ffffff; margin-bottom: 6px;">HIGH SCORE: <span style="color: #ffe600;">${latest.highScore || 0}</span></div>
+            <div style="font-size: 0.9rem; font-weight: 800; color: #00f0ff; margin-bottom: 10px;">CLASS: ${latest.selectedCharacter || 'KNIGHT'}</div>
+            <div style="font-size: 0.82rem; color: #ddd; background: rgba(0,0,0,0.3); padding: 10px; border-radius: 8px;">
+              <div>🏆 Achievements: ${(latest.unlockedAchievements || []).length} / 3 Unlocked</div>
+              <div style="margin-top: 4px;">🌊 Wave: ${latest.currentWave || 1} | Score: ${latest.currentScore || 0}</div>
+            </div>
+          </div>
+          <div style="display: flex; gap: 10px; margin-top: 16px;">
+            <button class="btn-primary" onclick="loadSaveSlot('${latest.id}')" style="flex: 2; padding: 12px; font-size: 0.9rem; background: linear-gradient(135deg, #00f0ff, #0088ff); color: #000; font-weight: 800; cursor: pointer;">
+              ▶ LOAD THIS SAVE
+            </button>
+            <button class="btn-primary" onclick="confirmDeleteSaveSlot('${latest.id}')" style="flex: 1; padding: 12px; font-size: 0.85rem; background: rgba(255, 0, 85, 0.2); border: 1.5px solid #ff0055; color: #ff0055; font-weight: 800; cursor: pointer;">
+              🗑️ DELETE
+            </button>
+          </div>
+        `;
+      }
+
+      // 2. Left Side: Previous Saves List (scrollable)
+      const previousSaves = saves.slice(1);
+      if (previousCount) previousCount.textContent = `(${previousSaves.length} Save${previousSaves.length === 1 ? '' : 's'})`;
+
+      if (previousScroll) {
+        if (previousSaves.length === 0) {
+          previousScroll.innerHTML = `<div style="text-align: center; color: var(--text-muted); font-size: 0.85rem; padding: 40px 0;">No older save history.</div>`;
+        } else {
+          previousScroll.innerHTML = previousSaves.map(s => `
+            <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 10px; padding: 12px; display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="font-weight: 800; font-size: 0.9rem; color: #ffe600;">SCORE: ${s.highScore || 0} <span style="font-size: 0.78rem; color: #00f0ff; font-weight: 600;">(${s.selectedCharacter || 'KNIGHT'})</span></div>
+                <div style="font-size: 0.75rem; color: var(--text-muted); margin-top: 2px;">${s.timestamp || ''} | Wave ${s.currentWave || 1}</div>
+              </div>
+              <div style="display: flex; gap: 6px;">
+                <button onclick="loadSaveSlot('${s.id}')" style="padding: 6px 10px; font-size: 0.78rem; font-weight: 800; background: linear-gradient(135deg, #00f0ff, #0088ff); color: #000; border: none; border-radius: 6px; cursor: pointer;">
+                  LOAD
+                </button>
+                <button onclick="confirmDeleteSaveSlot('${s.id}')" style="padding: 6px 10px; font-size: 0.78rem; font-weight: 800; background: rgba(255, 0, 85, 0.15); border: 1px solid #ff0055; color: #ff0055; border-radius: 6px; cursor: pointer;">
+                  DELETE
+                </button>
+              </div>
+            </div>
+          `).join('');
+        }
+      }
+    }
+
+    function confirmDeleteSaveSlot(saveId) {
+      if (confirm('Are you sure you want to delete this save? This action cannot be undone.')) {
+        deleteSaveSlot(saveId);
+      }
+    }
+
+    function deleteSaveSlot(saveId) {
+      let saves = getSavedRuns();
+      saves = saves.filter(s => s.id !== saveId);
+      localStorage.setItem('blade_deflector_all_saves', JSON.stringify(saves));
+      renderSavesModalUI();
+      if (typeof audio !== 'undefined' && audio.playDeflect) audio.playDeflect();
+    }
+
+    function loadSaveSlot(saveId) {
+      const saves = getSavedRuns();
+      const save = saves.find(s => s.id === saveId);
+      if (!save) return;
+
+      highScore = save.highScore || 0;
+      selectedCharacter = save.selectedCharacter || 'KNIGHT';
+      flameKillsAsArcher = save.flameKillsAsArcher || 0;
+      flameRamKillsAsSentinel = save.flameRamKillsAsSentinel || 0;
+      shotgunKills = save.shotgunKills || 0;
+      shotgunSwitches = save.shotgunSwitches || 0;
+
+      if (Array.isArray(save.unlockedAchievements)) {
+        unlockedAchievements.clear();
+        save.unlockedAchievements.forEach(id => unlockedAchievements.add(id));
+      }
+
+      const hiEl = document.getElementById('high-score');
+      if (hiEl) hiEl.textContent = highScore;
+
+      if (typeof window.setCharacter === 'function') {
+        window.setCharacter(selectedCharacter);
+      }
+
+      if (typeof updateAchievementsUI === 'function') {
+        updateAchievementsUI();
+      }
+
+      closeSavesModal();
+      if (typeof player !== 'undefined' && player && typeof addFloatingText === 'function') {
+        addFloatingText('✅ SAVE LOADED SUCCESSFULLY!', player.x, player.y - 45, '#39ff14');
+      }
+      if (typeof audio !== 'undefined' && audio.playDeflect) audio.playDeflect();
     }
 
     /* ==========================================================================
@@ -6092,9 +6300,8 @@
       try { audio.playDeflect(); } catch(e) {}
     };
 
-    // Initial character & auto-load save sync
+    // Initial character sync (auto-load on launch removed as requested!)
     window.setCharacter('KNIGHT');
-    autoLoadLastSave();
 
     /* Difficulty Selector Event Listeners & State Handler */
     window.setDifficulty = function(mode) {
