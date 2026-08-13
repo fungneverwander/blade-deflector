@@ -2628,6 +2628,8 @@
       // Floating Ability Tutorial Toast over Player
       if (player.character === 'FROZEN_ARCHER') {
         addFloatingText('💡 TIP: PRESS [1] FOR 360° ICE WAVE (300PX)!', width / 2, height / 2 - 60, '#00f0ff');
+      } else if (player.character === 'SIDE_ARM_SHOTGUNNER') {
+        addFloatingText('💡 TIP: RELEASE [SPACE] FOR ANTI-DEFLECT RPG ROUND!', width / 2, height / 2 - 60, '#ff6600');
       } else if (player.character === 'BURNING_SENTINEL') {
         addFloatingText('💡 TIP: TAP [SPACE / SHIFT] FOR 10s FIRE DASH TRAIL!', width / 2, height / 2 - 60, '#ff3300');
       } else if (player.character === 'SENTINEL') {
@@ -2892,6 +2894,21 @@
               });
             }
           }
+        }
+      } else if (player.character === 'SIDE_ARM_SHOTGUNNER') {
+        // SIDE ARM SHOTGUNNER:
+        // 1. Burst Rifle Passive: Shoots 3 energy balls every 3 seconds (180 frames)
+        if (!player.burstRifleCooldown) player.burstRifleCooldown = 0;
+        if (player.burstRifleCooldown > 0) player.burstRifleCooldown--;
+
+        if (player.burstRifleCooldown <= 0) {
+          player.burstRifleCooldown = 180; // 3 second cooldown
+          triggerBurstRifleVolley();
+        }
+
+        // 2. Anti-Deflect RPG Round on Shield Drop!
+        if (shieldJustDropped) {
+          triggerAntiDeflectRPG(mouse.x, mouse.y);
         }
       } else if (player.character === 'SENTINEL' || player.character === 'BURNING_SENTINEL') {
         // Shield Sentinel has ALWAYS-ACTIVE passive shield (unless currently dashing!)
@@ -3736,10 +3753,10 @@
           }
         }
 
-        // SWORD DEFLECTOR ENEMY AI (Deflects projectiles back at player!) is near this enemy!
+        // SWORD DEFLECTOR ENEMY AI (Deflects projectiles back at player!)
           if (e.deflectCooldown <= 0 && !e.slashActive) {
             projectiles.forEach(p => {
-              if (p.deflected) { // Player's bullet!
+              if (p.deflected && !p.isAntiDeflect) { // Player's bullet (skips Anti-Deflect RPG Round!)
                 const pdx = p.x - e.x;
                 const pdy = p.y - e.y;
                 const pdist = Math.sqrt(pdx * pdx + pdy * pdy);
@@ -4074,6 +4091,15 @@
         p.x += p.vx;
         p.y += p.vy;
 
+        // Anti-Deflect RPG Round Boundary / Collision Check
+        if (p.isRPG) {
+          if (p.x < 0 || p.x > width || p.y < 0 || p.y > height) {
+            detonateRPGExplosion(Math.max(20, Math.min(width - 20, p.x)), Math.max(20, Math.min(height - 20, p.y)));
+            projectiles.splice(i, 1);
+            continue;
+          }
+        }
+
         // Slow Thrown Archer Bomb Physics & Detonation Trigger
         if (p.isArcherBomb) {
           p.spinAngle = (p.spinAngle || 0) + 0.18;
@@ -4161,6 +4187,11 @@
             const edx = e.x - p.x;
             const edy = e.y - p.y;
             if (Math.sqrt(edx * edx + edy * edy) < e.size / 2 + p.radius) {
+              if (p.isRPG) {
+                detonateRPGExplosion(p.x, p.y);
+                projectiles.splice(i, 1);
+                break;
+              }
               if (p.isHeavySlug) {
                 triggerSlugAOEExplosion(p.x, p.y);
                 projectiles.splice(i, 1);
@@ -5244,7 +5275,82 @@
     ];
     let flameKillsAsArcher = parseInt(localStorage.getItem('blade_deflector_archer_flame_kills') || '0');
     let flameRamKillsAsSentinel = parseInt(localStorage.getItem('blade_deflector_sentinel_flame_ram_kills') || '0');
+    let shotgunKills = parseInt(localStorage.getItem('blade_deflector_shotgun_kills') || '0');
+    let shotgunSwitches = parseInt(localStorage.getItem('blade_deflector_shotgun_switches') || '0');
     const unlockedAchievements = new Set(JSON.parse(localStorage.getItem('blade_deflector_achievements') || '[]'));
+
+    function triggerBurstRifleVolley() {
+      const aimAngle = Math.atan2(mouse.y - player.y, mouse.x - player.x);
+      audio.playSlash();
+      screenShake = 8;
+      addFloatingText('💥 3-ROUND BURST!', player.x, player.y - 35, '#ff6600');
+      for (let b = 0; b < 3; b++) {
+        setTimeout(() => {
+          if (gameState !== 'PLAYING') return;
+          projectiles.push({
+            x: player.x + Math.cos(aimAngle) * 22,
+            y: player.y + Math.sin(aimAngle) * 22,
+            vx: Math.cos(aimAngle) * 13,
+            vy: Math.sin(aimAngle) * 13,
+            radius: 7,
+            color: '#ff6600',
+            deflected: true
+          });
+        }, b * 80);
+      }
+    }
+
+    function triggerAntiDeflectRPG(targetX, targetY) {
+      const aimAngle = Math.atan2(targetY - player.y, targetX - player.x);
+      projectiles.push({
+        x: player.x + Math.cos(aimAngle) * 25,
+        y: player.y + Math.sin(aimAngle) * 25,
+        vx: Math.cos(aimAngle) * 11,
+        vy: Math.sin(aimAngle) * 11,
+        radius: 14,
+        color: '#ff3300',
+        deflected: true,
+        isRPG: true,
+        isAntiDeflect: true
+      });
+      audio.playDeflect();
+      screenShake = 16;
+      createSparks(player.x, player.y, 24, '#ff3300', 8);
+      addFloatingText('🚀 ANTI-DEFLECT RPG LAUNCHED!', player.x, player.y - 40, '#ff3300');
+    }
+
+    function detonateRPGExplosion(impactX, impactY) {
+      const rRadius = 180;
+      audio.playDeflect();
+      screenShake = 22;
+      createSparks(impactX, impactY, 50, '#ff3300', 11);
+      createSparks(impactX, impactY, 35, '#ffe600', 8);
+      addFloatingText('💥 ANTI-DEFLECT RPG EXPLOSION!', impactX, impactY - 45, '#ff3300');
+
+      for (let k = enemies.length - 1; k >= 0; k--) {
+        const target = enemies[k];
+        const dx = target.x - impactX;
+        const dy = target.y - impactY;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+
+        if (dist <= rRadius + target.size / 2) {
+          const pushAngle = Math.atan2(dy, dx);
+          target.x += Math.cos(pushAngle) * 45;
+          target.y += Math.sin(pushAngle) * 45;
+
+          if (isBossOrMini(target)) {
+            damageBossOrMini(target, 6);
+          } else {
+            createSparks(target.x, target.y, 25, '#ff3300', 8);
+            audio.playEnemyKill();
+            score += Math.round(150 * getScoreMult());
+            const ex = target.x, ey = target.y;
+            enemies.splice(k, 1);
+            handleEnemyKillEffects(ex, ey);
+          }
+        }
+      }
+    }
 
     function checkFlameKillsAchievement() {
       if (typeof gameDifficulty !== 'undefined' && gameDifficulty === 'TEST') return; // NO ACHIEVEMENTS IN TEST MODE!
@@ -5270,6 +5376,15 @@
           localStorage.setItem('blade_deflector_achievements', JSON.stringify([...unlockedAchievements]));
           addFloatingText('🏆 UNLOCKED: RAM SLAYER & BURNING SENTINEL!', player.x, player.y - 45, '#ff3300');
         }
+      }
+    }
+
+    function checkSideArmShotgunnerAchievement() {
+      if (typeof gameDifficulty !== 'undefined' && gameDifficulty === 'TEST') return; // NO ACHIEVEMENTS IN TEST MODE!
+      if (shotgunKills >= 300 && shotgunSwitches >= 20 && !unlockedAchievements.has('SIDE_ARM_SHOTGUNNER')) {
+        unlockedAchievements.add('SIDE_ARM_SHOTGUNNER');
+        localStorage.setItem('blade_deflector_achievements', JSON.stringify([...unlockedAchievements]));
+        addFloatingText('🏆 UNLOCKED: SIDE ARM SHOTGUNNER!', player.x, player.y - 45, '#ff6600');
       }
     }
 
@@ -5321,6 +5436,8 @@
 
       flameKillsAsArcher = parseInt(localStorage.getItem('blade_deflector_archer_flame_kills') || '0');
       flameRamKillsAsSentinel = parseInt(localStorage.getItem('blade_deflector_sentinel_flame_ram_kills') || '0');
+      shotgunKills = parseInt(localStorage.getItem('blade_deflector_shotgun_kills') || '0');
+      shotgunSwitches = parseInt(localStorage.getItem('blade_deflector_shotgun_switches') || '0');
 
       const saveData = {
         game: 'Blade Deflector',
@@ -5330,6 +5447,8 @@
         selectedCharacter: selectedCharacter || 'KNIGHT',
         flameKillsAsArcher: flameKillsAsArcher || 0,
         flameRamKillsAsSentinel: flameRamKillsAsSentinel || 0,
+        shotgunKills: shotgunKills || 0,
+        shotgunSwitches: shotgunSwitches || 0,
         unlockedAchievements: [...unlockedAchievements],
         currentWave: (typeof gameState !== 'undefined' && gameState === 'PLAYING') ? wave : 1,
         currentScore: (typeof gameState !== 'undefined' && gameState === 'PLAYING') ? score : 0
@@ -5340,6 +5459,8 @@
       localStorage.setItem('blade_deflector_character', saveData.selectedCharacter);
       localStorage.setItem('blade_deflector_archer_flame_kills', saveData.flameKillsAsArcher);
       localStorage.setItem('blade_deflector_sentinel_flame_ram_kills', saveData.flameRamKillsAsSentinel);
+      localStorage.setItem('blade_deflector_shotgun_kills', saveData.shotgunKills);
+      localStorage.setItem('blade_deflector_shotgun_switches', saveData.shotgunSwitches);
       localStorage.setItem('blade_deflector_achievements', JSON.stringify(saveData.unlockedAchievements));
       localStorage.setItem('blade_deflector_full_save', JSON.stringify(saveData));
 
@@ -5364,7 +5485,7 @@
       }
       if (typeof audio !== 'undefined' && audio.playDeflect) audio.playDeflect();
 
-      alert(`💾 Progress successfully saved to your device!\n\n• High Score: ${saveData.highScore}\n• Character: ${saveData.selectedCharacter}\n• Unlocked Achievements: ${saveData.unlockedAchievements.length} / 2\n• Backup file downloaded to device downloads folder.`);
+      alert(`💾 Progress successfully saved to your device!\n\n• High Score: ${saveData.highScore}\n• Character: ${saveData.selectedCharacter}\n• Unlocked Achievements: ${saveData.unlockedAchievements.length} / 3\n• Backup file downloaded to device downloads folder.`);
     }
 
     /* ==========================================================================
@@ -5377,6 +5498,8 @@
         const savedChar = localStorage.getItem('blade_deflector_character');
         const savedArcherKills = localStorage.getItem('blade_deflector_archer_flame_kills');
         const savedSentinelKills = localStorage.getItem('blade_deflector_sentinel_flame_ram_kills');
+        const savedShotgunKills = localStorage.getItem('blade_deflector_shotgun_kills');
+        const savedShotgunSwitches = localStorage.getItem('blade_deflector_shotgun_switches');
         const savedAch = localStorage.getItem('blade_deflector_achievements');
 
         let loadedSave = null;
@@ -5400,6 +5523,18 @@
           flameRamKillsAsSentinel = parseInt(savedSentinelKills);
         } else if (loadedSave && loadedSave.flameRamKillsAsSentinel) {
           flameRamKillsAsSentinel = loadedSave.flameRamKillsAsSentinel;
+        }
+
+        if (savedShotgunKills) {
+          shotgunKills = parseInt(savedShotgunKills);
+        } else if (loadedSave && loadedSave.shotgunKills) {
+          shotgunKills = loadedSave.shotgunKills;
+        }
+
+        if (savedShotgunSwitches) {
+          shotgunSwitches = parseInt(savedShotgunSwitches);
+        } else if (loadedSave && loadedSave.shotgunSwitches) {
+          shotgunSwitches = loadedSave.shotgunSwitches;
         }
 
         if (savedAch) {
@@ -5435,6 +5570,8 @@
     function updateAchievementsUI() {
       flameKillsAsArcher = parseInt(localStorage.getItem('blade_deflector_archer_flame_kills') || '0');
       flameRamKillsAsSentinel = parseInt(localStorage.getItem('blade_deflector_sentinel_flame_ram_kills') || '0');
+      shotgunKills = parseInt(localStorage.getItem('blade_deflector_shotgun_kills') || '0');
+      shotgunSwitches = parseInt(localStorage.getItem('blade_deflector_shotgun_switches') || '0');
 
       const listContainer = document.getElementById('achievements-list');
       const countEl = document.getElementById('ach-unlocked-count');
@@ -5452,11 +5589,17 @@
         localStorage.setItem('blade_deflector_achievements', JSON.stringify([...unlockedAchievements]));
       }
 
-      const totalUnlocked = (isFlameUnlocked ? 1 : 0) + (isRamUnlocked ? 1 : 0);
+      const isShotgunUnlocked = unlockedAchievements.has('SIDE_ARM_SHOTGUNNER') || (shotgunKills >= 300 && shotgunSwitches >= 20);
+      if (isShotgunUnlocked && !unlockedAchievements.has('SIDE_ARM_SHOTGUNNER')) {
+        unlockedAchievements.add('SIDE_ARM_SHOTGUNNER');
+        localStorage.setItem('blade_deflector_achievements', JSON.stringify([...unlockedAchievements]));
+      }
 
-      if (countEl) countEl.textContent = `${totalUnlocked} / 2`;
+      const totalUnlocked = (isFlameUnlocked ? 1 : 0) + (isRamUnlocked ? 1 : 0) + (isShotgunUnlocked ? 1 : 0);
+
+      if (countEl) countEl.textContent = `${totalUnlocked} / 3`;
       if (bonusEl) {
-        bonusEl.textContent = totalUnlocked > 0 ? `${isFlameUnlocked ? '❄️ Frozen Archer ' : ''}${isRamUnlocked ? '🔥 Burning Sentinel' : ''} Unlocked` : 'None Active';
+        bonusEl.textContent = totalUnlocked > 0 ? `${isFlameUnlocked ? '❄️ Frozen Archer ' : ''}${isRamUnlocked ? '🔥 Burning Sentinel ' : ''}${isShotgunUnlocked ? '🚀 Side Arm Shotgunner' : ''}` : 'None Active';
       }
 
       if (listContainer) {
@@ -5483,7 +5626,7 @@
           </div>
 
           <!-- Achievement 2: RAM SLAYER -->
-          <div class="shop-item-card" style="border-color: ${isRamUnlocked ? '#ff3300' : 'rgba(255,255,255,0.15)'}; background: ${isRamUnlocked ? 'rgba(255, 51, 0, 0.08)' : 'rgba(0,0,0,0.4)'}; padding: 18px;">
+          <div class="shop-item-card" style="border-color: ${isRamUnlocked ? '#ff3300' : 'rgba(255,255,255,0.15)'}; background: ${isRamUnlocked ? 'rgba(255, 51, 0, 0.08)' : 'rgba(0,0,0,0.4)'}; padding: 18px; margin-bottom: 12px;">
             <div style="display: flex; gap: 14px; align-items: center;">
               <div style="font-size: 2.2rem;">${isRamUnlocked ? '🛡️🔥' : '🔒'}</div>
               <div style="flex: 1;">
@@ -5502,6 +5645,27 @@
               </button>
             </div>
           </div>
+
+          <!-- Achievement 3: SIDE ARM SHOTGUNNER -->
+          <div class="shop-item-card" style="border-color: ${isShotgunUnlocked ? '#ff6600' : 'rgba(255,255,255,0.15)'}; background: ${isShotgunUnlocked ? 'rgba(255, 102, 0, 0.08)' : 'rgba(0,0,0,0.4)'}; padding: 18px;">
+            <div style="display: flex; gap: 14px; align-items: center;">
+              <div style="font-size: 2.2rem;">${isShotgunUnlocked ? '💥🚀' : '🔒'}</div>
+              <div style="flex: 1;">
+                <div style="font-size: 1.05rem; font-weight: 800; color: ${isShotgunUnlocked ? '#ff6600' : '#ffffff'};">SIDE ARM SHOTGUNNER</div>
+                <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">Kill 300 enemies with Shotgun & switch from Shotgun 20 times.</div>
+                <div style="font-size: 0.78rem; font-weight: 800; color: #ffe600; margin-top: 6px;">Kills: ${Math.min(300, shotgunKills)} / 300 | Switches: ${Math.min(20, shotgunSwitches)} / 20</div>
+              </div>
+            </div>
+            <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="font-size: 0.75rem; letter-spacing: 1px; color: var(--text-muted); font-weight: 800;">BONUS UNLOCK</div>
+                <div style="font-size: 0.9rem; font-weight: 800; color: #ff6600;">🚀 Side Arm Shotgunner Side Class</div>
+              </div>
+              <button class="btn-primary" id="select-side-arm-shotgunner-btn" ${!isShotgunUnlocked ? 'disabled' : ''} style="padding: 10px 16px; font-size: 0.82rem; ${isShotgunUnlocked ? 'background: linear-gradient(135deg, #ff6600, #ff9900); color: #fff;' : ''}">
+                ${selectedCharacter === 'SIDE_ARM_SHOTGUNNER' ? 'EQUIPPED ✔' : (isShotgunUnlocked ? 'EQUIP SIDE ARM SHOTGUNNER' : 'LOCKED 🔒')}
+              </button>
+            </div>
+          </div>
         `;
 
         const equipFrozenBtn = document.getElementById('select-frozen-archer-btn');
@@ -5516,6 +5680,14 @@
         if (equipBurningBtn && isRamUnlocked) {
           equipBurningBtn.addEventListener('click', () => {
             setCharacter('BURNING_SENTINEL');
+            updateAchievementsUI();
+          });
+        }
+
+        const equipShotgunnerBtn = document.getElementById('select-side-arm-shotgunner-btn');
+        if (equipShotgunnerBtn && isShotgunUnlocked) {
+          equipShotgunnerBtn.addEventListener('click', () => {
+            setCharacter('SIDE_ARM_SHOTGUNNER');
             updateAchievementsUI();
           });
         }
@@ -5870,7 +6042,10 @@
 
       const charBadge = document.getElementById('char-display');
       if (charBadge) {
-        if (charType === 'BURNING_SENTINEL') {
+        if (charType === 'SIDE_ARM_SHOTGUNNER') {
+          charBadge.textContent = '💥🚀 SIDE ARM SHOTGUNNER';
+          charBadge.style.color = '#ff6600';
+        } else if (charType === 'BURNING_SENTINEL') {
           charBadge.textContent = '🛡️🔥 BURNING SENTINEL';
           charBadge.style.color = '#ff3300';
         } else if (charType === 'FROZEN_ARCHER') {
@@ -5891,10 +6066,17 @@
         }
       }
 
+      // Track switching from Shotgun to another class 20 times for Side Arm Shotgunner Achievement!
+      if (selectedCharacter === 'SHOTGUN' && charType !== 'SHOTGUN' && charType !== 'SIDE_ARM_SHOTGUNNER') {
+        shotgunSwitches++;
+        localStorage.setItem('blade_deflector_shotgun_switches', shotgunSwitches);
+        checkSideArmShotgunnerAchievement();
+      }
+
       // If in active gameplay or paused, switch character dynamically!
       if (gameState === 'PLAYING' || gameState === 'PAUSED') {
         player.character = charType;
-        player.color = charType === 'BURNING_SENTINEL' ? '#ff3300' : (charType === 'FROZEN_ARCHER' ? '#00f0ff' : (charType === 'SENTINEL' ? '#ffe600' : (charType === 'SHOTGUN' ? '#ff5500' : (charType === 'ARCHER' ? '#00ff66' : '#00f0ff'))));
+        player.color = charType === 'SIDE_ARM_SHOTGUNNER' ? '#ff6600' : (charType === 'BURNING_SENTINEL' ? '#ff3300' : (charType === 'FROZEN_ARCHER' ? '#00f0ff' : (charType === 'SENTINEL' ? '#ffe600' : (charType === 'SHOTGUN' ? '#ff5500' : (charType === 'ARCHER' ? '#00ff66' : '#00f0ff')))));
         player.dashActive = false;
         player.dashProgress = 0;
         player.dashCooldown = 0;
@@ -5903,7 +6085,7 @@
         player.shotgunCooldown = 0;
         player.archerCooldown = 0;
         player.archerBombCooldown = 0;
-        addFloatingText(`CLASS CHANGED TO ${charType === 'BURNING_SENTINEL' ? 'BURNING SENTINEL' : (charType === 'FROZEN_ARCHER' ? 'FROZEN ARCHER' : (charType === 'SENTINEL' ? 'SHIELD SENTINEL' : (charType === 'SHOTGUN' ? 'SHOTGUN ENFORCER' : (charType === 'ARCHER' ? 'ARCHER RANGER' : 'SQUARE KNIGHT'))))}!`, width / 2, height / 2 - 50, player.color);
+        addFloatingText(`CLASS CHANGED TO ${charType === 'SIDE_ARM_SHOTGUNNER' ? 'SIDE ARM SHOTGUNNER' : (charType === 'BURNING_SENTINEL' ? 'BURNING SENTINEL' : (charType === 'FROZEN_ARCHER' ? 'FROZEN ARCHER' : (charType === 'SENTINEL' ? 'SHIELD SENTINEL' : (charType === 'SHOTGUN' ? 'SHOTGUN ENFORCER' : (charType === 'ARCHER' ? 'ARCHER RANGER' : 'SQUARE KNIGHT')))))}!`, width / 2, height / 2 - 50, player.color);
       }
 
       if (audio && typeof audio.init === 'function') audio.init();
