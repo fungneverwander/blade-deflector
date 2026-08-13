@@ -2261,8 +2261,7 @@
 
     function isBossOrMini(e) {
       return e && (e.type === 'PURPLE_BOSS' || e.type === 'CRESCENT_BOSS' || e.type === 'TRIANGLE_BOSS' || 
-                  e.type === 'MINI_HEXAGON' || e.type === 'MINI_CRESCENT' || e.type === 'MINI_TRIANGLE' ||
-                  e.type === 'MINI_OCTAGON' || e.type === 'MINI_SHADOW_DAGGER');
+                  e.type === 'MINI_HEXAGON' || e.type === 'MINI_CRESCENT' || e.type === 'MINI_TRIANGLE');
     }
 
     function damageBossOrMini(e, dmg) {
@@ -2275,7 +2274,7 @@
       if (e.hp <= 0) {
         createSparks(e.x, e.y, 50, e.color || '#ffe600', 12);
         audio.playDeflect();
-        let bossScore = e.type === 'TRIANGLE_BOSS' ? 5000 : (e.type === 'CRESCENT_BOSS' ? 3000 : (e.type === 'MINI_SHADOW_DAGGER' ? 1200 : (e.type === 'MINI_OCTAGON' ? 1000 : (e.type === 'MINI_TRIANGLE' ? 850 : (e.type === 'MINI_CRESCENT' ? 750 : (e.type === 'MINI_HEXAGON' ? 600 : 2000))))));
+        let bossScore = e.type === 'TRIANGLE_BOSS' ? 5000 : (e.type === 'CRESCENT_BOSS' ? 3000 : (e.type === 'MINI_TRIANGLE' ? 850 : (e.type === 'MINI_CRESCENT' ? 750 : (e.type === 'MINI_HEXAGON' ? 600 : 2000))));
         score += Math.round(bossScore * getScoreMult());
         const ex = e.x, ey = e.y;
         const idx = enemies.indexOf(e);
@@ -2478,59 +2477,11 @@
       });
     }
 
-    function spawnMiniOctagon() {
-      waveEnemiesSpawned++;
-      let hp = 15;
-      if (gameDifficulty === 'IMPOSSIBLE') hp = 30;
-      else if (gameDifficulty === 'HARD') hp = 20;
-      else if (gameDifficulty === 'EASY') hp = 9;
-
-      let x = Math.random() < 0.5 ? 60 : width - 60;
-      let y = Math.random() * (height - 240) + 120;
-
-      enemies.push({
-        type: 'MINI_OCTAGON',
-        x, y,
-        size: 52,
-        speed: 1.2 * getSpeedMult(),
-        hp: hp,
-        maxHp: hp,
-        color: '#ffe600',
-        angle: 0,
-        shockwaveTimer: 100 + Math.random() * 50
-      });
-    }
-
-    function spawnMiniShadowDagger() {
-      waveEnemiesSpawned++;
-      let hp = 12;
-      if (gameDifficulty === 'IMPOSSIBLE') hp = 24;
-      else if (gameDifficulty === 'HARD') hp = 16;
-      else if (gameDifficulty === 'EASY') hp = 8;
-
-      let x = Math.random() < 0.5 ? 60 : width - 60;
-      let y = Math.random() * (height - 240) + 120;
-
-      enemies.push({
-        type: 'MINI_SHADOW_DAGGER',
-        x, y,
-        size: 42,
-        speed: 2.5 * getSpeedMult(),
-        hp: hp,
-        maxHp: hp,
-        color: '#ff00aa',
-        angle: 0,
-        blinkTimer: 120 + Math.random() * 60
-      });
-    }
-
     function spawnRandomMiniBoss() {
       const miniRand = Math.random();
-      if (miniRand < 0.20) spawnMiniHexagon();
-      else if (miniRand < 0.40) spawnMiniCrescent();
-      else if (miniRand < 0.60) spawnMiniTriangle();
-      else if (miniRand < 0.80) spawnMiniOctagon();
-      else spawnMiniShadowDagger();
+      if (miniRand < 0.35) spawnMiniHexagon();
+      else if (miniRand < 0.70) spawnMiniCrescent();
+      else spawnMiniTriangle();
       audio.playDeflect();
       addFloatingText('⚠️ MINI-BOSS ENTERED ARENA!', width / 2, height / 2 - 50, '#ff3300');
     }
@@ -3927,54 +3878,7 @@
           }
         }
 
-        // MINI OCTAGON CYBER JUGGERNAUT AI
-        if (e.type === 'MINI_OCTAGON') {
-          e.angle = (e.angle || 0) + 0.03;
-          const angleToPlayer = Math.atan2(player.y - e.y, player.x - e.x);
-          e.x += Math.cos(angleToPlayer) * e.speed;
-          e.y += Math.sin(angleToPlayer) * e.speed;
 
-          e.shockwaveTimer = (e.shockwaveTimer || 0) + 1;
-          if (e.shockwaveTimer >= 210) {
-            e.shockwaveTimer = 0;
-            audio.playDeflect();
-            createSparks(e.x, e.y, 25, '#ffe600', 8);
-            addFloatingText('💥 360° OCTAGON RING!', e.x, e.y - 35, '#ffe600');
-
-            for (let a = 0; a < 10; a++) {
-              const pAngle = (Math.PI * 2 / 10) * a;
-              projectiles.push({
-                x: e.x,
-                y: e.y,
-                vx: Math.cos(pAngle) * 7.5,
-                vy: Math.sin(pAngle) * 7.5,
-                radius: 7,
-                color: '#ffe600',
-                deflected: false
-              });
-            }
-          }
-        }
-
-        // MINI SHADOW DAGGER ASSASSIN AI
-        if (e.type === 'MINI_SHADOW_DAGGER') {
-          const angleToPlayer = Math.atan2(player.y - e.y, player.x - e.x);
-          e.x += Math.cos(angleToPlayer) * e.speed;
-          e.y += Math.sin(angleToPlayer) * e.speed;
-
-          e.blinkTimer = (e.blinkTimer || 0) + 1;
-          if (e.blinkTimer >= 180) {
-            e.blinkTimer = 0;
-            createSparks(e.x, e.y, 20, '#ff00aa', 7);
-            addFloatingText('🥷 SHADOW DASH!', e.x, e.y - 30, '#ff00aa');
-            audio.playSlash();
-
-            const angleFromPlayer = Math.atan2(e.y - player.y, e.x - player.x) + (Math.random() - 0.5);
-            e.x = Math.max(40, Math.min(width - 40, player.x + Math.cos(angleFromPlayer) * 110));
-            e.y = Math.max(40, Math.min(height - 40, player.y + Math.sin(angleFromPlayer) * 110));
-            createSparks(e.x, e.y, 20, '#ff00aa', 7);
-          }
-        }
 
         // SWORD DEFLECTOR ENEMY AI (Deflects projectiles back at player!)
           if (e.deflectCooldown <= 0 && !e.slashActive) {
@@ -4963,39 +4867,15 @@
           ctx.shadowBlur = 6;
           ctx.fillRect(-23, -e.size / 2 - 15, 46 * hpPct, 6);
           ctx.restore();
-        } else if (e.type === 'MINI_CRESCENT' || e.type === 'MINI_TRIANGLE' || e.type === 'MINI_OCTAGON' || e.type === 'MINI_SHADOW_DAGGER') {
-          // Render Mini Bosses (Crescent, Triangle, Octagon, Shadow Dagger)
+        } else if (e.type === 'MINI_CRESCENT' || e.type === 'MINI_TRIANGLE') {
+          // Render Mini Bosses (Crescent, Triangle)
           ctx.save();
           ctx.rotate(e.angle || 0);
 
           ctx.fillStyle = e.color;
           ctx.shadowColor = e.color;
           ctx.shadowBlur = 18;
-
-          if (e.type === 'MINI_OCTAGON') {
-            // 8-Sided Octagon Juggernaut
-            ctx.beginPath();
-            for (let k = 0; k < 8; k++) {
-              const oAngle = (k * Math.PI / 4);
-              const ox = Math.cos(oAngle) * e.size * 0.5;
-              const oy = Math.sin(oAngle) * e.size * 0.5;
-              if (k === 0) ctx.moveTo(ox, oy);
-              else ctx.lineTo(ox, oy);
-            }
-            ctx.closePath();
-            ctx.fill();
-          } else if (e.type === 'MINI_SHADOW_DAGGER') {
-            // Diamond Shadow Dagger
-            ctx.beginPath();
-            ctx.moveTo(0, -e.size * 0.6);
-            ctx.lineTo(e.size * 0.4, 0);
-            ctx.lineTo(0, e.size * 0.6);
-            ctx.lineTo(-e.size * 0.4, 0);
-            ctx.closePath();
-            ctx.fill();
-          } else {
-            ctx.fillRect(-e.size / 2, -e.size / 2, e.size, e.size);
-          }
+          ctx.fillRect(-e.size / 2, -e.size / 2, e.size, e.size);
 
           ctx.fillStyle = '#ffffff';
           ctx.fillRect(-4, -4, 8, 8);
