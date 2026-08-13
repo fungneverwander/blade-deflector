@@ -2570,7 +2570,9 @@
 
       // Apply Difficulty Settings
       player.character = selectedCharacter || 'KNIGHT';
-      if (player.character === 'BURNING_SENTINEL') {
+      if (player.character === 'SIDE_ARM_SHOTGUNNER') {
+        player.color = '#ff6600';
+      } else if (player.character === 'BURNING_SENTINEL') {
         player.color = '#ff3300';
       } else if (player.character === 'FROZEN_ARCHER') {
         player.color = '#00f0ff';
@@ -5427,6 +5429,10 @@
         localStorage.setItem('blade_deflector_achievements', JSON.stringify([...unlockedAchievements]));
         addFloatingText('🏆 UNLOCKED: SIDE ARM SHOTGUNNER!', player.x, player.y - 45, '#ff6600');
       }
+      const achModal = document.getElementById('achievements-modal');
+      if (achModal && achModal.classList.contains('active')) {
+        updateAchievementsUI();
+      }
     }
 
     let previousActiveModalId = null;
@@ -6238,6 +6244,13 @@
     }
 
     window.setCharacter = function(charType) {
+      // Track switching from Shotgun to another class 20 times for Side Arm Shotgunner Achievement!
+      if (selectedCharacter === 'SHOTGUN' && charType !== 'SHOTGUN' && charType !== 'SIDE_ARM_SHOTGUNNER') {
+        shotgunSwitches++;
+        localStorage.setItem('blade_deflector_shotgun_switches', shotgunSwitches);
+        checkSideArmShotgunnerAchievement();
+      }
+
       selectedCharacter = charType;
       updateHUDControlsCard(charType);
       document.querySelectorAll('.char-card').forEach(card => {
@@ -6272,13 +6285,6 @@
           charBadge.textContent = '🗡️ KNIGHT';
           charBadge.style.color = 'var(--accent-cyan)';
         }
-      }
-
-      // Track switching from Shotgun to another class 20 times for Side Arm Shotgunner Achievement!
-      if (selectedCharacter === 'SHOTGUN' && charType !== 'SHOTGUN' && charType !== 'SIDE_ARM_SHOTGUNNER') {
-        shotgunSwitches++;
-        localStorage.setItem('blade_deflector_shotgun_switches', shotgunSwitches);
-        checkSideArmShotgunnerAchievement();
       }
 
       // If in active gameplay or paused, switch character dynamically!
