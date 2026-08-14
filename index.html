@@ -3809,79 +3809,7 @@
         if (e.type === 'SWORD_DEFLECTOR') {
           if (e.deflectCooldown > 0) e.deflectCooldown--;
 
-          // MINI HEXAGON BOSS AI (Spawns Wave 16+)
-        if (e.type === 'MINI_HEXAGON') {
-          e.angle += 0.03;
-
-          // Slow drift toward player
-          const angleToPlayer = Math.atan2(player.y - e.y, player.x - e.x);
-          e.x += Math.cos(angleToPlayer) * e.speed;
-          e.y += Math.sin(angleToPlayer) * e.speed;
-
-          // Attack: 3-shot volley burst every 3.5s (210 frames)
-          e.shootTimer++;
-          if (e.shootTimer >= 210) {
-            e.shootTimer = 0;
-            audio.playSlash();
-            addFloatingText('MINI VOLLEY!', e.x, e.y - 30, '#bf00ff');
-
-            for (let b = -1; b <= 1; b++) {
-              const bAngle = angleToPlayer + (b * 0.22);
-              projectiles.push({
-                x: e.x + Math.cos(bAngle) * 22,
-                y: e.y + Math.sin(bAngle) * 22,
-                vx: Math.cos(bAngle) * 4.8,
-                vy: Math.sin(bAngle) * 4.8,
-                radius: 7,
-                color: '#bf00ff',
-                deflected: false
-              });
-            }
-          }
-        }
-
-        // MINI CRESCENT BOSS AI (Spawns Wave 16+)
-        if (e.type === 'MINI_CRESCENT') {
-          e.bladeAngle = (e.bladeAngle || 0) + (e.slashActive ? 0.25 : 0.08);
-
-          e.slashTimer = (e.slashTimer || 0) + 1;
-          if (e.slashTimer >= 180) {
-            e.slashTimer = 0;
-            e.slashActive = true;
-            audio.playSlash();
-            createSparks(e.x, e.y, 16, '#00ffaa', 6);
-            addFloatingText('MINI SLASH!', e.x, e.y - 30, '#00ffaa');
-            setTimeout(() => { e.slashActive = false; }, 600);
-          }
-        }
-
-        // MINI TRIANGLE PYROMANCER BOSS AI
-        if (e.type === 'MINI_TRIANGLE') {
-          e.angle = (e.angle || 0) + 0.04;
-
-          const pdist = Math.sqrt((player.x - e.x) ** 2 + (player.y - e.y) ** 2);
-          if (e.teleportCooldown > 0) e.teleportCooldown--;
-
-          if (pdist <= 120 && e.teleportCooldown <= 0) {
-            e.teleportCooldown = 240;
-            createSparks(e.x, e.y, 20, '#ff3300', 7);
-            addFloatingText('MINI BLINK!', e.x, e.y - 30, '#ff3300');
-            e.x = Math.random() < 0.5 ? 80 : width - 80;
-            e.y = Math.random() * (height - 200) + 100;
-          }
-
-          e.shootTimer = (e.shootTimer || 0) + 1;
-          if (e.shootTimer >= 190) {
-            e.shootTimer = 0;
-            audio.playSlash();
-            addFloatingText('MINI FIREBALL!', e.x, e.y - 30, '#ff3300');
-            fireBouncingProjectile(e.x, e.y, player.x, player.y);
-          }
-        }
-
-
-
-        // SWORD DEFLECTOR ENEMY AI (Deflects projectiles back at player!)
+          // SWORD DEFLECTOR ENEMY AI (Deflects projectiles back at player!)
           if (e.deflectCooldown <= 0 && !e.slashActive) {
             projectiles.forEach(p => {
               if (p.deflected && !p.isAntiDeflect) { // Player's bullet (skips Anti-Deflect RPG Round!)
@@ -3917,6 +3845,98 @@
               e.slashActive = false;
               e.slashProgress = 0;
             }
+          }
+        }
+
+        // MINI HEXAGON BOSS AI
+        if (e.type === 'MINI_HEXAGON') {
+          e.angle = (e.angle || 0) + 0.03;
+
+          // Slow drift toward player
+          const angleToPlayer = Math.atan2(player.y - e.y, player.x - e.x);
+          e.x += Math.cos(angleToPlayer) * e.speed;
+          e.y += Math.sin(angleToPlayer) * e.speed;
+
+          // Attack: 3-shot volley burst every 3.5s (210 frames)
+          e.shootTimer = (e.shootTimer || 0) + 1;
+          if (e.shootTimer >= 210) {
+            e.shootTimer = 0;
+            audio.playSlash();
+            addFloatingText('MINI VOLLEY!', e.x, e.y - 30, '#bf00ff');
+
+            for (let b = -1; b <= 1; b++) {
+              const bAngle = angleToPlayer + (b * 0.22);
+              projectiles.push({
+                x: e.x + Math.cos(bAngle) * 22,
+                y: e.y + Math.sin(bAngle) * 22,
+                vx: Math.cos(bAngle) * 4.8,
+                vy: Math.sin(bAngle) * 4.8,
+                radius: 7,
+                color: '#bf00ff',
+                deflected: false
+              });
+            }
+          }
+        }
+
+        // MINI CRESCENT BOSS AI
+        if (e.type === 'MINI_CRESCENT') {
+          e.bladeAngle = (e.bladeAngle || 0) + (e.slashActive ? 0.25 : 0.08);
+
+          const angleToPlayer = Math.atan2(player.y - e.y, player.x - e.x);
+          e.x += Math.cos(angleToPlayer) * e.speed;
+          e.y += Math.sin(angleToPlayer) * e.speed;
+
+          e.slashTimer = (e.slashTimer || 0) + 1;
+          if (e.slashTimer >= 180) {
+            e.slashTimer = 0;
+            e.slashActive = true;
+            audio.playSlash();
+            createSparks(e.x, e.y, 16, '#00ffaa', 6);
+            addFloatingText('MINI SLASH!', e.x, e.y - 30, '#00ffaa');
+
+            // Fire 2 spinning crescent projectiles!
+            for (let side of [-1, 1]) {
+              const cAngle = angleToPlayer + (side * 0.3);
+              projectiles.push({
+                x: e.x + Math.cos(cAngle) * 20,
+                y: e.y + Math.sin(cAngle) * 20,
+                vx: Math.cos(cAngle) * 5.2,
+                vy: Math.sin(cAngle) * 5.2,
+                radius: 8,
+                color: '#00ffaa',
+                deflected: false
+              });
+            }
+            setTimeout(() => { e.slashActive = false; }, 600);
+          }
+        }
+
+        // MINI TRIANGLE PYROMANCER BOSS AI
+        if (e.type === 'MINI_TRIANGLE') {
+          e.angle = (e.angle || 0) + 0.04;
+
+          const angleToPlayer = Math.atan2(player.y - e.y, player.x - e.x);
+          e.x += Math.cos(angleToPlayer) * e.speed;
+          e.y += Math.sin(angleToPlayer) * e.speed;
+
+          const pdist = Math.sqrt((player.x - e.x) ** 2 + (player.y - e.y) ** 2);
+          if (e.teleportCooldown > 0) e.teleportCooldown--;
+
+          if (pdist <= 120 && e.teleportCooldown <= 0) {
+            e.teleportCooldown = 240;
+            createSparks(e.x, e.y, 20, '#ff3300', 7);
+            addFloatingText('MINI BLINK!', e.x, e.y - 30, '#ff3300');
+            e.x = Math.random() < 0.5 ? 80 : width - 80;
+            e.y = Math.random() * (height - 200) + 100;
+          }
+
+          e.shootTimer = (e.shootTimer || 0) + 1;
+          if (e.shootTimer >= 190) {
+            e.shootTimer = 0;
+            audio.playSlash();
+            addFloatingText('MINI FIREBALL!', e.x, e.y - 30, '#ff3300');
+            fireBouncingProjectile(e.x, e.y, player.x, player.y);
           }
         }
 
