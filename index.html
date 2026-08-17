@@ -1972,6 +1972,11 @@
           localStorage.setItem('blade_deflector_shotgun_kills', shotgunKills);
           checkSideArmShotgunnerAchievement();
         }
+
+        // 3. Track Wind Archer Kills Achievement (All enemy kills while Archer / Frozen Archer / Wind Archer equipped!)
+        if (player.character === 'ARCHER' || player.character === 'FROZEN_ARCHER' || player.character === 'WIND_ARCHER') {
+          checkWindArcherKills();
+        }
       }
 
       // 1. Nova Burst: Shoot 8 projectiles in all directions!
@@ -2594,6 +2599,8 @@
         player.color = '#ff6600';
       } else if (player.character === 'BURNING_SENTINEL') {
         player.color = '#ff3300';
+      } else if (player.character === 'WIND_ARCHER') {
+        player.color = '#39ff14';
       } else if (player.character === 'FROZEN_ARCHER') {
         player.color = '#00f0ff';
       } else if (player.character === 'SENTINEL') {
@@ -2612,6 +2619,8 @@
       player.archerCooldown = 0;
       player.archerBombCooldown = 0;
       player.frozenWaveCooldown = 0;
+      player.windGaleCooldown = 0;
+      player.maxWindGaleCooldown = 360;
       frozenWaveActive = false;
       frozenWaveRadius = 0;
       player.isBlocking = false;
@@ -2689,7 +2698,9 @@
       document.getElementById('gameover-modal').classList.remove('active');
 
       // Floating Ability Tutorial Toast over Player
-      if (player.character === 'FROZEN_ARCHER') {
+      if (player.character === 'WIND_ARCHER') {
+        addFloatingText('💡 TIP: PRESS [1] FOR 360° GALE SHOCKWAVE!', width / 2, height / 2 - 60, '#39ff14');
+      } else if (player.character === 'FROZEN_ARCHER') {
         addFloatingText('💡 TIP: PRESS [1] FOR 360° ICE WAVE (300PX)!', width / 2, height / 2 - 60, '#00f0ff');
       } else if (player.character === 'SIDE_ARM_SHOTGUNNER') {
         addFloatingText('💡 TIP: RELEASE [SPACE] FOR ANTI-DEFLECT RPG ROUND!', width / 2, height / 2 - 60, '#ff6600');
@@ -2801,11 +2812,12 @@
       player.wasBlocking = player.isBlocking;
 
       // 1. Check Character Input Mechanics
-      if (player.character === 'ARCHER' || player.character === 'FROZEN_ARCHER') {
-        // ARCHER & FROZEN ARCHER: Firing Arrows & Physical Bomb Throw
+        if (player.character === 'ARCHER' || player.character === 'FROZEN_ARCHER' || player.character === 'WIND_ARCHER') {
+        // ARCHER, FROZEN ARCHER & WIND ARCHER: Firing Arrows & Physical Bomb Throw
         if (player.archerCooldown > 0) player.archerCooldown--;
         if (player.archerBombCooldown > 0) player.archerBombCooldown--;
         if (player.frozenWaveCooldown > 0) player.frozenWaveCooldown--;
+        if (player.windGaleCooldown > 0) player.windGaleCooldown--;
 
         // Passive 300px Frost Aura Slow for Frozen Archer (Balanced 25% Slow)
         if (player.character === 'FROZEN_ARCHER') {
@@ -2814,7 +2826,7 @@
             const edy = e.y - player.y;
             const edist = Math.sqrt(edx * edx + edy * edy);
             if (edist <= 300) {
-              e.slowAuraFactor = 0.75; // 25% balanced slow (no compounding frame freezes!)
+              e.slowAuraFactor = 0.75;
             } else {
               e.slowAuraFactor = 1.0;
             }
@@ -2823,7 +2835,7 @@
           enemies.forEach(e => e.slowAuraFactor = 1.0);
         }
 
-        // Active Ability: Press [1] for 360° Ice Wave (300px)
+        // Active Ability: Press [1] for 360° Ice Wave (300px) (Frozen Archer)
         if (iceWaveRequested && player.character === 'FROZEN_ARCHER') {
           iceWaveRequested = false;
           if (player.frozenWaveCooldown <= 0) {
@@ -2836,6 +2848,57 @@
             addFloatingText('❄️ 360° ICE WAVE (300PX)!', player.x, player.y - 45, '#00f0ff');
           } else {
             addFloatingText(`⏳ ICE WAVE RECHARGING (${(player.frozenWaveCooldown / 60).toFixed(1)}s)`, player.x, player.y - 35, '#00f0ff');
+          }
+        }
+
+        // Active Ability: Press [1] for 360° Gale Shockwave Wave (Wind Archer)
+        if (iceWaveRequested && player.character === 'WIND_ARCHER') {
+          iceWaveRequested = false;
+          if (player.windGaleCooldown <= 0) {
+            player.windGaleCooldown = player.maxWindGaleCooldown || 360; // 6 second cooldown
+            audio.playDeflect();
+            audio.playSlash();
+            screenShake = 14;
+            createSparks(player.x, player.y, 45, '#39ff14', 10);
+            addFloatingText('🍃 360° GALE SHOCKWAVE!', player.x, player.y - 45, '#39ff14');
+
+            let killsLeft = 5; // Instantly kills up to 5 regular enemies!
+            const rad = 260; // 260px radius
+
+            for (let i = enemies.length - 1; i >= 0; i--) {
+              const e = enemies[i];
+              const edx = e.x - player.x;
+              const edy = e.y - player.y;
+              const edist = Math.sqrt(edx * edx + edy * edy);
+
+              if (edist <= rad) {
+                if (isBossOrMini(e)) {
+                  damageBossOrMini(e, 1);
+                  const pushAngle = Math.atan2(edy, edx);
+                  e.x += Math.cos(pushAngle) * 25;
+                  e.y += Math.sin(pushAngle) * 25;
+                } else {
+                  if (killsLeft > 0) {
+                    killsLeft--;
+                    createSparks(e.x, e.y, 25, '#39ff14', 8);
+                    audio.playEnemyKill();
+                    score += Math.round(150 * getScoreMult());
+                    const ex = e.x, ey = e.y, etype = e.type;
+                    enemies.splice(i, 1);
+                    handleEnemyKillEffects(ex, ey, etype);
+                  } else {
+                    e.stunnedTimer = 150; // 2.5s stun!
+                    const pushAngle = Math.atan2(edy, edx);
+                    e.x += Math.cos(pushAngle) * 65;
+                    e.y += Math.sin(pushAngle) * 65;
+                    createSparks(e.x, e.y, 12, '#39ff14', 6);
+                    addFloatingText('🌀 STUNNED!', e.x, e.y - 30, '#39ff14');
+                  }
+                }
+              }
+            }
+          } else {
+            addFloatingText(`⏳ GALE RECHARGING (${(player.windGaleCooldown / 60).toFixed(1)}s)`, player.x, player.y - 35, '#39ff14');
           }
         }
 
@@ -2858,9 +2921,9 @@
 
             audio.playSlash();
             screenShake = 6;
-            const arrowColor = player.character === 'FROZEN_ARCHER' ? '#00f0ff' : '#00ff66';
+            const arrowColor = player.character === 'WIND_ARCHER' ? '#39ff14' : (player.character === 'FROZEN_ARCHER' ? '#00f0ff' : '#00ff66');
             createSparks(player.x, player.y, 14, arrowColor, 6);
-            addFloatingText(player.character === 'FROZEN_ARCHER' ? '❄️ FROST ARROW!' : '🏹 ARROW SHOT!', player.x, player.y - 30, arrowColor);
+            addFloatingText(player.character === 'WIND_ARCHER' ? '🍃 GALE ARROW!' : (player.character === 'FROZEN_ARCHER' ? '❄️ FROST ARROW!' : '🏹 ARROW SHOT!'), player.x, player.y - 30, arrowColor);
 
             const numArrows = player.buffs.slash360 ? 8 : 1;
             const arrowSpeed = 13.5 * (player.buffs.range ? 1.4 : 1.0) * (player.permBuffs.permRange ? 1.5 : 1.0);
@@ -3420,6 +3483,11 @@
           dx /= mag;
           dy /= mag;
         }
+      }
+
+      const moveSpeedCalculated = Math.sqrt((dx * moveSpeed) ** 2 + (dy * moveSpeed) ** 2);
+      if (moveSpeedCalculated > 0 && (player.character === 'ARCHER' || player.character === 'FROZEN_ARCHER' || player.character === 'WIND_ARCHER')) {
+        checkWindArcherMovement(moveSpeedCalculated);
       }
 
       player.x += dx * moveSpeed;
@@ -5535,6 +5603,17 @@
             ctx.shadowBlur = cdPct >= 1 ? 10 : 0;
             ctx.fillRect(-20, player.size / 2 + 11, 40 * cdPct, 4);
             ctx.restore();
+          } else if (player.character === 'WIND_ARCHER') {
+            // Draw Gale Wave Cooldown Bar for Wind Archer
+            ctx.save();
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
+            ctx.fillRect(-22, player.size / 2 + 10, 44, 6);
+            const cdPct = player.windGaleCooldown > 0 ? (1 - player.windGaleCooldown / (player.maxWindGaleCooldown || 360)) : 1;
+            ctx.fillStyle = cdPct >= 1 ? '#39ff14' : '#ff9900';
+            ctx.shadowColor = '#39ff14';
+            ctx.shadowBlur = cdPct >= 1 ? 10 : 0;
+            ctx.fillRect(-20, player.size / 2 + 11, 40 * cdPct, 4);
+            ctx.restore();
           } else {
             // Draw Dash Cooldown Bar for Shield Sentinel
             ctx.save();
@@ -5695,6 +5774,40 @@
         unlockedAchievements.add('SIDE_ARM_SHOTGUNNER');
         localStorage.setItem('blade_deflector_achievements', JSON.stringify([...unlockedAchievements]));
         addFloatingText('🏆 UNLOCKED: SIDE ARM SHOTGUNNER!', player.x, player.y - 45, '#ff6600');
+      }
+      const achModal = document.getElementById('achievements-modal');
+      if (achModal && achModal.classList.contains('active')) {
+        updateAchievementsUI();
+      }
+    }
+
+    let archerDistance = parseInt(localStorage.getItem('blade_deflector_archer_distance') || '0');
+    let archerKills = parseInt(localStorage.getItem('blade_deflector_archer_kills') || '0');
+
+    function checkWindArcherMovement(distMoved) {
+      if (typeof gameDifficulty !== 'undefined' && gameDifficulty === 'TEST') return; // NO ACHIEVEMENTS IN TEST MODE!
+      if (player.character === 'ARCHER' || player.character === 'FROZEN_ARCHER' || player.character === 'WIND_ARCHER') {
+        archerDistance += Math.round(distMoved);
+        localStorage.setItem('blade_deflector_archer_distance', archerDistance);
+        checkWindArcherAchievement();
+      }
+    }
+
+    function checkWindArcherKills() {
+      if (typeof gameDifficulty !== 'undefined' && gameDifficulty === 'TEST') return; // NO ACHIEVEMENTS IN TEST MODE!
+      if (player.character === 'ARCHER' || player.character === 'FROZEN_ARCHER' || player.character === 'WIND_ARCHER') {
+        archerKills++;
+        localStorage.setItem('blade_deflector_archer_kills', archerKills);
+        checkWindArcherAchievement();
+      }
+    }
+
+    function checkWindArcherAchievement() {
+      if (typeof gameDifficulty !== 'undefined' && gameDifficulty === 'TEST') return; // NO ACHIEVEMENTS IN TEST MODE!
+      if (archerDistance >= 100000 && archerKills >= 300 && !unlockedAchievements.has('WIND_SLAYER')) {
+        unlockedAchievements.add('WIND_SLAYER');
+        localStorage.setItem('blade_deflector_achievements', JSON.stringify([...unlockedAchievements]));
+        addFloatingText('🏆 UNLOCKED: WIND ARCHER!', player.x, player.y - 45, '#39ff14');
       }
       const achModal = document.getElementById('achievements-modal');
       if (achModal && achModal.classList.contains('active')) {
@@ -6076,11 +6189,20 @@
         localStorage.setItem('blade_deflector_achievements', JSON.stringify([...unlockedAchievements]));
       }
 
-      const totalUnlocked = (isFlameUnlocked ? 1 : 0) + (isRamUnlocked ? 1 : 0) + (isShotgunUnlocked ? 1 : 0);
+      archerDistance = parseInt(localStorage.getItem('blade_deflector_archer_distance') || '0');
+      archerKills = parseInt(localStorage.getItem('blade_deflector_archer_kills') || '0');
 
-      if (countEl) countEl.textContent = `${totalUnlocked} / 3`;
+      const isWindUnlocked = unlockedAchievements.has('WIND_SLAYER') || (archerDistance >= 100000 && archerKills >= 300);
+      if (isWindUnlocked && !unlockedAchievements.has('WIND_SLAYER')) {
+        unlockedAchievements.add('WIND_SLAYER');
+        localStorage.setItem('blade_deflector_achievements', JSON.stringify([...unlockedAchievements]));
+      }
+
+      const totalUnlocked = (isFlameUnlocked ? 1 : 0) + (isRamUnlocked ? 1 : 0) + (isShotgunUnlocked ? 1 : 0) + (isWindUnlocked ? 1 : 0);
+
+      if (countEl) countEl.textContent = `${totalUnlocked} / 4`;
       if (bonusEl) {
-        bonusEl.textContent = totalUnlocked > 0 ? `${isFlameUnlocked ? '❄️ Frozen Archer ' : ''}${isRamUnlocked ? '🔥 Burning Sentinel ' : ''}${isShotgunUnlocked ? '🚀 Side Arm Shotgunner' : ''}` : 'None Active';
+        bonusEl.textContent = totalUnlocked > 0 ? `${isFlameUnlocked ? '❄️ Frozen Archer ' : ''}${isRamUnlocked ? '🔥 Burning Sentinel ' : ''}${isShotgunUnlocked ? '🚀 Side Arm Shotgunner ' : ''}${isWindUnlocked ? '🍃 Wind Archer' : ''}` : 'None Active';
       }
 
       if (listContainer) {
@@ -6128,7 +6250,7 @@
           </div>
 
           <!-- Achievement 3: SIDE ARM SHOTGUNNER -->
-          <div class="shop-item-card" style="border-color: ${isShotgunUnlocked ? '#ff6600' : 'rgba(255,255,255,0.15)'}; background: ${isShotgunUnlocked ? 'rgba(255, 102, 0, 0.08)' : 'rgba(0,0,0,0.4)'}; padding: 18px;">
+          <div class="shop-item-card" style="border-color: ${isShotgunUnlocked ? '#ff6600' : 'rgba(255,255,255,0.15)'}; background: ${isShotgunUnlocked ? 'rgba(255, 102, 0, 0.08)' : 'rgba(0,0,0,0.4)'}; padding: 18px; margin-bottom: 12px;">
             <div style="display: flex; gap: 14px; align-items: center;">
               <div style="font-size: 2.2rem;">${isShotgunUnlocked ? '💥🚀' : '🔒'}</div>
               <div style="flex: 1;">
@@ -6144,6 +6266,27 @@
               </div>
               <button class="btn-primary" id="select-side-arm-shotgunner-btn" ${!isShotgunUnlocked ? 'disabled' : ''} style="padding: 10px 16px; font-size: 0.82rem; ${isShotgunUnlocked ? 'background: linear-gradient(135deg, #ff6600, #ff9900); color: #fff;' : ''}">
                 ${selectedCharacter === 'SIDE_ARM_SHOTGUNNER' ? 'EQUIPPED ✔' : (isShotgunUnlocked ? 'EQUIP SIDE ARM SHOTGUNNER' : 'LOCKED 🔒')}
+              </button>
+            </div>
+          </div>
+
+          <!-- Achievement 4: WIND SLAYER (WIND ARCHER) -->
+          <div class="shop-item-card" style="border-color: ${isWindUnlocked ? '#39ff14' : 'rgba(255,255,255,0.15)'}; background: ${isWindUnlocked ? 'rgba(57, 255, 20, 0.08)' : 'rgba(0,0,0,0.4)'}; padding: 18px;">
+            <div style="display: flex; gap: 14px; align-items: center;">
+              <div style="font-size: 2.2rem;">${isWindUnlocked ? '🏹🍃' : '🔒'}</div>
+              <div style="flex: 1;">
+                <div style="font-size: 1.05rem; font-weight: 800; color: ${isWindUnlocked ? '#39ff14' : '#ffffff'};">WIND SLAYER</div>
+                <div style="font-size: 0.82rem; color: var(--text-muted); margin-top: 2px;">Travel 100,000 px & Kill 300 enemies as the Archer class.</div>
+                <div style="font-size: 0.78rem; font-weight: 800; color: #ffe600; margin-top: 6px;">Distance: ${Math.min(100000, archerDistance)} / 100,000 px | Kills: ${Math.min(300, archerKills)} / 300</div>
+              </div>
+            </div>
+            <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div style="font-size: 0.75rem; letter-spacing: 1px; color: var(--text-muted); font-weight: 800;">BONUS UNLOCK</div>
+                <div style="font-size: 0.9rem; font-weight: 800; color: #39ff14;">🍃 Wind Archer Side Class</div>
+              </div>
+              <button class="btn-primary" id="select-wind-archer-btn" ${!isWindUnlocked ? 'disabled' : ''} style="padding: 10px 16px; font-size: 0.82rem; ${isWindUnlocked ? 'background: linear-gradient(135deg, #39ff14, #00ffcc); color: #000;' : ''}">
+                ${selectedCharacter === 'WIND_ARCHER' ? 'EQUIPPED ✔' : (isWindUnlocked ? 'EQUIP WIND ARCHER' : 'LOCKED 🔒')}
               </button>
             </div>
           </div>
@@ -6169,6 +6312,14 @@
         if (equipShotgunnerBtn && isShotgunUnlocked) {
           equipShotgunnerBtn.addEventListener('click', () => {
             setCharacter('SIDE_ARM_SHOTGUNNER');
+            updateAchievementsUI();
+          });
+        }
+
+        const equipWindBtn = document.getElementById('select-wind-archer-btn');
+        if (equipWindBtn && isWindUnlocked) {
+          equipWindBtn.addEventListener('click', () => {
+            setCharacter('WIND_ARCHER');
             updateAchievementsUI();
           });
         }
@@ -6440,7 +6591,19 @@
       const descEl = document.getElementById('ach-preview-desc');
       const tagEl = document.getElementById('ach-preview-tag');
 
-      if (charType === 'SIDE_ARM_SHOTGUNNER') {
+      if (charType === 'WIND_ARCHER') {
+        if (card) {
+          card.innerHTML = `
+            <div class="control-item"><span class="key-cap">WASD</span> Move</div>
+            <div class="control-item"><span class="key-cap">Tap SPACE / L-Click</span> Gale Arrow Spray</div>
+            <div class="control-item"><span class="key-cap">Passive</span> Arrow Proximity Knockback</div>
+            <div class="control-item"><span class="key-cap">Key 1</span> 360° Gale Shockwave Wave</div>
+          `;
+        }
+        if (titleEl) { titleEl.textContent = '🏹🍃 EQUIPPED: WIND ARCHER'; titleEl.style.color = '#39ff14'; }
+        if (descEl) descEl.innerHTML = `• Passive: Arrows Knock Back Nearby Enemies | • Press <span class="key-cap">1</span>: 360° Gale Wave (Kills 5, Stuns Rest, 1 Dmg to Bosses)`;
+        if (tagEl) { tagEl.textContent = '🍃 360° GALE WAVE [1]'; tagEl.style.borderColor = '#39ff14'; tagEl.style.color = '#39ff14'; tagEl.style.background = 'rgba(57, 255, 20, 0.15)'; }
+      } else if (charType === 'SIDE_ARM_SHOTGUNNER') {
         if (card) {
           card.innerHTML = `
             <div class="control-item"><span class="key-cap">WASD</span> Move</div>
@@ -6542,7 +6705,10 @@
 
       const charBadge = document.getElementById('char-display');
       if (charBadge) {
-        if (charType === 'SIDE_ARM_SHOTGUNNER') {
+        if (charType === 'WIND_ARCHER') {
+          charBadge.textContent = '🏹🍃 WIND ARCHER';
+          charBadge.style.color = '#39ff14';
+        } else if (charType === 'SIDE_ARM_SHOTGUNNER') {
           charBadge.textContent = '💥🚀 SIDE ARM SHOTGUNNER';
           charBadge.style.color = '#ff6600';
         } else if (charType === 'BURNING_SENTINEL') {
