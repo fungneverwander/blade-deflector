@@ -3621,8 +3621,8 @@
             spawnShieldBasher();
           }
 
-          // Wave 3+: Add Mini Bosses of all 5 kinds (Hexagon, Crescent, Triangle, Octagon, Shadow Dagger)!
-          if (wave >= 3 && Math.random() < (wave >= 12 ? 0.38 : (wave >= 6 ? 0.25 : 0.18))) {
+          // Wave 8+: Add Mini Bosses (Mini Hexagon, Mini Crescent, Mini Triangle)!
+          if (wave >= 8 && Math.random() < (wave >= 12 ? 0.38 : 0.25)) {
             spawnRandomMiniBoss();
           }
 
