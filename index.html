@@ -5446,7 +5446,7 @@
               const swordLength = player.isBlocking ? 30 : player.swordLength;
               ctx.fillRect(player.size / 2, -3, swordLength, 6);
             }
-          } else if (player.character === 'ARCHER' || player.character === 'FROZEN_ARCHER') {
+          } else if (player.character === 'ARCHER' || player.character === 'FROZEN_ARCHER' || player.character === 'WIND_ARCHER') {
             // Render 300px Passive Frost Aura Ring for Frozen Archer
             if (player.character === 'FROZEN_ARCHER') {
               ctx.save();
@@ -5462,13 +5462,39 @@
               ctx.restore();
             }
 
-            // Detailed Recurve Bow & Drawn Arrow Model
+            // Render 260px Swirling Gale Wind Aura for Wind Archer
+            if (player.character === 'WIND_ARCHER') {
+              ctx.save();
+              ctx.strokeStyle = 'rgba(57, 255, 20, 0.38)';
+              ctx.shadowColor = '#39ff14';
+              ctx.shadowBlur = 14;
+              ctx.lineWidth = 2.5;
+              ctx.setLineDash([14, 10]);
+              ctx.beginPath();
+              ctx.arc(0, 0, 260, 0, Math.PI * 2);
+              ctx.stroke();
+              ctx.setLineDash([]);
+
+              // Rotating Wind Particles / Gust Arc
+              const time = performance.now() * 0.003;
+              ctx.strokeStyle = 'rgba(0, 255, 204, 0.6)';
+              ctx.lineWidth = 3;
+              ctx.beginPath();
+              ctx.arc(0, 0, 260, time, time + Math.PI / 2);
+              ctx.stroke();
+              ctx.beginPath();
+              ctx.arc(0, 0, 260, time + Math.PI, time + Math.PI * 1.5);
+              ctx.stroke();
+              ctx.restore();
+            }
+
+            // Detailed Recurve Greatbow & Drawn Arrow Model
             ctx.save();
             ctx.rotate(player.angle);
 
-            // Glowing Emerald Curved Bow Arms
-            ctx.strokeStyle = '#00ff66';
-            ctx.shadowColor = '#00ff66';
+            const bowColor = player.character === 'WIND_ARCHER' ? '#39ff14' : (player.character === 'FROZEN_ARCHER' ? '#00f0ff' : '#00ff66');
+            ctx.strokeStyle = bowColor;
+            ctx.shadowColor = bowColor;
             ctx.shadowBlur = 16;
             ctx.lineWidth = 5;
 
@@ -5477,6 +5503,27 @@
             ctx.arc(player.size / 2 - 2, 0, 26, -Math.PI / 2.6, Math.PI / 2.6);
             ctx.stroke();
 
+            // Wind Archer Feathered Bow Wings
+            if (player.character === 'WIND_ARCHER') {
+              ctx.fillStyle = '#00ffcc';
+              ctx.shadowColor = '#00ffcc';
+              ctx.shadowBlur = 12;
+              // Top Wing Tip
+              ctx.beginPath();
+              ctx.moveTo(player.size / 2 + 10, -22);
+              ctx.lineTo(player.size / 2 + 24, -30);
+              ctx.lineTo(player.size / 2 + 16, -18);
+              ctx.closePath();
+              ctx.fill();
+              // Bottom Wing Tip
+              ctx.beginPath();
+              ctx.moveTo(player.size / 2 + 10, 22);
+              ctx.lineTo(player.size / 2 + 24, 30);
+              ctx.lineTo(player.size / 2 + 16, 18);
+              ctx.closePath();
+              ctx.fill();
+            }
+
             // Golden Bow Riser / Handle Grip
             ctx.fillStyle = '#ffe600';
             ctx.shadowColor = '#ffe600';
@@ -5484,7 +5531,7 @@
             ctx.fillRect(player.size / 2 + 10, -5, 6, 10);
 
             // Bowstring
-            ctx.strokeStyle = '#ffffff';
+            ctx.strokeStyle = player.character === 'WIND_ARCHER' ? '#00ffcc' : '#ffffff';
             ctx.lineWidth = 1.8;
             ctx.beginPath();
             const topTipX = player.size / 2 - 2 + Math.cos(-Math.PI / 2.6) * 26;
@@ -5500,8 +5547,8 @@
             ctx.stroke();
 
             // Drawn Arrow Shaft on Bowstring
-            ctx.fillStyle = '#00ff66';
-            ctx.shadowColor = '#00ff66';
+            ctx.fillStyle = bowColor;
+            ctx.shadowColor = bowColor;
             ctx.shadowBlur = 12;
             ctx.fillRect(notchX, -2, 28, 4);
 
@@ -5515,15 +5562,23 @@
 
             ctx.restore();
 
-            // Bomb Cooldown Bar below player
+            // Cooldown Bar below player
             ctx.save();
             ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
             ctx.fillRect(-22, player.size / 2 + 10, 44, 6);
-            const cdPct = player.archerBombCooldown > 0 ? (1 - player.archerBombCooldown / player.maxArcherBombCooldown) : 1;
-            ctx.fillStyle = cdPct >= 1 ? '#00ff66' : '#ff9900';
-            ctx.shadowColor = '#00ff66';
-            ctx.shadowBlur = cdPct >= 1 ? 10 : 0;
-            ctx.fillRect(-20, player.size / 2 + 11, 40 * cdPct, 4);
+            if (player.character === 'WIND_ARCHER') {
+              const cdPct = player.windGaleCooldown > 0 ? (1 - player.windGaleCooldown / (player.maxWindGaleCooldown || 360)) : 1;
+              ctx.fillStyle = cdPct >= 1 ? '#39ff14' : '#ff9900';
+              ctx.shadowColor = '#39ff14';
+              ctx.shadowBlur = cdPct >= 1 ? 10 : 0;
+              ctx.fillRect(-20, player.size / 2 + 11, 40 * cdPct, 4);
+            } else {
+              const cdPct = player.archerBombCooldown > 0 ? (1 - player.archerBombCooldown / player.maxArcherBombCooldown) : 1;
+              ctx.fillStyle = cdPct >= 1 ? (player.character === 'FROZEN_ARCHER' ? '#00f0ff' : '#00ff66') : '#ff9900';
+              ctx.shadowColor = player.character === 'FROZEN_ARCHER' ? '#00f0ff' : '#00ff66';
+              ctx.shadowBlur = cdPct >= 1 ? 10 : 0;
+              ctx.fillRect(-20, player.size / 2 + 11, 40 * cdPct, 4);
+            }
             ctx.restore();
             ctx.shadowBlur = 0;
             ctx.shadowColor = 'rgba(0, 0, 0, 0)';
@@ -5610,17 +5665,6 @@
             const cdPct = player.rpgCooldown > 0 ? (1 - player.rpgCooldown / (player.maxRPGCooldown || 300)) : 1;
             ctx.fillStyle = cdPct >= 1 ? '#ff6600' : '#ff9900';
             ctx.shadowColor = '#ff6600';
-            ctx.shadowBlur = cdPct >= 1 ? 10 : 0;
-            ctx.fillRect(-20, player.size / 2 + 11, 40 * cdPct, 4);
-            ctx.restore();
-          } else if (player.character === 'WIND_ARCHER') {
-            // Draw Gale Wave Cooldown Bar for Wind Archer
-            ctx.save();
-            ctx.fillStyle = 'rgba(0, 0, 0, 0.6)';
-            ctx.fillRect(-22, player.size / 2 + 10, 44, 6);
-            const cdPct = player.windGaleCooldown > 0 ? (1 - player.windGaleCooldown / (player.maxWindGaleCooldown || 360)) : 1;
-            ctx.fillStyle = cdPct >= 1 ? '#39ff14' : '#ff9900';
-            ctx.shadowColor = '#39ff14';
             ctx.shadowBlur = cdPct >= 1 ? 10 : 0;
             ctx.fillRect(-20, player.size / 2 + 11, 40 * cdPct, 4);
             ctx.restore();
