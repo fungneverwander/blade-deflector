@@ -4317,18 +4317,20 @@
         p.x += p.vx;
         p.y += p.vy;
 
-        // Wind Archer Passive Arrow Proximity Knockback: Pushes all nearby enemies away from flying arrows!
+        // Wind Archer Passive Arrow Proximity Knockback: Pushes all nearby enemies forward & away from player (No backfire)!
         if (player.character === 'WIND_ARCHER' && p.isArrow) {
+          const arrowFlyAngle = p.angle || Math.atan2(p.vy, p.vx);
           for (let k = 0; k < enemies.length; k++) {
             const e = enemies[k];
             const edx = e.x - p.x;
             const edy = e.y - p.y;
             const edist = Math.sqrt(edx * edx + edy * edy);
             if (edist <= 85) {
-              const pushAngle = Math.atan2(edy, edx);
-              const pushForce = Math.max(5.0, 18 - edist * 0.18);
-              e.x += Math.cos(pushAngle) * pushForce;
-              e.y += Math.sin(pushAngle) * pushForce;
+              const fromPlayerAngle = Math.atan2(e.y - player.y, e.x - player.x);
+              const pushForce = Math.max(4.5, 16 - edist * 0.16);
+              // Combine 65% arrow flight momentum + 35% away-from-player vector (Never backfires towards player!)
+              e.x += (Math.cos(arrowFlyAngle) * 0.65 + Math.cos(fromPlayerAngle) * 0.35) * pushForce;
+              e.y += (Math.sin(arrowFlyAngle) * 0.65 + Math.sin(fromPlayerAngle) * 0.35) * pushForce;
               if (Math.random() < 0.25) {
                 createSparks(e.x, e.y, 4, '#39ff14', 4);
               }
@@ -4433,9 +4435,9 @@
             const edy = e.y - p.y;
             if (Math.sqrt(edx * edx + edy * edy) < e.size / 2 + p.radius) {
               if (player.character === 'WIND_ARCHER' && p.isArrow) {
-                const kAngle = Math.atan2(e.y - p.y, e.x - p.x);
-                e.x += Math.cos(kAngle) * 55;
-                e.y += Math.sin(kAngle) * 55;
+                const arrowFlyAngle = p.angle || Math.atan2(p.vy, p.vx) || Math.atan2(e.y - player.y, e.x - player.x);
+                e.x += Math.cos(arrowFlyAngle) * 55;
+                e.y += Math.sin(arrowFlyAngle) * 55;
                 createSparks(e.x, e.y, 14, '#39ff14', 6);
                 addFloatingText('🍃 GALE IMPACT!', e.x, e.y - 30, '#39ff14');
               }
