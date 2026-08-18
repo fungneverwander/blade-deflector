@@ -1574,12 +1574,17 @@
     });
 
     window.addEventListener('mousedown', (e) => {
-      if (e.button === 0 && gameState === 'PLAYING') {
-        if (!keys['Space']) {
-          spaceDownTime = performance.now();
-          spaceWasTapped = true;
-          spaceIsHeld = true;
-          keys['Space'] = true;
+      if (audio && typeof audio.init === 'function') audio.init();
+      if (gameState === 'PLAYING') {
+        if (e.button === 0) {
+          if (!keys['Space']) {
+            spaceDownTime = performance.now();
+            spaceWasTapped = true;
+            spaceIsHeld = true;
+            keys['Space'] = true;
+          }
+        } else if (e.button === 2) {
+          e.preventDefault(); // Prevents context menu so keys don't freeze!
         }
       }
     });
@@ -1592,13 +1597,18 @@
       }
     });
 
+    window.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      return false;
+    });
+
     window.addEventListener('keydown', (e) => {
       if (e.code === 'Digit1' || e.code === 'Numpad1' || e.key === '1') {
         iceWaveRequested = true;
       }
       if (e.code === 'ShiftLeft' || e.code === 'ShiftRight' || e.code === 'KeyE') {
         if (gameState === 'PLAYING') {
-          spaceWasTapped = true; // Trigger Sentinel Dash / Abilities on Shift / E
+          spaceWasTapped = true; // Trigger Sentinel Dash / Shotgun Heavy Slug on Shift / E
         }
       }
       if (e.code === 'Space') {
